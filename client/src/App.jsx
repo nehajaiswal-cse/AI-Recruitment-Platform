@@ -1,8 +1,27 @@
-import React from 'react'
+//import React from 'react'
+
+import './index.css';
+import {Routes, Route} from 'react-router-dom';
+import ADashboard from './pages/applicant/Dashboard';
+import RDashboard from './pages/recruiter/Dashboard';
+import NotFound from './pages/NotFound';
+
 export default function App() {
   return (
     <div>
-       AI-Recruitment-Platform
+      <Routes>
+        {/* <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} /> */}
+
+        <Route path="/" element={<ADashboard />} />
+        <Route path="/recruiter" element={<RDashboard />} />
+        <Route path="*" element={<NotFound />} />
+        
+      </Routes>
+
+     
+       
     </div>
   )
 }
