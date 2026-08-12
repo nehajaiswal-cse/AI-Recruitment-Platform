@@ -2,8 +2,11 @@
 import RNavbar from '../../components/layout/recuriter/Navbar';
 import RSidebar from '../../components/layout/recuriter/Sidebar';
 import Topbar from '../../components/layout/recuriter/Topbar';
-// import StatsCards from '../../components/sections/StatsCards';
-// import HiringPipelines from '../../components/sections/HiringPipelines';
+import StatsCards from '../../components/sections/StatsCards';
+import ApplicationTrend from '../../components/sections/ApplicationTrend';
+import HiringPipelines from '../../components/sections/HiringPipelines';
+import RecentApplications from '../../components/sections/RecentApplication';
+import UpcomingInterviews from '../../components/sections/UpcomingInterviews';
 
 const RDashboard = () => {
   return (
@@ -32,10 +35,18 @@ const RDashboard = () => {
             Welcome to your dashboard
            </p>
 
-          {/* <div className="mt-6">
+          <div className="mt-6 flex flex-col gap-6">
            <StatsCards />
+           <ApplicationTrend />
            <HiringPipelines />
-          </div> */}
+           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+              <RecentApplications />
+
+              <UpcomingInterviews />
+
+            </div>
+          </div>
         </div>
       </main>
 
