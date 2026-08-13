@@ -12,6 +12,7 @@ app.use(express.json());
 app.use("/api", protectedRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
+app.use("/uploads", express.static("uploads"));
 
 app.get("/home", (req, res) => {
   res.json({

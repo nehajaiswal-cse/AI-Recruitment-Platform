@@ -15,7 +15,14 @@ const applicationSchema = new mongoose.Schema(
     },
 
     resume: {
-      type: String
+      fileName: {
+        type: String,
+        required: true
+      },
+      fileUrl: {
+        type: String,
+        required: true
+      }
     },
 
     coverLetter: {

@@ -3,9 +3,14 @@ import Job from "../models/job.js";
 
 const applyForJob = async (req, res) => {
   try {
-    const { jobId, resume, coverLetter } = req.body;
+    const { jobId, coverLetter } = req.body;
 
-    // Check if job exists
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Resume file is required"
+      });
+    }
+
     const job = await Job.findById(jobId);
 
     if (!job) {
@@ -14,7 +19,6 @@ const applyForJob = async (req, res) => {
       });
     }
 
-    // Check if already applied
     const existingApplication = await Application.findOne({
       jobId,
       applicantId: req.user.id
@@ -26,11 +30,13 @@ const applyForJob = async (req, res) => {
       });
     }
 
-    // Create application
     const application = await Application.create({
       jobId,
       applicantId: req.user.id,
-      resume,
+      resume: {
+        fileName: req.file.originalname,
+        fileUrl: `/uploads/${req.file.filename}`
+      },
       coverLetter
     });
 
