@@ -13,7 +13,7 @@ export default function App() {
       <Routes>
          <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} /> */}
+       {/* <Route path="/forgot-password" element={<ForgotPassword />} />  */}
          <Route path="/applicant" element={<ADashboard />} />
         <Route path="/" element={<Home/>} />
         <Route path="/recruiter" element={<RDashboard />} />
