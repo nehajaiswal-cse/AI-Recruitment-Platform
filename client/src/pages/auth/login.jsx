@@ -12,8 +12,9 @@ import {
   FiUserCheck,
   FiCpu,
 } from "react-icons/fi";
+import Navbar from "../../components/dashboard/Navbar";
 import Logo from "../../components/common/Logo";
-import { loginUser } from "../../api/authApi";
+//import { loginUser } from "../../api/authApi";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -71,19 +72,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gray-700 text-white flex flex-col justify-between">
-      {/* Header Bar matching Dashboard Navbar */}
-      <header className="bg-gray-800 min-h-20 shadow-xl border-b-2 border-gray-600 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        <Logo />
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-300 hidden sm:inline">New to Talvyn?</span>
-          <Link
-            to="/register"
-            className="px-4 py-2 text-sm font-semibold text-white bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 hover:text-amber-300 transition"
-          >
-            Create Account
-          </Link>
-        </div>
-      </header>
+      <Navbar></Navbar>
 
       {/* Main Content Area */}
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
@@ -141,7 +130,6 @@ const Login = () => {
                 </p>
               </div>
 
-              {/* Alert Feedback */}
               {error && (
                 <div className="mb-5 p-4 rounded-xl bg-red-900/40 border border-red-500/50 text-red-200 text-sm flex items-start gap-3">
                   <FiAlertCircle className="text-lg shrink-0 mt-0.5 text-red-400" />
@@ -241,28 +229,7 @@ const Login = () => {
                 </button>
               </form>
 
-              {/* Demo Login Shortcuts */}
-              <div className="mt-6 pt-6 border-t border-gray-600">
-                <p className="text-xs text-center text-gray-300 mb-3 font-medium">
-                  Quick Fill Demo Credentials:
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => handleDemoLogin("applicant")}
-                    className="py-2.5 px-3 bg-gray-900 hover:bg-gray-700 border border-gray-600 rounded-lg text-xs font-medium text-gray-200 hover:text-amber-300 transition flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <FiUserCheck className="text-blue-400" /> Applicant Demo
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDemoLogin("recruiter")}
-                    className="py-2.5 px-3 bg-gray-900 hover:bg-gray-700 border border-gray-600 rounded-lg text-xs font-medium text-gray-200 hover:text-amber-300 transition flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <FiBriefcase className="text-purple-400" /> Recruiter Demo
-                  </button>
-                </div>
-              </div>
+             
 
               {/* Footer Register Link */}
               <div className="mt-6 text-center text-sm text-gray-300">

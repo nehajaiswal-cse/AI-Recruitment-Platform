@@ -13,8 +13,9 @@ import {
   FiUserCheck,
   FiCheck,
 } from "react-icons/fi";
+import Navbar from "../../components/dashboard/Navbar";
 import Logo from "../../components/common/Logo";
-import { registerUser } from "../../api/authApi";
+//import { registerUser } from "../../api/authApi";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -93,19 +94,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gray-700 text-white flex flex-col justify-between">
-      {/* Header Bar matching Dashboard Navbar */}
-      <header className="bg-gray-800 min-h-20 shadow-xl border-b-2 border-gray-600 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        <Logo />
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-300 hidden sm:inline">Already have an account?</span>
-          <Link
-            to="/login"
-            className="px-4 py-2 text-sm font-semibold text-white bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 hover:text-amber-300 transition"
-          >
-            Sign In
-          </Link>
-        </div>
-      </header>
+     <Navbar />
 
       {/* Main Container */}
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
