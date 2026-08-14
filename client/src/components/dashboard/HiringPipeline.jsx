@@ -1,144 +1,232 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 
 const pipelineData = [
   {
-    id: "applied",
-    title: "Applied",
+    id: 'applied',
+    title: 'Applied',
     count: 154,
     percentage: 55,
-    color: "bg-blue-500",
-    textColor: "text-blue-700",
-    bgColor: "bg-blue-50",
+    color: '#3b82f6',
   },
   {
-    id: "shortlisted",
-    title: "Shortlisted",
+    id: 'shortlisted',
+    title: 'Shortlisted',
     count: 62,
     percentage: 22,
-    color: "bg-orange-500",
-    textColor: "text-orange-700",
-    bgColor: "bg-orange-50",
+    color: '#f59e0b',
   },
   {
-    id: "interview",
-    title: "Interview",
+    id: 'interview',
+    title: 'Interview',
     count: 18,
     percentage: 6,
-    color: "bg-purple-500",
-    textColor: "text-purple-700",
-    bgColor: "bg-purple-50",
+    color: '#9333ea',
   },
   {
-    id: "selected",
-    title: "Selected",
+    id: 'selected',
+    title: 'Selected',
     count: 6,
     percentage: 2,
-    color: "bg-emerald-500",
-    textColor: "text-emerald-700",
-    bgColor: "bg-emerald-50",
+    color: '#10b981',
   },
   {
-    id: "rejected",
-    title: "Rejected",
+    id: 'rejected',
+    title: 'Rejected',
     count: 41,
     percentage: 15,
-    color: "bg-rose-500",
-    textColor: "text-rose-700",
-    bgColor: "bg-rose-50",
+    color: '#f43f5e',
   },
-];
+]
 
 const HiringPipeline = () => {
+  //const theme = useTheme()
+
   const totalCandidates = pipelineData.reduce(
     (total, stage) => total + stage.count,
     0
-  );
+  )
 
   return (
-    <section className="bg-gray-600 rounded-xl p-6">
-
+    <Box
+      sx={{
+        bgcolor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 3,
+        p: {
+          xs: 2,
+          sm: 3,
+          md: 4,
+        },
+      }}
+    >
       {/* Header */}
-      <div className="flex items-start justify-between">
-
-        <div>
-          <h2 className="text-2xl font-semibold text-white">
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: {
+            xs: 'flex-start',
+            sm: 'center',
+          },
+          justifyContent: 'space-between',
+          gap: 2,
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              color: 'text.primary',
+            }}
+          >
             Hiring Pipeline
-          </h2>
+          </Typography>
 
-          <p className="text-md text-gray-100 mt-1">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mt: 0.5,
+            }}
+          >
             {totalCandidates} total candidates
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        <Link
+        <Box
+          component={Link}
           to="/recruiter/pipeline"
-          className="text-blue-600 text-lg font-medium hover:text-blue-700"
+          sx={{
+            color: 'primary.main',
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+
+            '&:hover': {
+              textDecoration: 'underline',
+            },
+          }}
         >
           View all
-        </Link>
-
-      </div>
-
+        </Box>
+      </Box>
 
       {/* Pipeline Progress Bar */}
-      <div className="flex h-5 overflow-hidden rounded-full mt-8 mb-8">
-
+      <Box
+        sx={{
+          display: 'flex',
+          height: 20,
+          overflow: 'hidden',
+          borderRadius: 999,
+          mt: 4,
+          mb: 4,
+          bgcolor: 'action.hover',
+        }}
+      >
         {pipelineData.map((stage) => (
-          <div
+          <Box
             key={stage.id}
-            className={`${stage.color}`}
-            style={{
+            sx={{
               width: `${stage.percentage}%`,
+              bgcolor: stage.color,
+              transition: 'width 0.3s ease',
             }}
           />
         ))}
-
-      </div>
-
+      </Box>
 
       {/* Pipeline Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: '1fr 1fr',
+            lg: 'repeat(3, 1fr)',
+          },
+          gap: 2,
+        }}
+      >
         {pipelineData.map((stage) => (
-          <div
+          <Box
             key={stage.id}
-            className={`${stage.bgColor} rounded-2xl p-6 min-h-41.25`}
+            sx={{
+              bgcolor: alpha(stage.color, 0.10),
+              border: '1px solid',
+              borderColor: alpha(stage.color, 0.20),
+              borderRadius: 3,
+              p: 3,
+              minHeight: 165,
+
+              transition: 'all 0.2s ease',
+
+              '&:hover': {
+                bgcolor: alpha(stage.color, 0.15),
+                transform: 'translateY(-2px)',
+              },
+            }}
           >
-
             {/* Title */}
-            <div className="flex items-center gap-3">
-
-              <span
-                className={`w-4 h-4 rounded-full ${stage.color}`}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: '50%',
+                  bgcolor: stage.color,
+                  flexShrink: 0,
+                }}
               />
 
-              <h3 className="text-lg font-medium text-gray-700">
+              <Typography
+                sx={{
+                  color: 'text.primary',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                }}
+              >
                 {stage.title}
-              </h3>
-
-            </div>
-
+              </Typography>
+            </Box>
 
             {/* Count */}
-            <p
-              className={`text-4xl font-bold mt-5 ${stage.textColor}`}
+            <Typography
+              sx={{
+                color: stage.color,
+                fontSize: '2.25rem',
+                fontWeight: 700,
+                mt: 2,
+              }}
             >
               {stage.count}
-            </p>
-
+            </Typography>
 
             {/* Percentage */}
-            <p className="text-base text-gray-400 mt-1">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mt: 0.5,
+              }}
+            >
               {stage.percentage}% of total
-            </p>
-
-          </div>
+            </Typography>
+          </Box>
         ))}
+      </Box>
+    </Box>
+  )
+}
 
-      </div>
-
-    </section>
-  );
-};
-
-export default HiringPipeline;
+export default HiringPipeline

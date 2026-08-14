@@ -1,4 +1,3 @@
-
 import {
   ResponsiveContainer,
   AreaChart,
@@ -8,120 +7,192 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-} from "recharts";
+} from 'recharts'
+
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 
 const applicationData = [
   {
-    month: "Jan",
+    month: 'Jan',
     applied: 42,
     shortlisted: 12,
     hired: 3,
   },
   {
-    month: "Feb",
+    month: 'Feb',
     applied: 62,
     shortlisted: 18,
     hired: 5,
   },
   {
-    month: "Mar",
+    month: 'Mar',
     applied: 58,
     shortlisted: 15,
     hired: 4,
   },
   {
-    month: "Apr",
+    month: 'Apr',
     applied: 78,
     shortlisted: 22,
     hired: 7,
   },
   {
-    month: "May",
+    month: 'May',
     applied: 95,
     shortlisted: 28,
     hired: 9,
   },
   {
-    month: "Jun",
+    month: 'Jun',
     applied: 110,
     shortlisted: 32,
     hired: 11,
   },
   {
-    month: "Jul",
+    month: 'Jul',
     applied: 98,
     shortlisted: 26,
     hired: 8,
   },
   {
-    month: "Aug",
+    month: 'Aug',
     applied: 124,
     shortlisted: 35,
     hired: 14,
   },
-];
+]
 
 const ApplicationTrend = () => {
+  const theme = useTheme()
+
+  const colors = {
+    applied: '#3b82f6',
+    shortlisted: '#f59e0b',
+    hired: '#10b981',
+  }
+
   return (
-    <section className="bg-gray-600 rounded-2xl p-6 md:p-8">
-
-      {/* ================= HEADER ================= */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 mb-8">
-
-        {/* Title */}
-        <div>
-          <h2 className="text-2xl font-semibold text-white">
+    <Box
+      sx={{
+        bgcolor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 3,
+        p: {
+          xs: 2,
+          sm: 3,
+          md: 4,
+        },
+      }}
+    >
+      {/* Header */}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: {
+            xs: 'column',
+            md: 'row',
+          },
+          alignItems: {
+            xs: 'flex-start',
+            md: 'center',
+          },
+          justifyContent: 'space-between',
+          gap: 3,
+          mb: 4,
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              color: 'text.primary',
+            }}
+          >
             Application Trend
-          </h2>
+          </Typography>
 
-          <p className="text-gray-300 mt-1">
+          <Typography
+            sx={{
+              color: 'text.secondary',
+              mt: 0.5,
+            }}
+          >
             Monthly hiring overview
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
+        {/* Legend */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: {
+              xs: 2,
+              sm: 3,
+            },
+          }}
+        >
+          {[
+            {
+              label: 'Applied',
+              color: colors.applied,
+            },
+            {
+              label: 'Shortlisted',
+              color: colors.shortlisted,
+            },
+            {
+              label: 'Hired',
+              color: colors.hired,
+            },
+          ].map((item) => (
+            <Box
+              key={item.label}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  bgcolor: item.color,
+                }}
+              />
 
-        {/* ================= LEGEND ================= */}
-        <div className="flex flex-wrap items-center gap-5">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  fontWeight: 600,
+                }}
+              >
+                {item.label}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
 
-          {/* Applied */}
-          <div className="flex items-center gap-2">
-            <span className="w-3.5 h-3.5 rounded-full bg-blue-500" />
-
-            <span className="text-gray-100 text-sm font-medium">
-              Applied
-            </span>
-          </div>
-
-
-          {/* Shortlisted */}
-          <div className="flex items-center gap-2">
-            <span className="w-3.5 h-3.5 rounded-full bg-orange-500" />
-
-            <span className="text-gray-100 text-sm font-medium">
-              Shortlisted
-            </span>
-          </div>
-
-
-          {/* Hired */}
-          <div className="flex items-center gap-2">
-            <span className="w-3.5 h-3.5 rounded-full bg-emerald-500" />
-
-            <span className="text-gray-100 text-sm font-medium">
-              Hired
-            </span>
-          </div>
-
-        </div>
-
-      </div>
-
-
-      {/* ================= CHART ================= */}
-      <div className="w-full h-87.5">
-
+      {/* Chart */}
+      <Box
+        sx={{
+          width: '100%',
+          height: {
+            xs: 280,
+            sm: 320,
+            md: 350,
+          },
+        }}
+      >
         <ResponsiveContainer width="100%" height="100%">
-
           <AreaChart
             data={applicationData}
             margin={{
@@ -131,11 +202,8 @@ const ApplicationTrend = () => {
               bottom: 10,
             }}
           >
-
-            {/* ================= GRADIENTS ================= */}
+            {/* Gradients */}
             <defs>
-
-              {/* Blue */}
               <linearGradient
                 id="appliedGradient"
                 x1="0"
@@ -145,19 +213,17 @@ const ApplicationTrend = () => {
               >
                 <stop
                   offset="0%"
-                  stopColor="#3b82f6"
+                  stopColor={colors.applied}
                   stopOpacity={0.35}
                 />
 
                 <stop
                   offset="100%"
-                  stopColor="#3b82f6"
+                  stopColor={colors.applied}
                   stopOpacity={0.02}
                 />
               </linearGradient>
 
-
-              {/* Orange */}
               <linearGradient
                 id="shortlistedGradient"
                 x1="0"
@@ -167,19 +233,17 @@ const ApplicationTrend = () => {
               >
                 <stop
                   offset="0%"
-                  stopColor="#f59e0b"
+                  stopColor={colors.shortlisted}
                   stopOpacity={0.25}
                 />
 
                 <stop
                   offset="100%"
-                  stopColor="#f59e0b"
+                  stopColor={colors.shortlisted}
                   stopOpacity={0.02}
                 />
               </linearGradient>
 
-
-              {/* Green */}
               <linearGradient
                 id="hiredGradient"
                 x1="0"
@@ -189,68 +253,64 @@ const ApplicationTrend = () => {
               >
                 <stop
                   offset="0%"
-                  stopColor="#10b981"
+                  stopColor={colors.hired}
                   stopOpacity={0.25}
                 />
 
                 <stop
                   offset="100%"
-                  stopColor="#10b981"
+                  stopColor={colors.hired}
                   stopOpacity={0.02}
                 />
               </linearGradient>
-
             </defs>
 
-
-            {/* ================= GRID ================= */}
+            {/* Grid */}
             <CartesianGrid
-              stroke="#9ca3af"
-              strokeOpacity={0.2}
+              stroke={theme.palette.divider}
+              strokeOpacity={1}
               vertical={false}
             />
 
-
-            {/* ================= X AXIS ================= */}
+            {/* X Axis */}
             <XAxis
               dataKey="month"
               axisLine={false}
               tickLine={false}
               tick={{
-                fill: "#d1d5db",
+                fill: theme.palette.text.secondary,
                 fontSize: 14,
               }}
             />
 
-
-            {/* ================= Y AXIS ================= */}
+            {/* Y Axis */}
             <YAxis
               axisLine={false}
               tickLine={false}
               tick={{
-                fill: "#d1d5db",
+                fill: theme.palette.text.secondary,
                 fontSize: 14,
               }}
               domain={[0, 125]}
             />
 
-
-            {/* ================= TOOLTIP ================= */}
+            {/* Tooltip */}
             <Tooltip
               contentStyle={{
-                backgroundColor: "#374151",
-                border: "1px solid #6b7280",
-                borderRadius: "10px",
-                color: "#ffffff",
+                backgroundColor: theme.palette.background.paper,
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: '10px',
+                color: theme.palette.text.primary,
               }}
               labelStyle={{
-                color: "#ffffff",
+                color: theme.palette.text.primary,
+              }}
+              itemStyle={{
+                color: theme.palette.text.secondary,
               }}
             />
 
-
-            {/* ================= AREA SHADOWS ================= */}
-
+            {/* Areas */}
             <Area
               type="monotone"
               dataKey="applied"
@@ -272,80 +332,70 @@ const ApplicationTrend = () => {
               fill="url(#hiredGradient)"
             />
 
-
-            {/* ================= APPLIED ================= */}
-
+            {/* Applied */}
             <Line
               type="monotone"
               dataKey="applied"
-              stroke="#3b82f6"
+              stroke={colors.applied}
               strokeWidth={3}
               dot={{
                 r: 5,
-                fill: "#4b5563",
-                stroke: "#3b82f6",
+                fill: theme.palette.background.paper,
+                stroke: colors.applied,
                 strokeWidth: 3,
               }}
               activeDot={{
                 r: 7,
-                fill: "#3b82f6",
-                stroke: "#ffffff",
+                fill: colors.applied,
+                stroke: theme.palette.background.paper,
                 strokeWidth: 2,
               }}
             />
 
-
-            {/* ================= SHORTLISTED ================= */}
-
+            {/* Shortlisted */}
             <Line
               type="monotone"
               dataKey="shortlisted"
-              stroke="#f59e0b"
+              stroke={colors.shortlisted}
               strokeWidth={3}
               dot={{
                 r: 5,
-                fill: "#4b5563",
-                stroke: "#f59e0b",
+                fill: theme.palette.background.paper,
+                stroke: colors.shortlisted,
                 strokeWidth: 3,
               }}
               activeDot={{
                 r: 7,
-                fill: "#f59e0b",
-                stroke: "#ffffff",
+                fill: colors.shortlisted,
+                stroke: theme.palette.background.paper,
                 strokeWidth: 2,
               }}
             />
 
-
-            {/* ================= HIRED ================= */}
-
+            {/* Hired */}
             <Line
               type="monotone"
               dataKey="hired"
-              stroke="#10b981"
+              stroke={colors.hired}
               strokeWidth={3}
               dot={{
                 r: 5,
-                fill: "#4b5563",
-                stroke: "#10b981",
+                fill: theme.palette.background.paper,
+                stroke: colors.hired,
                 strokeWidth: 3,
               }}
               activeDot={{
                 r: 7,
-                fill: "#10b981",
-                stroke: "#ffffff",
+                fill: colors.hired,
+                stroke: theme.palette.background.paper,
                 strokeWidth: 2,
               }}
             />
-
           </AreaChart>
-
         </ResponsiveContainer>
+      </Box>
+    </Box>
+  )
+}
 
-      </div>
-
-    </section>
-  );
-};
-
-export default ApplicationTrend;
+export default ApplicationTrend
