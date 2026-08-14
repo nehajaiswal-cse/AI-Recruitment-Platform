@@ -1,7 +1,6 @@
 
-import "../../../index.css";
-import Navbar from "../../dashboard/Navbar.jsx";
-
+import "../../../index.css"
+import Navbar from "../../dashboard/Navbar.jsx"
 
 const recruiterLinks = [
   {
@@ -32,17 +31,15 @@ const recruiterLinks = [
     label: "Logout",
     path: "/recruiter/logout",
   },
-];
+]
 
-
-
-const RNavbar = () => {
+const RNavbar = ({ onSidebarToggle }) => {
   return (
-    <div>
-      <Navbar links={recruiterLinks} />
-    </div>
-  );
-};
+    <Navbar
+      links={recruiterLinks}
+      onSidebarToggle={onSidebarToggle}
+    />
+  )
+}
 
-export default RNavbar;
-
+export default RNavbar

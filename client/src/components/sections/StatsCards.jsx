@@ -1,42 +1,61 @@
-import StatsCard from "../dashboard/StatsCard";
+import Box from '@mui/material/Box'
+
+import StatsCard from '../dashboard/StatsCard'
 
 const StatsCards = () => {
   return (
-    
-      <div className="bg-gray-600 rounded-xl p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+    <Box
+      sx={{
+        bgcolor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 3,
+        p: {
+          xs: 2,
+          sm: 2.5,
+          md: 3,
+        },
 
-        <StatsCard
-          title="Total Jobs"
-          value="24"
-          icon="💼"
-          description="5 active jobs"
-        />
+        display: 'grid',
 
-        <StatsCard
-          title="Applications"
-          value="281"
-          icon="📄"
-          description="12 new this week"
-        />
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: '1fr 1fr',
+          lg: 'repeat(4, 1fr)',
+        },
 
-        <StatsCard
-          title="Interviews"
-          value="18"
-          icon="📅"
-          description="4 scheduled today"
-        />
+        gap: 2,
+      }}
+    >
+      <StatsCard
+        title="Total Jobs"
+        value="24"
+        icon="💼"
+        description="5 active jobs"
+      />
 
-        <StatsCard
-          title="Selected"
-          value="6"
-          icon="🎯"
-          description="This month"
-        />
+      <StatsCard
+        title="Applications"
+        value="281"
+        icon="📄"
+        description="12 new this week"
+      />
 
-      </div>
+      <StatsCard
+        title="Interviews"
+        value="18"
+        icon="📅"
+        description="4 scheduled today"
+      />
 
+      <StatsCard
+        title="Selected"
+        value="6"
+        icon="🎯"
+        description="This month"
+      />
+    </Box>
+  )
+}
 
-  );
-};
-
-export default StatsCards;
+export default StatsCards

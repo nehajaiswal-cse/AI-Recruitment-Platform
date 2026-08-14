@@ -1,139 +1,259 @@
-import { FiClock, FiVideo } from "react-icons/fi";
+
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
+import { FiClock, FiVideo } from 'react-icons/fi'
 
 const interviews = [
   {
     id: 1,
-    name: "Priya Sharma",
-    role: "Senior Frontend Engineer",
-    initials: "PS",
-    color: "bg-rose-500",
-    date: "Today",
-    time: "10:00 AM",
-    type: "Technical Round",
+    name: 'Priya Sharma',
+    role: 'Senior Frontend Engineer',
+    initials: 'PS',
+    color: '#f43f5e',
+    date: 'Today',
+    time: '10:00 AM',
+    type: 'Technical Round',
   },
   {
     id: 2,
-    name: "Karthik Rao",
-    role: "Product Manager",
-    initials: "KR",
-    color: "bg-blue-500",
-    date: "Today",
-    time: "2:30 PM",
-    type: "HR Round",
+    name: 'Karthik Rao',
+    role: 'Product Manager',
+    initials: 'KR',
+    color: '#3b82f6',
+    date: 'Today',
+    time: '2:30 PM',
+    type: 'HR Round',
   },
   {
     id: 3,
-    name: "Meera Nair",
-    role: "UX Researcher",
-    initials: "MN",
-    color: "bg-emerald-500",
-    date: "Tomorrow",
-    time: "11:00 AM",
-    type: "Portfolio Review",
+    name: 'Meera Nair',
+    role: 'UX Researcher',
+    initials: 'MN',
+    color: '#10b981',
+    date: 'Tomorrow',
+    time: '11:00 AM',
+    type: 'Portfolio Review',
   },
   {
     id: 4,
-    name: "Vikram Singh",
-    role: "Full Stack Developer",
-    initials: "VS",
-    color: "bg-orange-500",
-    date: "Tomorrow",
-    time: "4:00 PM",
-    type: "Technical Round",
+    name: 'Vikram Singh',
+    role: 'Full Stack Developer',
+    initials: 'VS',
+    color: '#f97316',
+    date: 'Tomorrow',
+    time: '4:00 PM',
+    type: 'Technical Round',
   },
-];
+]
 
 const UpcomingInterviews = () => {
   return (
-    <section className="bg-gray-600 border border-gray-500 rounded-2xl overflow-hidden">
-
+    <Box
+      sx={{
+        bgcolor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 3,
+        overflow: 'hidden',
+      }}
+    >
       {/* Header */}
-      <div className="px-8 py-6 border-b border-gray-500">
-
-        <h2 className="text-2xl font-semibold text-gray-100">
+      <Box
+        sx={{
+          px: {
+            xs: 2,
+            sm: 3,
+            md: 4,
+          },
+          py: 3,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 700,
+            color: 'text.primary',
+          }}
+        >
           Upcoming Interviews
-        </h2>
+        </Typography>
 
-        <p className="text-lg text-gray-300 mt-1">
+        <Typography
+          sx={{
+            color: 'text.secondary',
+            mt: 0.5,
+          }}
+        >
           Scheduled sessions
-        </p>
-
-      </div>
-
+        </Typography>
+      </Box>
 
       {/* Interviews */}
-      <div className="grid grid-cols-1">
+      {interviews.map((interview) => (
+        <Box
+          key={interview.id}
+          sx={{
+            px: {
+              xs: 2,
+              sm: 3,
+              md: 4,
+            },
 
-        {interviews.map((interview) => (
+            py: 3,
 
-          <div
-            key={interview.id}
-            className="px-8 py-6 border-b border-gray-500 last:border-b-0 hover:bg-gray-700 transition"
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+
+            '&:last-child': {
+              borderBottom: 0,
+            },
+
+            '&:hover': {
+              bgcolor: 'action.hover',
+            },
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: {
+                xs: 1.5,
+                sm: 2.5,
+              },
+            }}
           >
+            {/* Avatar */}
+            <Box
+              sx={{
+                width: {
+                  xs: 44,
+                  sm: 56,
+                },
+                height: {
+                  xs: 44,
+                  sm: 56,
+                },
 
-            <div className="flex items-starts gap-5">
+                borderRadius: '50%',
+                bgcolor: interview.color,
+                color: '#fff',
 
-              {/* Avatar */}
-              <div
-                className={`w-16 h-16 rounded-full ${interview.color} text-white flex items-center justify-center font-semibold text-lg shrink-0`}
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
+            >
+              {interview.initials}
+            </Box>
+
+            {/* Details */}
+            <Box
+              sx={{
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                }}
               >
-                {interview.initials}
-              </div>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography
+                    sx={{
+                      color: 'text.primary',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {interview.name}
+                  </Typography>
 
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                      mt: 0.5,
+                    }}
+                  >
+                    {interview.role}
+                  </Typography>
+                </Box>
 
-              {/* Candidate details */}
-              <div className="flex-1 min-w-0">
+                {/* Date */}
+                <Box
+                  sx={{
+                    px: 1.5,
+                    py: 0.75,
+                    borderRadius: 2,
 
-                <div className="flex items-start justify-between gap-4">
+                    bgcolor: alpha('#3b82f6', 0.12),
+                    color: '#3b82f6',
 
-                  <div>
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  {interview.date}
+                </Box>
+              </Box>
 
-                    <h3 className="text-xl font-medium text-gray-100">
-                      {interview.name}
-                    </h3>
+              {/* Time + Type */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  gap: {
+                    xs: 2,
+                    sm: 3,
+                  },
 
-                    <p className="text-base text-gray-300 mt-1">
-                      {interview.role}
-                    </p>
+                  mt: 2,
 
-                  </div>
+                  color: 'text.secondary',
+                  fontSize: '0.9rem',
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                  }}
+                >
+                  <FiClock />
+                  <span>{interview.time}</span>
+                </Box>
 
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                  }}
+                >
+                  <FiVideo />
+                  <span>{interview.type}</span>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  )
+}
 
-                  {/* Date */}
-                  <span className="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 text-sm font-medium whitespace-nowrap">
-                    {interview.date}
-                  </span>
-
-                </div>
-
-
-                {/* Time + Interview type */}
-                <div className="flex items-center gap-5 mt-4 text-gray-300">
-
-                  <div className="flex items-center gap-2">
-                    <FiClock />
-                    <span>{interview.time}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <FiVideo />
-                    <span>{interview.type}</span>
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
-
-    </section>
-  );
-};
-
-export default UpcomingInterviews;
+export default UpcomingInterviews
