@@ -6,6 +6,8 @@ import ADashboard from './pages/applicant/Dashboard';
 import RDashboard from './pages/recruiter/Dashboard';
 import NotFound from './pages/NotFound';
 import Home from './pages/Home';
+import Login from './pages/auth/login';
+import Register from './pages/auth/register';
 
 export default function App() {
   return (
