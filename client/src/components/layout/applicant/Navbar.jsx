@@ -29,7 +29,7 @@ const applicantLinks = [
   },
   {
     label: "Logout",
-    path: "/applicant/logout",
+    path: "/logout",
   },
 ];
 
