@@ -1,16 +1,8 @@
 
-import HiringPipeline from "../dashboard/HiringPipeline";
+import HiringPipeline from '../dashboard/HiringPipeline'
 
 const HiringPipelines = () => {
-  return (
-    <div className="p-6 space-y-6">
+  return <HiringPipeline />
+}
 
-
-      {/* Hiring Pipeline */}
-      <HiringPipeline />
-
-    </div>
-  );
-};
-
-export default HiringPipelines;
+export default HiringPipelines

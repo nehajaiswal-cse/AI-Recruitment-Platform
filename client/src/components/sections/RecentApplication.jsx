@@ -1,136 +1,268 @@
-import { FiArrowRight } from "react-icons/fi";
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
+//import { useTheme } from '@mui/material/styles'
+import { FiArrowRight } from 'react-icons/fi'
 
 const applications = [
   {
     id: 1,
-    name: "Priya Sharma",
-    role: "Senior Frontend Engineer",
-    initials: "PS",
-    color: "bg-rose-500",
-    time: "2 hours ago",
-    status: "Interview",
-    statusColor: "bg-purple-50 text-purple-700",
+    name: 'Priya Sharma',
+    role: 'Senior Frontend Engineer',
+    initials: 'PS',
+    color: '#f43f5e',
+    time: '2 hours ago',
+    status: 'Interview',
+    statusColor: '#9333ea',
   },
   {
     id: 2,
-    name: "Arjun Mehta",
-    role: "Product Designer",
-    initials: "AM",
-    color: "bg-blue-500",
-    time: "5 hours ago",
-    status: "Shortlisted",
-    statusColor: "bg-amber-50 text-amber-700",
+    name: 'Arjun Mehta',
+    role: 'Product Designer',
+    initials: 'AM',
+    color: '#3b82f6',
+    time: '5 hours ago',
+    status: 'Shortlisted',
+    statusColor: '#f59e0b',
   },
   {
     id: 3,
-    name: "Sneha Patel",
-    role: "Backend Developer",
-    initials: "SP",
-    color: "bg-emerald-500",
-    time: "1 day ago",
-    status: "Applied",
-    statusColor: "bg-slate-100 text-slate-700",
+    name: 'Sneha Patel',
+    role: 'Backend Developer',
+    initials: 'SP',
+    color: '#10b981',
+    time: '1 day ago',
+    status: 'Applied',
+    statusColor: '#64748b',
   },
   {
     id: 4,
-    name: "Rahul Verma",
-    role: "DevOps Engineer",
-    initials: "RV",
-    color: "bg-orange-500",
-    time: "1 day ago",
-    status: "Offer",
-    statusColor: "bg-emerald-50 text-emerald-700",
+    name: 'Rahul Verma',
+    role: 'DevOps Engineer',
+    initials: 'RV',
+    color: '#f97316',
+    time: '1 day ago',
+    status: 'Offer',
+    statusColor: '#10b981',
   },
   {
     id: 5,
-    name: "Ananya Iyer",
-    role: "Data Analyst",
-    initials: "AI",
-    color: "bg-violet-500",
-    time: "2 days ago",
-    status: "Applied",
-    statusColor: "bg-slate-100 text-slate-700",
+    name: 'Ananya Iyer',
+    role: 'Data Analyst',
+    initials: 'AI',
+    color: '#8b5cf6',
+    time: '2 days ago',
+    status: 'Applied',
+    statusColor: '#64748b',
   },
-];
+]
 
 const RecentApplications = () => {
+  //const theme = useTheme()
+
   return (
-    <section className="bg-gray-600 border border-gray-500 rounded-2xl overflow-hidden">
-
+    <Box
+      sx={{
+        bgcolor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 3,
+        overflow: 'hidden',
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between px-8 py-6 border-b border-gray-500">
-
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-100">
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+          px: {
+            xs: 2,
+            sm: 3,
+            md: 4,
+          },
+          py: 3,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              color: 'text.primary',
+            }}
+          >
             Recent Applications
-          </h2>
+          </Typography>
 
-          <p className="text-lg text-gray-300 mt-1">
+          <Typography
+            sx={{
+              color: 'text.secondary',
+              mt: 0.5,
+            }}
+          >
             Latest candidate submissions
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        <button className="flex items-center gap-2 text-blue-300 text-lg font-medium hover:text-blue-700">
+        <Box
+          component="button"
+          sx={{
+            border: 0,
+            background: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            color: 'primary.main',
+            fontWeight: 600,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+
+            '&:hover': {
+              opacity: 0.8,
+            },
+          }}
+        >
           View all
           <FiArrowRight />
-        </button>
-
-      </div>
-
+        </Box>
+      </Box>
 
       {/* Applications */}
-      <div>
+      {applications.map((candidate) => (
+        <Box
+          key={candidate.id}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: {
+              xs: 1.5,
+              sm: 2.5,
+            },
 
-        {applications.map((candidate) => (
+            px: {
+              xs: 2,
+              sm: 3,
+              md: 4,
+            },
 
-          <div
-            key={candidate.id}
-            className="flex items-center gap-5 px-8 py-5 border-b border-gray-500 last:border-b-0 hover:bg-gray-700 transition"
+            py: 2.5,
+
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+
+            '&:last-child': {
+              borderBottom: 0,
+            },
+
+            '&:hover': {
+              bgcolor: 'action.hover',
+            },
+          }}
+        >
+          {/* Avatar */}
+          <Box
+            sx={{
+              width: {
+                xs: 44,
+                sm: 56,
+              },
+              height: {
+                xs: 44,
+                sm: 56,
+              },
+
+              borderRadius: '50%',
+              bgcolor: candidate.color,
+              color: '#fff',
+
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+
+              fontWeight: 700,
+              flexShrink: 0,
+            }}
           >
+            {candidate.initials}
+          </Box>
 
-            {/* Avatar */}
-            <div
-              className={`w-16 h-16 rounded-full ${candidate.color} text-white flex items-center justify-center font-semibold text-lg shrink-0`}
+          {/* Candidate */}
+          <Box
+            sx={{
+              minWidth: 0,
+              flex: 1,
+            }}
+          >
+            <Typography
+              sx={{
+                color: 'text.primary',
+                fontWeight: 600,
+                fontSize: {
+                  xs: '0.95rem',
+                  sm: '1rem',
+                },
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
             >
-              {candidate.initials}
-            </div>
+              {candidate.name}
+            </Typography>
 
-
-            {/* Candidate information */}
-            <div className="min-w-0 flex-1">
-
-              <h3 className="text-xl font-medium text-gray-100">
-                {candidate.name}
-              </h3>
-
-              <p className="text-base text-gray-300 mt-1">
-                {candidate.role}
-              </p>
-
-            </div>
-
-
-            {/* Time */}
-            <p className="text-base text-gray-300 whitespace-nowrap">
-              {candidate.time}
-            </p>
-
-
-            {/* Status */}
-            <span
-              className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap ${candidate.statusColor}`}
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mt: 0.5,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
             >
-              {candidate.status}
-            </span>
+              {candidate.role}
+            </Typography>
+          </Box>
 
-          </div>
+          {/* Time */}
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              whiteSpace: 'nowrap',
+              display: {
+                xs: 'none',
+                md: 'block',
+              },
+            }}
+          >
+            {candidate.time}
+          </Typography>
 
-        ))}
+          {/* Status */}
+          <Box
+            sx={{
+              px: 1.5,
+              py: 0.75,
+              borderRadius: 2,
 
-      </div>
+              bgcolor: alpha(candidate.statusColor, 0.12),
+              color: candidate.statusColor,
 
-    </section>
-  );
-};
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {candidate.status}
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  )
+}
 
-export default RecentApplications;
+export default RecentApplications

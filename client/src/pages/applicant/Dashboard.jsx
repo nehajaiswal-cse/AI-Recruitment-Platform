@@ -1,7 +1,7 @@
 
 import Navbar from '../../components/layout/applicant/Navbar';
 import ASidebar from '../../components/layout/applicant/Sidebar';
-import Topbar from '../../components/layout/applicant/Topbar';
+//import Topbar from '../../components/layout/applicant/Topbar';
 
 
 const ADashboard = () => {
@@ -19,10 +19,10 @@ const ADashboard = () => {
       
 
    
-       <main className="w-full lg:ml-64 lg:w-[calc(100%-16rem)]">
+       {/* <main className="w-full lg:ml-64 lg:w-[calc(100%-16rem)]">
          <Topbar />
 
-        <div className="p-4 sm:p-6">
+        {/* <div className="p-4 sm:p-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-white">
            👋 Hi Applicant
           </h1>
@@ -32,8 +32,8 @@ const ADashboard = () => {
            </p>
 
           
-        </div>
-      </main>
+        </div> 
+      </main> */}
 
       </div>
     </div>
