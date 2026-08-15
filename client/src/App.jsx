@@ -12,19 +12,20 @@ import ApplicantRegister from './pages/applicant/ApplicantRegister';
 import ApplicantLogin from './pages/applicant/ApplicantLogin';
 import RecruiterLogin from './pages/recruiter/RecruiterLogin';
 import RecruiterRegister from './pages/recruiter/RecruiterRegister';
-
+import ProtectedRoute from './components/dashboard/ProtectedRoute.jsx';
 
 export default function App() {
   return (
     <div>
       <Routes>
-         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-       {/* <Route path="/forgot-password" element={<ForgotPassword />} />  */}
-        {/* <Route path="/forgot-password" element={<ForgotPassword />} />  */}
-         <Route path="/applicant" element={<ADashboard />} />
         <Route path="/" element={<Home/>} />
-        <Route path="/recruiter" element={<RDashboard />} />
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+        <Route path="/recruiter"element={<RDashboard />}/>
+        </Route>
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant"element={<ADashboard />}/>
+        </Route>
+        <Route path="/recruiter" element={<ProtectedRoute allowedRole="recruiter" />} />
         <Route path="*" element={<NotFound />} />
         <Route path="/applicant/register" element={<ApplicantRegister />} />
         <Route path="/applicant/login" element={<ApplicantLogin />} />
