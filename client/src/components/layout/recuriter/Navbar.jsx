@@ -26,16 +26,14 @@ const recruiterLinks = [
   {
     label: "Profile",
     path: "/recruiter/profile",
-  },
-  {
-    label: "Logout",
-    path: "/recruiter/logout",
-  },
+  }
+ 
 ]
 
 const RNavbar = ({ onSidebarToggle }) => {
   return (
     <Navbar
+      showLogout={true}
       links={recruiterLinks}
       onSidebarToggle={onSidebarToggle}
     />

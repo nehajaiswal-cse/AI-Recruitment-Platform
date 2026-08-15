@@ -9,11 +9,20 @@ const AuthContextProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
+      const token = localStorage.getItem("token");
+
+      // No token = no need to call /profile
+      if (!token) {
+        setLoading(false);
+        return;
+      }
       try {
         const data = await getprofile();
 
         setUser(data.user || data.data?.user || null);
       } catch (error) {
+        console.error("Authentication check failed:", error);
+        localStorage.removeItem("token");
         setUser(null);
       } finally {
         setLoading(false);
@@ -23,6 +32,7 @@ const AuthContextProvider = ({ children }) => {
     checkAuth();
   }, []);
 
+  const isAuthenticated = Boolean(user);
   return (
     <AuthContext.Provider
       value={{
