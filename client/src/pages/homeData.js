@@ -84,7 +84,7 @@ export const audiences = [
       "Build your professional profile",
     ],
     button: "Find jobs",
-    path:"/applicant"
+    path:"/applicant/login"
   },
   {
     icon: Work,
@@ -98,7 +98,7 @@ export const audiences = [
       "Manage your hiring pipeline",
     ],
     button: "Start hiring",
-    path:"/recruiter"
+    path:"/recruiter/login"
   },
 ];
 
