@@ -42,6 +42,16 @@ export const logoutUser = async () => {
   }
 };
 export const getprofile = async () => {
-  const response = await api.get("/profile");
-  return response.data;
+  try {
+    const response = await api.get("/profile");
+    return response.data;
+  } catch (error) {
+    console.error("Get profile error:", error);
+
+    throw new Error(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      "Failed to fetch profile."
+    );
+  }
 };

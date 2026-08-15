@@ -17,6 +17,14 @@ const useAuth = () => {
 
   const login = async (credentials) => {
     const data = await loginUser(credentials);
+     
+    const token =
+      data.token ||
+      data.data?.token;
+
+    if (token) {
+      localStorage.setItem("token", token);
+    }
 
     const loggedInUser =
       data.user ||
@@ -30,6 +38,14 @@ const useAuth = () => {
   const register = async (userData) => {
     const data = await registerUser(userData);
 
+    const token =
+      data.token ||
+      data.data?.token;
+
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+    
     const registeredUser =
       data.user ||
       data.data?.user;
