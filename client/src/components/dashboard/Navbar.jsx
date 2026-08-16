@@ -1,62 +1,399 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
-import Logo from "../common/Logo";
+import { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 
-const Navbar = ({ links = [] }) => {
-  const [isOpen, setIsOpen] = useState(false);
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Divider from '@mui/material/Divider'
+
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+
+import Logo from '../common/Logo.jsx'
+import ThemeToggle from '../common/ThemeToggle.jsx'
+
+const Navbar = ({
+  links = [],
+  onSidebarToggle,
+  showLogout = false,
+}) => {
+  const [anchorEl, setAnchorEl] = useState(null)
+
+  const navigate = useNavigate()
+
+  const menuOpen = Boolean(anchorEl)
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+  }
+
+  const handleLogout = () => {
+    // Remove authentication data
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+
+    // Close mobile menu
+    handleMenuClose()
+
+    // Navigate to login
+    navigate('/')
+    showLogout = false
+  }
 
   return (
-    <nav className="bg-gray-800 min-h-20 shadow-xl/30 text-white border-b-2 border-gray-600 px-4 sm:px-6 lg:px-8">
+    <AppBar
+      position="sticky"
+      elevation={0}
+      sx={{
+        bgcolor: 'background.default',
+        color: 'text.primary',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        width: '100%',
+      }}
+    >
+      <Toolbar
+        sx={{
+          height: {
+            xs: 60,
+            sm: 64,
+            md: 68,
+            lg: 72,
+          },
 
-      <div className="min-h-20 flex justify-between items-center">
+          minHeight: 'unset',
+
+          px: {
+            xs: 1,
+            sm: 2,
+            md: 3,
+            lg: 4,
+          },
+
+          gap: {
+            xs: 0.5,
+            sm: 1,
+            md: 1.5,
+          },
+
+          width: '100%',
+          boxSizing: 'border-box',
+        }}
+      >
+
+        {/* Mobile Sidebar Button */}
+        <IconButton
+          onClick={onSidebarToggle}
+          aria-label="Toggle sidebar"
+          sx={{
+            display: {
+              xs: 'inline-flex',
+              md: 'none',
+            },
+
+            color: 'text.primary',
+            flexShrink: 0,
+          }}
+        >
+          <MenuRoundedIcon />
+        </IconButton>
+
 
         {/* Logo */}
-        <Logo />
+        <Box
+          sx={{
+            flexShrink: 0,
+            minWidth: 0,
+            display: 'flex',
+            alignItems: 'center',
+
+            '& img': {
+              maxWidth: {
+                xs: 42,
+                sm: 46,
+                md: 50,
+              },
+
+              width: 'auto',
+            },
+          }}
+        >
+          <Logo />
+        </Box>
+
+
+        {/* Space */}
+        <Box sx={{ flex: 1 }} />
+
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+        <Box
+          sx={{
+            display: {
+              xs: 'none',
+              md: 'flex',
+            },
+
+            alignItems: 'center',
+
+            gap: {
+              md: 0,
+              lg: 0.5,
+              xl: 1,
+            },
+
+            mr: {
+              md: 1,
+              lg: 2,
+            },
+          }}
+        >
+
           {links.map((link) => (
-            <Link
+            <Button
               key={link.path}
+              component={NavLink}
               to={link.path}
-              className="text-lg hover:text-amber-300 transition"
+              sx={{
+                color: 'text.secondary',
+
+                fontSize: {
+                  md: '0.8rem',
+                  lg: '0.875rem',
+                  xl: '0.95rem',
+                },
+
+                px: {
+                  md: 1,
+                  lg: 1.25,
+                  xl: 1.5,
+                },
+
+                minWidth: 'auto',
+
+                '&.active': {
+                  color: 'text.primary',
+                  fontWeight: 700,
+                },
+
+                '&:hover': {
+                  color: 'text.primary',
+                  bgcolor: 'action.hover',
+                },
+              }}
             >
               {link.label}
-            </Link>
+            </Button>
           ))}
-        </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden text-3xl hover:text-amber-300 transition"
+        </Box>
+
+
+        {/* ========================= */}
+        {/* Desktop Logout */}
+        {/* ========================= */}
+
+        {showLogout && (
+          <Button
+            onClick={handleLogout}
+            startIcon={<LogoutRoundedIcon />}
+            sx={{
+              display: {
+                xs: 'none',
+                md: 'flex',
+              },
+
+              color: 'error.main',
+
+              fontSize: {
+                md: '0.8rem',
+                lg: '0.875rem',
+                xl: '0.95rem',
+              },
+
+              px: {
+                md: 1,
+                lg: 1.25,
+                xl: 1.5,
+              },
+
+              minWidth: 'auto',
+
+              borderRadius: 1.5,
+
+              '&:hover': {
+                bgcolor: 'error.main',
+                color: '#fff',
+              },
+            }}
+          >
+            Logout
+          </Button>
+        )}
+
+
+        {/* Theme Toggle */}
+        <Box
+          sx={{
+            flexShrink: 0,
+
+            display: 'flex',
+            alignItems: 'center',
+          }}
         >
-          {isOpen ? <FiX /> : <FiMenu />}
-        </button>
-      </div>
+          <ThemeToggle />
+        </Box>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="lg:hidden border-t border-gray-600 py-4">
-          <div className="flex flex-col gap-2">
 
-            {links.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className="px-4 py-3 rounded-lg hover:bg-gray-700 hover:text-amber-300 transition"
+        {/* Mobile Navigation Button */}
+        <IconButton
+          onClick={handleMenuOpen}
+          aria-label="Open navigation menu"
+          sx={{
+            display: {
+              xs: 'inline-flex',
+              md: 'none',
+            },
+
+            color: 'text.primary',
+            flexShrink: 0,
+          }}
+        >
+          <MenuRoundedIcon />
+        </IconButton>
+
+
+        {/* ========================= */}
+        {/* Mobile Navigation Menu */}
+        {/* ========================= */}
+
+        <Menu
+          anchorEl={anchorEl}
+          open={menuOpen}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          slotProps={{
+            paper: {
+              sx: {
+                mt: 1,
+
+                minWidth: {
+                  xs: 210,
+                  sm: 240,
+                },
+
+                maxWidth: 'calc(100vw - 24px)',
+
+                bgcolor: 'background.paper',
+                color: 'text.primary',
+
+                border: '1px solid',
+                borderColor: 'divider',
+              },
+            },
+          }}
+        >
+
+          {/* Mobile Links */}
+          {links.map((link) => (
+            <MenuItem
+              key={link.path}
+              component={NavLink}
+              to={link.path}
+              onClick={handleMenuClose}
+              sx={{
+                py: 1.25,
+
+                '&.active': {
+                  color: 'primary.main',
+                  fontWeight: 700,
+                  bgcolor: 'action.selected',
+                },
+              }}
+            >
+              {link.label}
+            </MenuItem>
+          ))}
+
+
+          {/* Mobile Logout */}
+          {showLogout && (
+            <>
+              <Divider />
+
+              <MenuItem
+                onClick={handleLogout}
+                sx={{
+                  py: 1.25,
+
+                  color: 'error.main',
+
+                  '&:hover': {
+                    bgcolor: 'error.main',
+                    color: '#fff',
+                  },
+                }}
               >
-                {link.label}
-              </Link>
-            ))}
+                <LogoutRoundedIcon
+                  fontSize="small"
+                  sx={{
+                    mr: 1.5,
+                  }}
+                />
 
-          </div>
-        </div>
-      )}
-    </nav>
-  );
-};
+                Logout
+              </MenuItem>
+            </>
+          )}
 
-export default Navbar;
+
+          <Divider />
+
+
+          {/* Mobile Theme Toggle */}
+          <Box
+            sx={{
+              px: 2,
+              py: 1.5,
+
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                fontSize: '0.9rem',
+                color: 'text.secondary',
+              }}
+            >
+              Theme
+            </Box>
+
+            <ThemeToggle />
+          </Box>
+
+        </Menu>
+
+      </Toolbar>
+    </AppBar>
+  )
+}
+
+export default Navbar

@@ -27,5 +27,16 @@ router.get(
     });
   }
 );
+router.get(
+  "/applicant-dashboard",
+  authMiddleware,
+  roleMiddleware("applicant"),
+  (req, res) => {
+    res.json({
+      message: "Welcome Applicant!",
+      user: req.user,
+    });
+  }
+);
 
 export default router;

@@ -27,15 +27,12 @@ const applicantLinks = [
     label: "Profile",
     path: "/applicant/profile",
   },
-  {
-    label: "Logout",
-    path: "/applicant/logout",
-  },
+ 
 ];
 
 const ANavbar = () => {
   return (
-    <Navbar links={applicantLinks} />
+    <Navbar links={applicantLinks} showLogout={true} />
   );
 };
 

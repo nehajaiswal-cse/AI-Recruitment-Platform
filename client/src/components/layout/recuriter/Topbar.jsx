@@ -1,15 +1,76 @@
-import SearchBar from "../../common/SearchBar.jsx";
-import Button from "../../common/Button.jsx"
-const Topbar = () => {
-  return (
-    <div className="bg-gray-600 h-20 min-w-full relative flex items-center justify-around">
-      <SearchBar placeholder="Search Candidates" className="w-[50%]"/>
-      <Button className="  hover:scale-105
-    hover:shadow-2xl
-    transition-all
-    duration-300">Create Job</Button>
-    </div>
-  );
-};
+import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
+import InputAdornment from '@mui/material/InputAdornment'
+import Button from '@mui/material/Button'
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import { brandGradient } from '../../../theme.js'
 
-export default Topbar;
+export default function RTopbar() {
+  return (
+  <Box
+  sx={{
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      sm: 'row',
+    },
+    alignItems: 'stretch',
+    gap: 2,
+
+    px: {
+      xs: 2,
+      sm: 3,
+      md: 4,
+    },
+
+    pt: {
+      xs: 2,
+      sm: 2,
+      md: 2,
+    },
+
+    mb: 3,
+  }}
+>
+      <TextField
+        placeholder="Search Candidates"
+        fullWidth
+        size="small"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+            </InputAdornment>
+          ),
+          sx: {
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            height: 44,
+          },
+        }}
+      />
+
+      <Button
+        variant="contained"
+        startIcon={<AddRoundedIcon />}
+        sx={{
+          background: brandGradient,
+          whiteSpace: 'nowrap',
+          px: 2.5,
+          height: 44,
+          width: { xs: '100%', sm: 'auto' },
+          flexShrink: 0,
+          '&:hover': { background: brandGradient, opacity: 0.92 },
+        }}
+      >
+        Create Job
+      </Button>
+    </Box>
+  )
+}
+
+
+
+
+

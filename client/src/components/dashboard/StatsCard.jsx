@@ -1,3 +1,6 @@
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+
 const StatsCard = ({
   title,
   value,
@@ -5,30 +8,86 @@ const StatsCard = ({
   description,
 }) => {
   return (
-    <div className="bg-gray-500 rounded-xl shadow-md p-5 my-5 mx-5 flex items-center justify-between">
-      
-      <div>
-        <p className="text-gray-100 text-md font-medium">
-          {title}
-        </p>
+    <Box
+      sx={{
+        bgcolor: 'background.surface',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 3,
+        boxShadow: 1,
+        p: 3,
 
-        <h2 className="text-3xl font-bold text-gray-800 mt-2">
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+
+        minWidth: 0,
+
+        transition: 'all 0.2s ease',
+
+        '&:hover': {
+          boxShadow: 3,
+          transform: 'translateY(-2px)',
+        },
+      }}
+    >
+      <Box sx={{ minWidth: 0 }}>
+        <Typography
+          variant="body1"
+          sx={{
+            color: 'text.secondary',
+            fontWeight: 500,
+          }}
+        >
+          {title}
+        </Typography>
+
+        <Typography
+          variant="h4"
+          sx={{
+            color: 'text.primary',
+            fontWeight: 700,
+            mt: 1,
+          }}
+        >
           {value}
-        </h2>
+        </Typography>
 
         {description && (
-          <p className="text-sm text-gray-500 mt-1">
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              mt: 0.5,
+            }}
+          >
             {description}
-          </p>
+          </Typography>
         )}
-      </div>
+      </Box>
 
-      <div className="text-3xl bg-gray-400 p-3 rounded-lg">
+      <Box
+        sx={{
+          width: 64,
+          height: 64,
+          borderRadius: 2,
+
+          bgcolor: 'action.hover',
+
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+
+          fontSize: '1.8rem',
+
+          flexShrink: 0,
+          ml: 2,
+        }}
+      >
         {icon}
-      </div>
+      </Box>
+    </Box>
+  )
+}
 
-    </div>
-  );
-};
-
-export default StatsCard;
+export default StatsCard
