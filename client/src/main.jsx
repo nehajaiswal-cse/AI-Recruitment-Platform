@@ -7,19 +7,23 @@ import AuthContextProvider from "./context/AuthContext.jsx";
 
 import { ThemeModeProvider } from './context/ThemeModeContext.jsx'
 import AppTheme from './components/common/AppTheme.jsx'
+import { JobProvider } from './context/jobContext.jsx';
 
 ReactDOM.createRoot(
   document.getElementById('root')
 ).render(
   <React.StrictMode>
     <AuthContextProvider>
-      <BrowserRouter>
-        <ThemeModeProvider>
-        <AppTheme>
-          <App />
-        </AppTheme>
-      </ThemeModeProvider>
+      <JobProvider>
+        <BrowserRouter>
+          <ThemeModeProvider>
+            <AppTheme>
+              <App />
+            </AppTheme>
+          </ThemeModeProvider>
       </BrowserRouter>
+    </JobProvider>
+
     </AuthContextProvider>
   </React.StrictMode>
 )
