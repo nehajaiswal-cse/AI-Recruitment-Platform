@@ -14,7 +14,11 @@ ReactDOM.createRoot(
   <React.StrictMode>
     <AuthContextProvider>
       <BrowserRouter>
-        <App />
+        <ThemeModeProvider>
+        <AppTheme>
+          <App />
+        </AppTheme>
+      </ThemeModeProvider>
       </BrowserRouter>
     </AuthContextProvider>
   </React.StrictMode>
