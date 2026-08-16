@@ -104,7 +104,7 @@ const Hero = () => {
 
           <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
             <Button
-              onClick={()=>navigate("/recruiter")}
+              onClick={()=>navigate("/recruiter/login")}
               variant="contained"
               size="large"
               endIcon={<ArrowForward />}
@@ -464,7 +464,7 @@ const CTA = () => {
         </Typography>
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center">
           <Button
-          onClick={()=>navigate("/recruiter")}
+          onClick={()=>navigate("/recruiter/login")}
             variant="contained"
             size="large"
             endIcon={<ArrowForward />}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
@@ -11,12 +11,19 @@ import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
 
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 
 import Logo from '../common/Logo.jsx'
 import ThemeToggle from '../common/ThemeToggle.jsx'
 
-const Navbar = ({ links = [], onSidebarToggle }) => {
+const Navbar = ({
+  links = [],
+  onSidebarToggle,
+  showLogout = false,
+}) => {
   const [anchorEl, setAnchorEl] = useState(null)
+
+  const navigate = useNavigate()
 
   const menuOpen = Boolean(anchorEl)
 
@@ -26,6 +33,19 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
 
   const handleMenuClose = () => {
     setAnchorEl(null)
+  }
+
+  const handleLogout = () => {
+    // Remove authentication data
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+
+    // Close mobile menu
+    handleMenuClose()
+
+    // Navigate to login
+    navigate('/')
+    showLogout = false
   }
 
   return (
@@ -48,7 +68,9 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
             md: 68,
             lg: 72,
           },
-          minHeight:"unset",
+
+          minHeight: 'unset',
+
           px: {
             xs: 1,
             sm: 2,
@@ -76,6 +98,7 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
               xs: 'inline-flex',
               md: 'none',
             },
+
             color: 'text.primary',
             flexShrink: 0,
           }}
@@ -89,8 +112,8 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
           sx={{
             flexShrink: 0,
             minWidth: 0,
-            displya:'flex',
-            alignItem:'center',
+            display: 'flex',
+            alignItems: 'center',
 
             '& img': {
               maxWidth: {
@@ -98,7 +121,8 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
                 sm: 46,
                 md: 50,
               },
-              width:"auto"
+
+              width: 'auto',
             },
           }}
         >
@@ -132,6 +156,7 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
             },
           }}
         >
+
           {links.map((link) => (
             <Button
               key={link.path}
@@ -168,13 +193,58 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
               {link.label}
             </Button>
           ))}
+
         </Box>
+
+
+        {/* ========================= */}
+        {/* Desktop Logout */}
+        {/* ========================= */}
+
+        {showLogout && (
+          <Button
+            onClick={handleLogout}
+            startIcon={<LogoutRoundedIcon />}
+            sx={{
+              display: {
+                xs: 'none',
+                md: 'flex',
+              },
+
+              color: 'error.main',
+
+              fontSize: {
+                md: '0.8rem',
+                lg: '0.875rem',
+                xl: '0.95rem',
+              },
+
+              px: {
+                md: 1,
+                lg: 1.25,
+                xl: 1.5,
+              },
+
+              minWidth: 'auto',
+
+              borderRadius: 1.5,
+
+              '&:hover': {
+                bgcolor: 'error.main',
+                color: '#fff',
+              },
+            }}
+          >
+            Logout
+          </Button>
+        )}
 
 
         {/* Theme Toggle */}
         <Box
           sx={{
             flexShrink: 0,
+
             display: 'flex',
             alignItems: 'center',
           }}
@@ -201,7 +271,10 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
         </IconButton>
 
 
+        {/* ========================= */}
         {/* Mobile Navigation Menu */}
+        {/* ========================= */}
+
         <Menu
           anchorEl={anchorEl}
           open={menuOpen}
@@ -218,6 +291,7 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
             paper: {
               sx: {
                 mt: 1,
+
                 minWidth: {
                   xs: 210,
                   sm: 240,
@@ -227,12 +301,15 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
 
                 bgcolor: 'background.paper',
                 color: 'text.primary',
+
                 border: '1px solid',
                 borderColor: 'divider',
               },
             },
           }}
         >
+
+          {/* Mobile Links */}
           {links.map((link) => (
             <MenuItem
               key={link.path}
@@ -253,13 +330,47 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
             </MenuItem>
           ))}
 
+
+          {/* Mobile Logout */}
+          {showLogout && (
+            <>
+              <Divider />
+
+              <MenuItem
+                onClick={handleLogout}
+                sx={{
+                  py: 1.25,
+
+                  color: 'error.main',
+
+                  '&:hover': {
+                    bgcolor: 'error.main',
+                    color: '#fff',
+                  },
+                }}
+              >
+                <LogoutRoundedIcon
+                  fontSize="small"
+                  sx={{
+                    mr: 1.5,
+                  }}
+                />
+
+                Logout
+              </MenuItem>
+            </>
+          )}
+
+
           <Divider />
 
-          {/* Theme Toggle inside mobile menu */}
+
+          {/* Mobile Theme Toggle */}
           <Box
             sx={{
               px: 2,
               py: 1.5,
+
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -277,6 +388,7 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
 
             <ThemeToggle />
           </Box>
+
         </Menu>
 
       </Toolbar>
@@ -285,10 +397,3 @@ const Navbar = ({ links = [], onSidebarToggle }) => {
 }
 
 export default Navbar
-
-
-
-
-
-
-

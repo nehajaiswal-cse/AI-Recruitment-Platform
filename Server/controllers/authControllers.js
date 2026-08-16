@@ -2,8 +2,7 @@ import bcrypt from "bcryptjs";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 
-//  REGISTER 
-
+// REGISTER
 export const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -15,7 +14,7 @@ export const register = async (req, res) => {
       });
     }
 
-    // 2. Check if user already exists
+    // 2. Check existing user
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -35,9 +34,24 @@ export const register = async (req, res) => {
       role,
     });
 
-    // 5. Send response
+    // 5. Generate JWT token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    // 6. Send response
     res.status(201).json({
       message: "User registered successfully",
+
+      token,
+
       user: {
         id: user._id,
         name: user.name,
@@ -53,8 +67,8 @@ export const register = async (req, res) => {
   }
 };
 
-//  LOGIN 
 
+// LOGIN
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -87,22 +101,24 @@ export const login = async (req, res) => {
       });
     }
 
-    // 5. Generate JWT token
+    // 4. Generate JWT
     const token = jwt.sign(
       {
         id: user._id,
-        role: user.role
+        role: user.role,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "7d"
+        expiresIn: "7d",
       }
     );
 
-    // 6. Send response
+    // 5. Send response
     res.status(200).json({
       message: "Login successful",
+
       token,
+
       user: {
         id: user._id,
         name: user.name,
@@ -117,6 +133,9 @@ export const login = async (req, res) => {
     });
   }
 };
+
+
+// LOGOUT
 export const logout = async (req, res) => {
   try {
     res.status(200).json({

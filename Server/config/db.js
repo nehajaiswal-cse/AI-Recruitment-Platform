@@ -1,4 +1,12 @@
+
+import dns from "node:dns";
 import mongoose from "mongoose";
+
+// Use Google DNS for MongoDB Atlas SRV lookup
+dns.setServers([
+  "8.8.8.8",
+  "8.8.4.4",
+]);
 
 const connectDB = async () => {
   try {
