@@ -4,20 +4,25 @@ import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
-router.get("/profile", authMiddleware, (req, res) => {
-  res.json({
-    message: "You are authenticated!",
-    user: req.user,
-  });
-});
-
 router.get(
-  "/recruiter-dashboard",
+  "/recruiter",
   authMiddleware,
   roleMiddleware("recruiter"),
   (req, res) => {
-    res.json({
-      message: "Welcome Recruiter!",
+    res.status(200).json({
+      message: "Welcome Recruiter",
+      user: req.user,
+    });
+  }
+);
+
+router.get(
+  "/applicant",
+  authMiddleware,
+  roleMiddleware("applicant"),
+  (req, res) => {
+    res.status(200).json({
+      message: "Welcome Applicant",
       user: req.user,
     });
   }
