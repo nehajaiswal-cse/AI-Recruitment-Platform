@@ -6,20 +6,23 @@ import ADashboard from './pages/applicant/Dashboard';
 import RDashboard from './pages/recruiter/Dashboard';
 import NotFound from './pages/NotFound';
 import Home from './pages/Home';
-import Login from './pages/auth/login';
-import Register from './pages/auth/register';
+import Jobs from './pages/recruiter/Jobs';
+//import Login from './pages/auth/login';
+//import Register from './pages/auth/register';
 
 export default function App() {
   return (
     <div>
       <Routes>
-         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} /> */}
+         {/* <Route path="/login" element={<Login />} /> 
+        <Route path="/register" element={<Register />} /> */}
+        {/* <Route path="/forgot-password" element={<ForgotPassword />}/> */}
          <Route path="/applicant" element={<ADashboard />} />
         <Route path="/" element={<Home/>} />
         <Route path="/recruiter" element={<RDashboard />} />
         <Route path="*" element={<NotFound />} />
+
+        <Route path="/recruiter/jobs" element={<Jobs/>}/>
         
       </Routes>
 

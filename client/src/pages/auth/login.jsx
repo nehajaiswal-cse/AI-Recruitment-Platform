@@ -13,8 +13,8 @@ import {
   FiCpu,
 } from "react-icons/fi";
 import Navbar from "../../components/dashboard/Navbar";
-import Logo from "../../components/common/Logo";
-//import { loginUser } from "../../api/authApi";
+//import Logo from "../../components/common/Logo";
+import { loginUser } from "../../api/authApi";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -62,13 +62,13 @@ const Login = () => {
     }
   };
 
-  const handleDemoLogin = (role) => {
-    const email = role === "recruiter" ? "recruiter@talvyn.ai" : "applicant@talvyn.ai";
-    setFormData({
-      email,
-      password: "password123",
-    });
-  };
+  // const handleDemoLogin = (role) => {
+  //   const email = role === "recruiter" ? "recruiter@talvyn.ai" : "applicant@talvyn.ai";
+  //   setFormData({
+  //     email,
+  //     password: "password123",
+  //   });
+  // };
 
   return (
     <div className="min-h-screen bg-gray-700 text-white flex flex-col justify-between">
@@ -86,7 +86,7 @@ const Login = () => {
 
             <h1 className="text-4xl xl:text-5xl font-extrabold tracking-tight leading-tight text-white">
               Welcome back to <br />
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-amber-300 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-blue-400 via-purple-400 to-amber-300 bg-clip-text text-transparent">
                 Talvyn Dashboard
               </span>
             </h1>
@@ -98,7 +98,7 @@ const Login = () => {
             {/* Feature Cards matching dashboard styling */}
             <div className="space-y-4 pt-2">
               <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800 border border-gray-600 shadow-md">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-linear-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold shrink-0">
                   <FiUserCheck className="text-xl" />
                 </div>
                 <div>
@@ -108,7 +108,7 @@ const Login = () => {
               </div>
 
               <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800 border border-gray-600 shadow-md">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-linear-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold shrink-0">
                   <FiBriefcase className="text-xl" />
                 </div>
                 <div>
@@ -216,7 +216,7 @@ const Login = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:text-amber-300 mt-2"
+                  className="w-full py-3.5 px-4 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:text-amber-300 mt-2"
                 >
                   {loading ? (
                     <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -1,4 +1,4 @@
-import React from "react";
+//import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -34,7 +34,7 @@ import {
 import {
   COLORS,
   sectionSx,
-  sectionLabelSx,
+ // sectionLabelSx,
   tealIconBox,
   outlineButtonSx,
   primaryButtonSx,
@@ -205,7 +205,7 @@ const Cards = () => {
         </Box>
 
         <Grid container spacing={3}>
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <Grid key={feature.title} size={{ xs: 12, sm: 6, md: 3 }}>
               <Card
                 elevation={0}

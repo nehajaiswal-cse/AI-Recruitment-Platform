@@ -14,8 +14,8 @@ import {
   FiCheck,
 } from "react-icons/fi";
 import Navbar from "../../components/dashboard/Navbar";
-import Logo from "../../components/common/Logo";
-//import { registerUser } from "../../api/authApi";
+//import Logo from "../../components/common/Logo";
+import { registerUser } from "../../api/authApi";
 
 const Register = () => {
   const navigate = useNavigate();

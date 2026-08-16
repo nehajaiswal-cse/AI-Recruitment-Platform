@@ -9,6 +9,13 @@ app.use(cors());
 app.use(express.json());
 app.use("/api", protectedRoutes);
 
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "AI Recruitment Platform API is running",
+  });
+});
+
 app.get("/home", (req, res) => {
   res.json({
     success: true,
