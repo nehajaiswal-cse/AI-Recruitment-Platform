@@ -13,6 +13,9 @@ import ApplicantLogin from './pages/applicant/ApplicantLogin';
 import RecruiterLogin from './pages/recruiter/RecruiterLogin';
 import RecruiterRegister from './pages/recruiter/RecruiterRegister';
 import ProtectedRoute from './components/dashboard/ProtectedRoute.jsx';
+import ApplicantProfile from './pages/applicant/Profile';
+import RecruiterProfile from './pages/recruiter/Profile';
+
 
 export default function App() {
   return (
@@ -31,7 +34,20 @@ export default function App() {
         <Route path="/applicant/login" element={<ApplicantLogin />} />
         <Route path="/recruiter/register" element={<RecruiterRegister />} />
         <Route path="/recruiter/login" element={<RecruiterLogin />} />  
-         
+
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant" element={<ADashboard />} />
+        <Route path="/applicant/profile" element={<ApplicantProfile />} />
+        </Route>
+        
+
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+        <Route path="/recruiter" element={<RDashboard />} />
+        <Route path="/recruiter/profile" element={<RecruiterProfile />} />
+        </Route>
+
+
+
         
       </Routes>
 
@@ -58,15 +74,15 @@ export default function App() {
 // import { getTheme } from './theme.js'
 // import { ThemeModeProvider} from './context/ThemeModeContext.jsx'
 // import {useThemeMode } from './context/useThemeMode.js'
-// import RNavbar from './components/layout/recuriter/Navbar.jsx'
-// import RSidebar from './components/layout/recuriter/Sidebar.jsx'
-// import RTopbar from './components/layout/recuriter/Topbar.jsx'
-// // import WelcomeHeader from './components/layout/recuriter/WelcomeHeader.jsx'
-// // import StatCards from './components/layout/recuriter/StatCards.jsx'
-// // import TrendChart from './components/layout/recuriter/TrendChart.jsx'
-// // import PipelineFunnel from './components/layout/recuriter/PipelineFunnel.jsx'
-// // import RecentApplications from './components/layout/recuriter/RecentApplications.jsx'
-// // import UpcomingInterviews from './components/layout/recuriter/UpcomingInterviews.jsx'
+// import RNavbar from './components/layout/recruiter/Navbar.jsx'
+// import RSidebar from './components/layout/recruiter/Sidebar.jsx'
+// import RTopbar from './components/layout/recruiter/Topbar.jsx'
+// // import WelcomeHeader from './components/layout/recruiter/WelcomeHeader.jsx'
+// // import StatCards from './components/layout/recruiter/StatCards.jsx'
+// // import TrendChart from './components/layout/recruiter/TrendChart.jsx'
+// // import PipelineFunnel from './components/layout/recruiter/PipelineFunnel.jsx'
+// // import RecentApplications from './components/layout/recruiter/RecentApplications.jsx'
+// // import UpcomingInterviews from './components/layout/recruiter/UpcomingInterviews.jsx'
 // import { fetchDashboardData } from './data/mockData.js'
 // import { ThemeProvider} from '@mui/material/styles'
 
