@@ -13,6 +13,10 @@ import ApplicantLogin from './pages/applicant/ApplicantLogin';
 import RecruiterLogin from './pages/recruiter/RecruiterLogin';
 import RecruiterRegister from './pages/recruiter/RecruiterRegister';
 import ProtectedRoute from './components/dashboard/ProtectedRoute.jsx';
+import Jobs from './pages/recruiter/jobs/Jobs.jsx';
+import CreateJob from './pages/recruiter/jobs/createJob.jsx';
+import EditJob from './pages/recruiter/jobs/editJob.jsx';
+import ViewJob from './pages/recruiter/jobs/ViewJob.jsx';
 
 export default function App() {
   return (
@@ -31,8 +35,20 @@ export default function App() {
         <Route path="/applicant/login" element={<ApplicantLogin />} />
         <Route path="/recruiter/register" element={<RecruiterRegister />} />
         <Route path="/recruiter/login" element={<RecruiterLogin />} />  
-         
-        
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+        <Route path="/recruiter/jobs" element={<Jobs />} />
+        </Route>
+        <Route  path="/recruiter/jobs/create"element={<CreateJob />}/>
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+         <Route  path="/recruiter/jobs/edit/:id"element={<EditJob />}/>
+        </Route>
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+         <Route  path="/recruiter/jobs/:id/edit"element={<EditJob />}/>
+        </Route>
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+         <Route  path="/recruiter/jobs/:id"element={<ViewJob />}/>
+        </Route>
+       
       </Routes>
 
      

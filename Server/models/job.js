@@ -5,73 +5,96 @@ const jobSchema = new mongoose.Schema(
     recruiterId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true
+      required: true,
     },
+
+    // =========================
+    // BASIC INFORMATION
+    // =========================
 
     title: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
-    description: {
+    company: {
       type: String,
-      required: true
-    },
-
-    skills: {
-      type: [String],
-      required: true
-    },
-
-    experience: {
-      min: {
-        type: Number,
-        default: 0
-      },
-      max: {
-        type: Number
-      }
-    },
-
-    education: {
-      type: String
+      trim: true,
     },
 
     location: {
-      type: String
+      type: String,
+      trim: true,
     },
 
-    employmentType: {
+    jobType: {
       type: String,
-      enum: ["full-time", "part-time", "internship", "contract"],
-      default: "full-time"
+      enum: [
+        "Full-time",
+        "Part-time",
+        "Internship",
+        "Contract",
+        "Remote",
+      ],
+      default: "Full-time",
+    },
+
+    experience: {
+      type: String,
+      trim: true,
     },
 
     salary: {
-      min: {
-        type: Number
-      },
-      max: {
-        type: Number
-      },
-      currency: {
-        type: String,
-        default: "INR"
-      }
+      type: String,
+      trim: true,
     },
+
+    // =========================
+    // JOB DESCRIPTION
+    // =========================
+
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    requirements: {
+      type: String,
+      trim: true,
+    },
+
+    // =========================
+    // SKILLS
+    // =========================
+
+    skills: {
+      type: [String],
+      default: [],
+    },
+
+    // =========================
+    // JOB STATUS
+    // =========================
 
     status: {
       type: String,
-      enum: ["draft", "published", "archived"],
-      default: "draft"
+      enum: ["draft", "published", "closed"],
+      default: "published",
     },
 
+    // =========================
+    // DEADLINE
+    // =========================
+
     deadline: {
-      type: Date
-    }
+      type: Date,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 const Job = mongoose.model("Job", jobSchema);
