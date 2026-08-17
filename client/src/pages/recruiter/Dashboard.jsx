@@ -4,11 +4,11 @@ import RNavbar from '../../components/layout/recruiter/Navbar'
 import RSidebar from '../../components/layout/recruiter/Sidebar'
 import Topbar from '../../components/layout/recruiter/Topbar'
 
-import StatsCards from '../../components/sections/StatsCards'
-import ApplicationTrend from '../../components/sections/ApplicationTrend'
-import HiringPipelines from '../../components/sections/HiringPipelines'
-import RecentApplications from '../../components/sections/RecentApplication'
-import UpcomingInterviews from '../../components/sections/UpcomingInterviews'
+import StatsCards from '../../components/sections/recruiter/StatsCards'
+import ApplicationTrend from '../../components/sections/recruiter/ApplicationTrend'
+import HiringPipelines from '../../components/sections/recruiter/HiringPipelines'
+import RecentApplications from '../../components/sections/recruiter/RecentApplication'
+import UpcomingInterviews from '../../components/sections/recruiter/UpcomingInterviews'
 
 const RDashboard = () => {
   return (

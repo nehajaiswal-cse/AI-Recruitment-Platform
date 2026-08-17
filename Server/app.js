@@ -19,6 +19,13 @@ app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/uploads", express.static("uploads"));
 
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "AI Recruitment Platform API is running",
+  });
+});
+
 app.get("/home", (req, res) => {
   res.json({
     success: true,

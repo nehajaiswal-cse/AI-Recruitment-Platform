@@ -5,7 +5,7 @@ import Navbar from "../../dashboard/Navbar.jsx"
 const recruiterLinks = [
   {
     label: "Dashboard",
-    path: "/recruiter/dashboard",
+    path: "/recruiter",
   },
   {
     label: "Jobs",

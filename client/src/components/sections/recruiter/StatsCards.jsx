@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box'
 
-import StatsCard from '../dashboard/StatsCard'
+import StatsCard from '../../dashboard/StatsCard'
 
 const StatsCards = () => {
   return (

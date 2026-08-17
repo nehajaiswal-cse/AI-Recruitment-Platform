@@ -1,9 +1,10 @@
-import React from "react";
+//import React from "react";
 import {
   Box, Card, CardContent, Container, Divider, Grid, Paper, Stack, Typography,
 } from "@mui/material";
 import {
-  ArrowForward, AutoAwesome, Bolt, CheckCircle, Warning,
+ // ArrowForward, AutoAwesome, Bolt, CheckCircle, Warning,
+   AutoAwesome, Bolt
 } from "@mui/icons-material";
 import { COLORS } from "../../pages/homeStyles";
 import {

@@ -6,8 +6,6 @@ import ADashboard from './pages/applicant/Dashboard';
 import RDashboard from './pages/recruiter/Dashboard';
 import NotFound from './pages/NotFound';
 import Home from './pages/Home';
-import Login from './pages/auth/login';
-import Register from './pages/auth/register';
 import ApplicantRegister from './pages/applicant/ApplicantRegister';
 import ApplicantLogin from './pages/applicant/ApplicantLogin';
 import RecruiterLogin from './pages/recruiter/RecruiterLogin';
@@ -64,6 +62,8 @@ export default function App() {
 
 
 
+<<<<<<< HEAD
+=======
 // import { useEffect, useMemo, useState } from 'react'
 // //import { BrowserRouter } from 'react-router-dom'
 // import {Routes, Route} from 'react-router-dom';
@@ -181,3 +181,4 @@ export default function App() {
 //   )
 // }
 
+>>>>>>> e6de717310eb4a41138d2441497d2c44bf1565cd
