@@ -12,6 +12,7 @@ import {
   Divider,
   Grid,
   IconButton,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -25,6 +26,7 @@ import {
   LocationOn,
   Business,
   Description,
+  CalendarToday,
 } from "@mui/icons-material";
 
 import useJob from "../../../hooks/useJob";
@@ -33,6 +35,10 @@ const CreateJob = () => {
   const navigate = useNavigate();
 
   const { addJob, loading, error } = useJob();
+
+  // ==========================================
+  // FORM STATE - MATCHES JOB SCHEMA
+  // ==========================================
 
   const [formData, setFormData] = useState({
     title: "",
@@ -43,11 +49,12 @@ const CreateJob = () => {
     salary: "",
     description: "",
     requirements: "",
+    status: "published",
+    deadline: "",
   });
 
   const [skills, setSkills] = useState([]);
   const [skillInput, setSkillInput] = useState("");
-
   const [formError, setFormError] = useState("");
 
   // ==========================================
@@ -61,6 +68,8 @@ const CreateJob = () => {
       ...previous,
       [name]: value,
     }));
+
+    setFormError("");
   };
 
   // ==========================================
@@ -72,16 +81,16 @@ const CreateJob = () => {
 
     if (!skill) return;
 
-    if (skills.includes(skill)) {
+    const alreadyExists = skills.some(
+      (item) => item.toLowerCase() === skill.toLowerCase()
+    );
+
+    if (alreadyExists) {
       setSkillInput("");
       return;
     }
 
-    setSkills((previous) => [
-      ...previous,
-      skill,
-    ]);
-
+    setSkills((previous) => [...previous, skill]);
     setSkillInput("");
   };
 
@@ -91,9 +100,7 @@ const CreateJob = () => {
 
   const handleRemoveSkill = (skillToRemove) => {
     setSkills((previous) =>
-      previous.filter(
-        (skill) => skill !== skillToRemove
-      )
+      previous.filter((skill) => skill !== skillToRemove)
     );
   };
 
@@ -106,6 +113,10 @@ const CreateJob = () => {
 
     setFormError("");
 
+    // ------------------------------------------
+    // VALIDATION
+    // ------------------------------------------
+
     if (!formData.title.trim()) {
       setFormError("Job title is required.");
       return;
@@ -116,17 +127,55 @@ const CreateJob = () => {
       return;
     }
 
-    try {
-      const jobData = {
-        ...formData,
-        skills,
-      };
+    // ------------------------------------------
+    // DATA MATCHING BACKEND SCHEMA
+    // ------------------------------------------
 
+    const jobData = {
+      title: formData.title.trim(),
+
+      company: formData.company.trim(),
+
+      location: formData.location.trim(),
+
+      jobType: formData.jobType,
+
+      experience: formData.experience.trim(),
+
+      salary: formData.salary.trim(),
+
+      description: formData.description.trim(),
+
+      requirements: formData.requirements.trim(),
+
+      skills,
+
+      status: formData.status,
+
+      ...(formData.deadline
+        ? {
+            deadline: formData.deadline,
+          }
+        : {}),
+    };
+
+    console.log("CREATE JOB DATA:", jobData);
+
+    // ------------------------------------------
+    // CREATE JOB
+    // ------------------------------------------
+
+    try {
       await addJob(jobData);
 
       navigate("/recruiter/jobs");
     } catch (err) {
       console.error("Create job error:", err);
+
+      setFormError(
+        err.response?.data?.message ||
+          "Failed to create job."
+      );
     }
   };
 
@@ -157,12 +206,11 @@ const CreateJob = () => {
           }}
         >
           <IconButton
-            onClick={() =>
-              navigate("/recruiter/jobs")
-            }
+            onClick={() => navigate("/recruiter/jobs")}
             sx={{
               color: "#d1d5db",
               bgcolor: "#1f2937",
+
               "&:hover": {
                 bgcolor: "#374151",
               },
@@ -210,15 +258,14 @@ const CreateJob = () => {
         )}
 
         {/* ======================================
-            FORM
+            FORM CARD
         ======================================= */}
 
         <Card
           sx={{
             bgcolor: "#1f2937",
             color: "#fff",
-            border:
-              "1px solid #374151",
+            border: "1px solid #374151",
             borderRadius: 3,
           }}
         >
@@ -232,36 +279,19 @@ const CreateJob = () => {
           >
             <form onSubmit={handleSubmit}>
 
-              {/* BASIC INFORMATION */}
+              {/* ==================================
+                  BASIC INFORMATION
+              ================================== */}
 
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{
-                  alignItems: "center",
-                  mb: 3,
-                }}
-              >
-                <Work
-                  sx={{
-                    color: "#818cf8",
-                  }}
-                />
+              <SectionTitle
+                icon={<Work />}
+                title="Basic Information"
+              />
 
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                  }}
-                >
-                  Basic Information
-                </Typography>
-              </Stack>
+              <Grid container spacing={3}>
 
-              <Grid
-                container
-                spacing={3}
-              >
+                {/* TITLE */}
+
                 <Grid
                   size={{
                     xs: 12,
@@ -280,6 +310,8 @@ const CreateJob = () => {
                   />
                 </Grid>
 
+                {/* COMPANY */}
+
                 <Grid
                   size={{
                     xs: 12,
@@ -294,8 +326,22 @@ const CreateJob = () => {
                     onChange={handleChange}
                     placeholder="e.g. Talvyn Technologies"
                     sx={inputStyle}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <Business
+                            sx={{
+                              color: "#9ca3af",
+                              mr: 1,
+                            }}
+                          />
+                        ),
+                      },
+                    }}
                   />
                 </Grid>
+
+                {/* LOCATION */}
 
                 <Grid
                   size={{
@@ -326,6 +372,8 @@ const CreateJob = () => {
                   />
                 </Grid>
 
+                {/* JOB TYPE */}
+
                 <Grid
                   size={{
                     xs: 12,
@@ -340,33 +388,30 @@ const CreateJob = () => {
                     value={formData.jobType}
                     onChange={handleChange}
                     sx={inputStyle}
-                    slotProps={{
-                      select: {
-                        native: true,
-                      },
-                    }}
                   >
-                    <option value="Full-time">
+                    <MenuItem value="Full-time">
                       Full-time
-                    </option>
+                    </MenuItem>
 
-                    <option value="Part-time">
+                    <MenuItem value="Part-time">
                       Part-time
-                    </option>
+                    </MenuItem>
 
-                    <option value="Internship">
+                    <MenuItem value="Internship">
                       Internship
-                    </option>
+                    </MenuItem>
 
-                    <option value="Contract">
+                    <MenuItem value="Contract">
                       Contract
-                    </option>
+                    </MenuItem>
 
-                    <option value="Remote">
+                    <MenuItem value="Remote">
                       Remote
-                    </option>
+                    </MenuItem>
                   </TextField>
                 </Grid>
+
+                {/* EXPERIENCE */}
 
                 <Grid
                   size={{
@@ -385,6 +430,8 @@ const CreateJob = () => {
                   />
                 </Grid>
 
+                {/* SALARY */}
+
                 <Grid
                   size={{
                     xs: 12,
@@ -401,6 +448,62 @@ const CreateJob = () => {
                     sx={inputStyle}
                   />
                 </Grid>
+
+                {/* STATUS */}
+
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6,
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    select
+                    label="Job Status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    sx={inputStyle}
+                  >
+                    <MenuItem value="draft">
+                      Draft
+                    </MenuItem>
+
+                    <MenuItem value="published">
+                      Published
+                    </MenuItem>
+
+                    <MenuItem value="closed">
+                      Closed
+                    </MenuItem>
+                  </TextField>
+                </Grid>
+
+                {/* DEADLINE */}
+
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6,
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    type="date"
+                    label="Application Deadline"
+                    name="deadline"
+                    value={formData.deadline}
+                    onChange={handleChange}
+                    sx={inputStyle}
+                    slotProps={{
+                      inputLabel: {
+                        shrink: true,
+                      },
+                    }}
+                  />
+                </Grid>
+
               </Grid>
 
               <Divider
@@ -410,31 +513,14 @@ const CreateJob = () => {
                 }}
               />
 
-              {/* DESCRIPTION */}
+              {/* ==================================
+                  DESCRIPTION
+              ================================== */}
 
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{
-                  alignItems: "center",
-                  mb: 3,
-                }}
-              >
-                <Description
-                  sx={{
-                    color: "#818cf8",
-                  }}
-                />
-
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 600,
-                  }}
-                >
-                  Job Description
-                </Typography>
-              </Stack>
+              <SectionTitle
+                icon={<Description />}
+                title="Job Description"
+              />
 
               <TextField
                 fullWidth
@@ -448,6 +534,8 @@ const CreateJob = () => {
                 placeholder="Describe the role, responsibilities and expectations..."
                 sx={inputStyle}
               />
+
+              {/* REQUIREMENTS */}
 
               <Box sx={{ mt: 3 }}>
                 <TextField
@@ -470,17 +558,14 @@ const CreateJob = () => {
                 }}
               />
 
-              {/* SKILLS */}
+              {/* ==================================
+                  SKILLS
+              ================================== */}
 
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 600,
-                  mb: 2,
-                }}
-              >
-                Required Skills
-              </Typography>
+              <SectionTitle
+                icon={<Work />}
+                title="Required Skills"
+              />
 
               <Stack
                 direction={{
@@ -494,14 +579,10 @@ const CreateJob = () => {
                   label="Add Skill"
                   value={skillInput}
                   onChange={(event) =>
-                    setSkillInput(
-                      event.target.value
-                    )
+                    setSkillInput(event.target.value)
                   }
                   onKeyDown={(event) => {
-                    if (
-                      event.key === "Enter"
-                    ) {
+                    if (event.key === "Enter") {
                       event.preventDefault();
                       handleAddSkill();
                     }
@@ -511,6 +592,7 @@ const CreateJob = () => {
                 />
 
                 <Button
+                  type="button"
                   variant="outlined"
                   startIcon={<Add />}
                   onClick={handleAddSkill}
@@ -519,6 +601,7 @@ const CreateJob = () => {
                     borderColor: "#6366f1",
                     color: "#a5b4fc",
                     textTransform: "none",
+
                     "&:hover": {
                       borderColor: "#818cf8",
                     },
@@ -527,6 +610,8 @@ const CreateJob = () => {
                   Add Skill
                 </Button>
               </Stack>
+
+              {/* SKILL CHIPS */}
 
               {skills.length > 0 && (
                 <Stack
@@ -543,13 +628,9 @@ const CreateJob = () => {
                       key={skill}
                       label={skill}
                       onDelete={() =>
-                        handleRemoveSkill(
-                          skill
-                        )
+                        handleRemoveSkill(skill)
                       }
-                      deleteIcon={
-                        <Delete />
-                      }
+                      deleteIcon={<Delete />}
                       sx={{
                         bgcolor:
                           "rgba(99,102,241,0.15)",
@@ -560,7 +641,9 @@ const CreateJob = () => {
                 </Stack>
               )}
 
-              {/* ACTIONS */}
+              {/* ==================================
+                  ACTIONS
+              ================================== */}
 
               <Stack
                 direction={{
@@ -569,17 +652,15 @@ const CreateJob = () => {
                 }}
                 spacing={2}
                 sx={{
-                  justifyContent:
-                    "flex-end",
+                  justifyContent: "flex-end",
                   mt: 5,
                 }}
               >
                 <Button
+                  type="button"
                   variant="outlined"
                   onClick={() =>
-                    navigate(
-                      "/recruiter/jobs"
-                    )
+                    navigate("/recruiter/jobs")
                   }
                   sx={{
                     textTransform: "none",
@@ -600,6 +681,7 @@ const CreateJob = () => {
                     px: 4,
                     background:
                       "linear-gradient(135deg, #6366f1, #8b5cf6)",
+
                     "&:hover": {
                       background:
                         "linear-gradient(135deg, #4f46e5, #7c3aed)",
@@ -619,6 +701,46 @@ const CreateJob = () => {
     </Box>
   );
 };
+
+// ==========================================
+// SECTION TITLE
+// ==========================================
+
+const SectionTitle = ({ icon, title }) => {
+  return (
+    <Stack
+      direction="row"
+      spacing={1}
+      sx={{
+        alignItems: "center",
+        mb: 3,
+      }}
+    >
+      <Box
+        sx={{
+          color: "#818cf8",
+          display: "flex",
+        }}
+      >
+        {icon}
+      </Box>
+
+      <Typography
+        variant="h6"
+        sx={{
+          fontWeight: 600,
+          color: "#fff",
+        }}
+      >
+        {title}
+      </Typography>
+    </Stack>
+  );
+};
+
+// ==========================================
+// INPUT STYLE
+// ==========================================
 
 const inputStyle = {
   "& .MuiOutlinedInput-root": {

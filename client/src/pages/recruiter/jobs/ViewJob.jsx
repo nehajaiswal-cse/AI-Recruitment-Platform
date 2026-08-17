@@ -22,11 +22,12 @@ import {
   Work,
   LocationOn,
   BusinessCenter,
-  School,
   Payments,
   CalendarToday,
   CheckCircle,
   Description,
+  Business,
+  ListAlt,
 } from "@mui/icons-material";
 
 import useJob from "../../../hooks/useJob";
@@ -42,15 +43,19 @@ const ViewJob = () => {
     fetchJobById,
   } = useJob();
 
+  // ==========================================
+  // FETCH JOB
+  // ==========================================
+
   useEffect(() => {
     if (id) {
       fetchJobById(id);
     }
-  }, [id, fetchJobById]);
+  }, [id]);
 
-  // ================================
+  // ==========================================
   // LOADING
-  // ================================
+  // ==========================================
 
   if (loading && !currentJob) {
     return (
@@ -65,15 +70,17 @@ const ViewJob = () => {
       >
         <CircularProgress
           size={42}
-          sx={{ color: "#8b5cf6" }}
+          sx={{
+            color: "#8b5cf6",
+          }}
         />
       </Box>
     );
   }
 
-  // ================================
+  // ==========================================
   // ERROR
-  // ================================
+  // ==========================================
 
   if (error && !currentJob) {
     return (
@@ -111,81 +118,28 @@ const ViewJob = () => {
     return null;
   }
 
-  // ================================
+  // ==========================================
   // HELPERS
-  // ================================
+  // ==========================================
 
   const formatJobType = (type) => {
     if (!type) return "Not specified";
 
-    return type
-      .split("-")
-      .map(
-        (word) =>
-          word.charAt(0).toUpperCase() +
-          word.slice(1)
-      )
-      .join("-");
-  };
-
-  const formatSalary = () => {
-    const salary = currentJob.salary;
-
-    if (!salary) {
-      return "Not specified";
-    }
-
-    const min = salary.min;
-    const max = salary.max;
-    const currency = salary.currency || "INR";
-
-    if (min && max) {
-      return `${currency} ${min.toLocaleString()} - ${max.toLocaleString()}`;
-    }
-
-    if (min) {
-      return `${currency} ${min.toLocaleString()}+`;
-    }
-
-    if (max) {
-      return `Up to ${currency} ${max.toLocaleString()}`;
-    }
-
-    return "Not specified";
-  };
-
-  const formatExperience = () => {
-    const experience = currentJob.experience;
-
-    if (!experience) {
-      return "Not specified";
-    }
-
-    const min = experience.min;
-    const max = experience.max;
-
-    if (
-      min !== undefined &&
-      max !== undefined
-    ) {
-      return `${min} - ${max} years`;
-    }
-
-    if (min !== undefined) {
-      return `${min}+ years`;
-    }
-
-    if (max !== undefined) {
-      return `Up to ${max} years`;
-    }
-
-    return "Not specified";
+    return type;
   };
 
   const formatDate = (date) => {
-    if (!date) return "Not specified";
+    if (!date) {
+      return "Not specified";
+    }
 
-    return new Date(date).toLocaleDateString(
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "Not specified";
+    }
+
+    return parsedDate.toLocaleDateString(
       "en-IN",
       {
         day: "numeric",
@@ -195,6 +149,10 @@ const ViewJob = () => {
     );
   };
 
+  // ==========================================
+  // STATUS
+  // ==========================================
+
   const status = currentJob.status || "draft";
 
   const statusConfig = {
@@ -203,13 +161,15 @@ const ViewJob = () => {
       color: "#fbbf24",
       bg: "rgba(251,191,36,0.12)",
     },
+
     published: {
       label: "Published",
       color: "#4ade80",
       bg: "rgba(34,197,94,0.12)",
     },
-    archived: {
-      label: "Archived",
+
+    closed: {
+      label: "Closed",
       color: "#f87171",
       bg: "rgba(239,68,68,0.12)",
     },
@@ -218,6 +178,10 @@ const ViewJob = () => {
   const currentStatus =
     statusConfig[status] ||
     statusConfig.draft;
+
+  // ==========================================
+  // UI
+  // ==========================================
 
   return (
     <Box
@@ -233,9 +197,9 @@ const ViewJob = () => {
     >
       <Container maxWidth="lg">
 
-        {/* ================================
+        {/* ======================================
             HEADER
-        ================================= */}
+        ====================================== */}
 
         <Stack
           direction={{
@@ -260,16 +224,22 @@ const ViewJob = () => {
             }}
           >
             <Button
+              variant="outlined"
               startIcon={<ArrowBack />}
               onClick={() =>
                 navigate("/recruiter/jobs")
               }
               sx={{
                 color: "#d1d5db",
-                textTransform: "none",
                 borderColor: "#374151",
+                textTransform: "none",
+
+                "&:hover": {
+                  borderColor: "#6366f1",
+                  bgcolor:
+                    "rgba(99,102,241,0.08)",
+                },
               }}
-              variant="outlined"
             >
               Back
             </Button>
@@ -305,13 +275,16 @@ const ViewJob = () => {
               )
             }
             sx={{
+              minWidth: 130,
               textTransform: "none",
               fontWeight: 600,
               px: 3,
               py: 1.2,
               borderRadius: 2,
+
               background:
                 "linear-gradient(135deg, #6366f1, #8b5cf6)",
+
               "&:hover": {
                 background:
                   "linear-gradient(135deg, #4f46e5, #7c3aed)",
@@ -322,9 +295,9 @@ const ViewJob = () => {
           </Button>
         </Stack>
 
-        {/* ================================
+        {/* ======================================
             MAIN JOB CARD
-        ================================= */}
+        ====================================== */}
 
         <Card
           sx={{
@@ -344,7 +317,7 @@ const ViewJob = () => {
             }}
           >
 
-            {/* JOB TITLE */}
+            {/* JOB HEADER */}
 
             <Stack
               direction={{
@@ -353,7 +326,8 @@ const ViewJob = () => {
               }}
               spacing={3}
               sx={{
-                justifyContent: "space-between",
+                justifyContent:
+                  "space-between",
                 alignItems: {
                   xs: "flex-start",
                   sm: "center",
@@ -377,6 +351,7 @@ const ViewJob = () => {
                     alignItems: "center",
                     bgcolor:
                       "rgba(99,102,241,0.15)",
+                    flexShrink: 0,
                   }}
                 >
                   <Work
@@ -398,17 +373,34 @@ const ViewJob = () => {
                     {currentJob.title}
                   </Typography>
 
-                  <Typography
+                  <Stack
+                    direction="row"
+                    spacing={1}
                     sx={{
-                      color: "#9ca3af",
-                      mt: 0.5,
+                      alignItems: "center",
+                      mt: 0.7,
                     }}
                   >
-                    {currentJob.company ||
-                      "Your Company"}
-                  </Typography>
+                    <Business
+                      sx={{
+                        fontSize: 18,
+                        color: "#9ca3af",
+                      }}
+                    />
+
+                    <Typography
+                      sx={{
+                        color: "#9ca3af",
+                      }}
+                    >
+                      {currentJob.company ||
+                        "Company not specified"}
+                    </Typography>
+                  </Stack>
                 </Box>
               </Stack>
+
+              {/* STATUS */}
 
               <Chip
                 label={currentStatus.label}
@@ -419,6 +411,7 @@ const ViewJob = () => {
                   color:
                     currentStatus.color,
                   fontWeight: 600,
+
                   "& .MuiChip-icon": {
                     color:
                       currentStatus.color,
@@ -434,12 +427,17 @@ const ViewJob = () => {
               }}
             />
 
-            {/* JOB INFO */}
+            {/* ==================================
+                JOB INFORMATION
+            ================================== */}
 
             <Grid
               container
               spacing={3}
             >
+
+              {/* LOCATION */}
+
               <Grid
                 size={{
                   xs: 12,
@@ -457,6 +455,8 @@ const ViewJob = () => {
                 />
               </Grid>
 
+              {/* JOB TYPE */}
+
               <Grid
                 size={{
                   xs: 12,
@@ -466,12 +466,14 @@ const ViewJob = () => {
               >
                 <InfoItem
                   icon={<BusinessCenter />}
-                  label="Employment Type"
+                  label="Job Type"
                   value={formatJobType(
-                    currentJob.employmentType
+                    currentJob.jobType
                   )}
                 />
               </Grid>
+
+              {/* EXPERIENCE */}
 
               <Grid
                 size={{
@@ -483,9 +485,14 @@ const ViewJob = () => {
                 <InfoItem
                   icon={<Work />}
                   label="Experience"
-                  value={formatExperience()}
+                  value={
+                    currentJob.experience ||
+                    "Not specified"
+                  }
                 />
               </Grid>
+
+              {/* SALARY */}
 
               <Grid
                 size={{
@@ -497,26 +504,14 @@ const ViewJob = () => {
                 <InfoItem
                   icon={<Payments />}
                   label="Salary"
-                  value={formatSalary()}
-                />
-              </Grid>
-
-              <Grid
-                size={{
-                  xs: 12,
-                  sm: 6,
-                  md: 4,
-                }}
-              >
-                <InfoItem
-                  icon={<School />}
-                  label="Education"
                   value={
-                    currentJob.education ||
+                    currentJob.salary ||
                     "Not specified"
                   }
                 />
               </Grid>
+
+              {/* DEADLINE */}
 
               <Grid
                 size={{
@@ -533,13 +528,29 @@ const ViewJob = () => {
                   )}
                 />
               </Grid>
+
+              {/* STATUS */}
+
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  md: 4,
+                }}
+              >
+                <InfoItem
+                  icon={<CheckCircle />}
+                  label="Status"
+                  value={currentStatus.label}
+                />
+              </Grid>
             </Grid>
           </CardContent>
         </Card>
 
-        {/* ================================
+        {/* ======================================
             DESCRIPTION
-        ================================= */}
+        ====================================== */}
 
         <Card
           sx={{
@@ -576,9 +587,48 @@ const ViewJob = () => {
           </CardContent>
         </Card>
 
-        {/* ================================
+        {/* ======================================
+            REQUIREMENTS
+        ====================================== */}
+
+        <Card
+          sx={{
+            bgcolor: "#1f2937",
+            border: "1px solid #374151",
+            borderRadius: 3,
+            color: "#fff",
+            mb: 3,
+          }}
+        >
+          <CardContent
+            sx={{
+              p: {
+                xs: 3,
+                md: 4,
+              },
+            }}
+          >
+            <SectionTitle
+              icon={<ListAlt />}
+              title="Requirements"
+            />
+
+            <Typography
+              sx={{
+                color: "#d1d5db",
+                lineHeight: 1.8,
+                whiteSpace: "pre-line",
+              }}
+            >
+              {currentJob.requirements ||
+                "No requirements specified."}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        {/* ======================================
             SKILLS
-        ================================= */}
+        ====================================== */}
 
         <Card
           sx={{
@@ -642,9 +692,9 @@ const ViewJob = () => {
           </CardContent>
         </Card>
 
-        {/* ================================
-            FOOTER INFO
-        ================================= */}
+        {/* ======================================
+            FOOTER
+        ====================================== */}
 
         <Card
           sx={{
@@ -659,7 +709,7 @@ const ViewJob = () => {
                 xs: "column",
                 sm: "row",
               }}
-              spacing={2}
+              spacing={3}
               sx={{
                 justifyContent:
                   "space-between",
@@ -722,9 +772,16 @@ const ViewJob = () => {
                   )
                 }
                 sx={{
+                  minWidth: 130,
                   textTransform: "none",
+                  fontWeight: 600,
                   background:
                     "linear-gradient(135deg, #6366f1, #8b5cf6)",
+
+                  "&:hover": {
+                    background:
+                      "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                  },
                 }}
               >
                 Edit Job
@@ -732,6 +789,7 @@ const ViewJob = () => {
             </Stack>
           </CardContent>
         </Card>
+
       </Container>
     </Box>
   );
@@ -771,7 +829,7 @@ const InfoItem = ({
         {icon}
       </Box>
 
-      <Box>
+      <Box sx={{ minWidth: 0 }}>
         <Typography
           variant="body2"
           sx={{
@@ -786,6 +844,7 @@ const InfoItem = ({
             color: "#fff",
             fontWeight: 500,
             mt: 0.2,
+            wordBreak: "break-word",
           }}
         >
           {value}

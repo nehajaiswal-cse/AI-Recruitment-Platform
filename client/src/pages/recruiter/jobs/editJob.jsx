@@ -48,18 +48,14 @@ const EditJob = () => {
 
   const [formData, setFormData] = useState({
     title: "",
-    description: "",
+    company: "",
     location: "",
-    employmentType: "full-time",
-
-    experienceMin: "",
-    experienceMax: "",
-
-    salaryMin: "",
-    salaryMax: "",
-    currency: "INR",
-
-    education: "",
+    jobType: "Full-time",
+    experience: "",
+    salary: "",
+    description: "",
+    requirements: "",
+    status: "published",
     deadline: "",
   });
 
@@ -97,38 +93,27 @@ const EditJob = () => {
     setFormData({
       title: currentJob.title ?? "",
 
+      company: currentJob.company ?? "",
+
+      location: currentJob.location ?? "",
+
+      jobType:
+        currentJob.jobType ?? "Full-time",
+
+      experience:
+        currentJob.experience ?? "",
+
+      salary:
+        currentJob.salary ?? "",
+
       description:
         currentJob.description ?? "",
 
-      location:
-        currentJob.location ?? "",
+      requirements:
+        currentJob.requirements ?? "",
 
-      employmentType:
-        currentJob.employmentType ??
-        "full-time",
-
-      experienceMin:
-        currentJob.experience?.min ??
-        "",
-
-      experienceMax:
-        currentJob.experience?.max ??
-        "",
-
-      salaryMin:
-        currentJob.salary?.min ??
-        "",
-
-      salaryMax:
-        currentJob.salary?.max ??
-        "",
-
-      currency:
-        currentJob.salary?.currency ??
-        "INR",
-
-      education:
-        currentJob.education ?? "",
+      status:
+        currentJob.status ?? "published",
 
       deadline: currentJob.deadline
         ? new Date(currentJob.deadline)
@@ -145,7 +130,7 @@ const EditJob = () => {
   }, [currentJob]);
 
   // =====================================================
-  // HANDLE INPUT CHANGE
+  // HANDLE CHANGE
   // =====================================================
 
   const handleChange = (event) => {
@@ -226,96 +211,38 @@ const EditJob = () => {
       return;
     }
 
-    if (!formData.experienceMin) {
-      setFormError(
-        "Minimum experience is required."
-      );
-      return;
-    }
-
-    if (
-      formData.experienceMax !== "" &&
-      Number(formData.experienceMax) <
-        Number(formData.experienceMin)
-    ) {
-      setFormError(
-        "Maximum experience cannot be less than minimum experience."
-      );
-      return;
-    }
-
-    if (
-      formData.salaryMin !== "" &&
-      formData.salaryMax !== "" &&
-      Number(formData.salaryMax) <
-        Number(formData.salaryMin)
-    ) {
-      setFormError(
-        "Maximum salary cannot be less than minimum salary."
-      );
-      return;
-    }
-
     // =================================================
-    // DATA MATCHING BACKEND SCHEMA
+    // BACKEND PAYLOAD
     // =================================================
 
     const jobData = {
       title: formData.title.trim(),
 
+      company: formData.company.trim(),
+
+      location: formData.location.trim(),
+
+      jobType: formData.jobType,
+
+      experience:
+        formData.experience.trim(),
+
+      salary:
+        formData.salary.trim(),
+
       description:
         formData.description.trim(),
 
+      requirements:
+        formData.requirements.trim(),
+
       skills,
 
-      experience: {
-        min: Number(
-          formData.experienceMin
-        ),
-
-        ...(formData.experienceMax !== ""
-          ? {
-              max: Number(
-                formData.experienceMax
-              ),
-            }
-          : {}),
-      },
-
-      education:
-        formData.education.trim(),
-
-      location:
-        formData.location.trim(),
-
-      employmentType:
-        formData.employmentType,
-
-      salary: {
-        ...(formData.salaryMin !== ""
-          ? {
-              min: Number(
-                formData.salaryMin
-              ),
-            }
-          : {}),
-
-        ...(formData.salaryMax !== ""
-          ? {
-              max: Number(
-                formData.salaryMax
-              ),
-            }
-          : {}),
-
-        currency:
-          formData.currency || "INR",
-      },
+      status: formData.status,
 
       ...(formData.deadline
         ? {
-            deadline:
-              formData.deadline,
+            deadline: formData.deadline,
           }
         : {}),
     };
@@ -326,7 +253,7 @@ const EditJob = () => {
     );
 
     // =================================================
-    // UPDATE
+    // UPDATE JOB
     // =================================================
 
     try {
@@ -358,8 +285,7 @@ const EditJob = () => {
     return (
       <Box
         sx={{
-          minHeight:
-            "calc(100vh - 70px)",
+          minHeight: "100vh",
           bgcolor: "#111827",
           display: "flex",
           justifyContent: "center",
@@ -383,8 +309,7 @@ const EditJob = () => {
   return (
     <Box
       sx={{
-        minHeight:
-          "calc(100vh - 70px)",
+        minHeight: "100vh",
         bgcolor: "#111827",
         color: "#fff",
         py: {
@@ -395,9 +320,7 @@ const EditJob = () => {
     >
       <Container maxWidth="lg">
 
-        {/* =========================================
-            HEADER
-        ========================================= */}
+        {/* HEADER */}
 
         <Stack
           direction="row"
@@ -409,9 +332,7 @@ const EditJob = () => {
         >
           <IconButton
             onClick={() =>
-              navigate(
-                "/recruiter/jobs"
-              )
+              navigate("/recruiter/jobs")
             }
             sx={{
               color: "#d1d5db",
@@ -442,15 +363,12 @@ const EditJob = () => {
                 mt: 0.5,
               }}
             >
-              Update your job posting
-              details.
+              Update your job posting details.
             </Typography>
           </Box>
         </Stack>
 
-        {/* =========================================
-            ERROR
-        ========================================= */}
+        {/* ERROR */}
 
         {(formError || error) && (
           <Alert
@@ -464,16 +382,13 @@ const EditJob = () => {
           </Alert>
         )}
 
-        {/* =========================================
-            FORM CARD
-        ========================================= */}
+        {/* FORM CARD */}
 
         <Card
           sx={{
             bgcolor: "#1f2937",
             color: "#fff",
-            border:
-              "1px solid #374151",
+            border: "1px solid #374151",
             borderRadius: 3,
           }}
         >
@@ -485,13 +400,11 @@ const EditJob = () => {
               },
             }}
           >
-            <form
-              onSubmit={handleSubmit}
-            >
+            <form onSubmit={handleSubmit}>
 
-              {/* ===================================
+              {/* =====================================
                   BASIC INFORMATION
-              =================================== */}
+              ====================================== */}
 
               <SectionTitle
                 icon={<Work />}
@@ -503,7 +416,7 @@ const EditJob = () => {
                 spacing={3}
               >
 
-                {/* TITLE */}
+                {/* JOB TITLE */}
 
                 <Grid
                   size={{
@@ -516,12 +429,26 @@ const EditJob = () => {
                     required
                     label="Job Title"
                     name="title"
-                    value={
-                      formData.title
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.title}
+                    onChange={handleChange}
+                    sx={inputStyle}
+                  />
+                </Grid>
+
+                {/* COMPANY */}
+
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6,
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    label="Company"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
                     sx={inputStyle}
                   />
                 </Grid>
@@ -538,20 +465,15 @@ const EditJob = () => {
                     fullWidth
                     label="Location"
                     name="location"
-                    value={
-                      formData.location
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.location}
+                    onChange={handleChange}
                     sx={inputStyle}
                     slotProps={{
                       input: {
                         startAdornment: (
                           <LocationOn
                             sx={{
-                              color:
-                                "#9ca3af",
+                              color: "#9ca3af",
                               mr: 1,
                             }}
                           />
@@ -561,7 +483,7 @@ const EditJob = () => {
                   />
                 </Grid>
 
-                {/* EMPLOYMENT TYPE */}
+                {/* JOB TYPE */}
 
                 <Grid
                   size={{
@@ -572,35 +494,35 @@ const EditJob = () => {
                   <TextField
                     fullWidth
                     select
-                    label="Employment Type"
-                    name="employmentType"
-                    value={
-                      formData.employmentType
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    label="Job Type"
+                    name="jobType"
+                    value={formData.jobType}
+                    onChange={handleChange}
                     sx={inputStyle}
                   >
-                    <MenuItem value="full-time">
+                    <MenuItem value="Full-time">
                       Full-time
                     </MenuItem>
 
-                    <MenuItem value="part-time">
+                    <MenuItem value="Part-time">
                       Part-time
                     </MenuItem>
 
-                    <MenuItem value="internship">
+                    <MenuItem value="Internship">
                       Internship
                     </MenuItem>
 
-                    <MenuItem value="contract">
+                    <MenuItem value="Contract">
                       Contract
                     </MenuItem>
+
+                    <MenuItem value="Remote">
+                      Remote
+                    </MenuItem>
                   </TextField>
                 </Grid>
 
-                {/* EDUCATION */}
+                {/* EXPERIENCE */}
 
                 <Grid
                   size={{
@@ -610,19 +532,16 @@ const EditJob = () => {
                 >
                   <TextField
                     fullWidth
-                    label="Education"
-                    name="education"
-                    value={
-                      formData.education
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    label="Experience"
+                    name="experience"
+                    placeholder="e.g. 2-4 years"
+                    value={formData.experience}
+                    onChange={handleChange}
                     sx={inputStyle}
                   />
                 </Grid>
 
-                {/* EXPERIENCE MIN */}
+                {/* SALARY */}
 
                 <Grid
                   size={{
@@ -632,173 +551,22 @@ const EditJob = () => {
                 >
                   <TextField
                     fullWidth
-                    type="number"
-                    label="Minimum Experience (years)"
-                    name="experienceMin"
-                    value={
-                      formData.experienceMin
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    label="Salary"
+                    name="salary"
+                    placeholder="e.g. ₹6-10 LPA"
+                    value={formData.salary}
+                    onChange={handleChange}
                     sx={inputStyle}
-                    slotProps={{
-                      htmlInput: {
-                        min: 0,
-                      },
-                    }}
-                  />
-                </Grid>
-
-                {/* EXPERIENCE MAX */}
-
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 6,
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    type="number"
-                    label="Maximum Experience (years)"
-                    name="experienceMax"
-                    value={
-                      formData.experienceMax
-                    }
-                    onChange={
-                      handleChange
-                    }
-                    sx={inputStyle}
-                    slotProps={{
-                      htmlInput: {
-                        min: 0,
-                      },
-                    }}
                   />
                 </Grid>
 
               </Grid>
 
-              <Divider
-                sx={{
-                  my: 4,
-                  borderColor:
-                    "#374151",
-                }}
-              />
+              <Divider sx={dividerStyle} />
 
-              {/* ===================================
-                  SALARY
-              =================================== */}
-
-              <SectionTitle
-                title="Salary"
-              />
-
-              <Grid
-                container
-                spacing={3}
-              >
-
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 4,
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    type="number"
-                    label="Minimum Salary"
-                    name="salaryMin"
-                    value={
-                      formData.salaryMin
-                    }
-                    onChange={
-                      handleChange
-                    }
-                    sx={inputStyle}
-                    slotProps={{
-                      htmlInput: {
-                        min: 0,
-                      },
-                    }}
-                  />
-                </Grid>
-
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 4,
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    type="number"
-                    label="Maximum Salary"
-                    name="salaryMax"
-                    value={
-                      formData.salaryMax
-                    }
-                    onChange={
-                      handleChange
-                    }
-                    sx={inputStyle}
-                    slotProps={{
-                      htmlInput: {
-                        min: 0,
-                      },
-                    }}
-                  />
-                </Grid>
-
-                <Grid
-                  size={{
-                    xs: 12,
-                    md: 4,
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    select
-                    label="Currency"
-                    name="currency"
-                    value={
-                      formData.currency
-                    }
-                    onChange={
-                      handleChange
-                    }
-                    sx={inputStyle}
-                  >
-                    <MenuItem value="INR">
-                      INR
-                    </MenuItem>
-
-                    <MenuItem value="USD">
-                      USD
-                    </MenuItem>
-
-                    <MenuItem value="EUR">
-                      EUR
-                    </MenuItem>
-                  </TextField>
-                </Grid>
-
-              </Grid>
-
-              <Divider
-                sx={{
-                  my: 4,
-                  borderColor:
-                    "#374151",
-                }}
-              />
-
-              {/* ===================================
+              {/* =====================================
                   JOB DESCRIPTION
-              =================================== */}
+              ====================================== */}
 
               <SectionTitle
                 icon={<Description />}
@@ -812,26 +580,31 @@ const EditJob = () => {
                 minRows={7}
                 label="Description"
                 name="description"
-                value={
-                  formData.description
-                }
-                onChange={
-                  handleChange
-                }
+                value={formData.description}
+                onChange={handleChange}
                 sx={inputStyle}
               />
 
-              <Divider
-                sx={{
-                  my: 4,
-                  borderColor:
-                    "#374151",
-                }}
-              />
+              {/* REQUIREMENTS */}
 
-              {/* ===================================
+              <Box sx={{ mt: 3 }}>
+                <TextField
+                  fullWidth
+                  multiline
+                  minRows={5}
+                  label="Requirements"
+                  name="requirements"
+                  value={formData.requirements}
+                  onChange={handleChange}
+                  sx={inputStyle}
+                />
+              </Box>
+
+              <Divider sx={dividerStyle} />
+
+              {/* =====================================
                   SKILLS
-              =================================== */}
+              ====================================== */}
 
               <Typography
                 variant="h6"
@@ -853,19 +626,14 @@ const EditJob = () => {
                 <TextField
                   fullWidth
                   label="Add Skill"
-                  value={
-                    skillInput
-                  }
+                  value={skillInput}
                   onChange={(event) =>
                     setSkillInput(
                       event.target.value
                     )
                   }
                   onKeyDown={(event) => {
-                    if (
-                      event.key ===
-                      "Enter"
-                    ) {
+                    if (event.key === "Enter") {
                       event.preventDefault();
                       handleAddSkill();
                     }
@@ -877,20 +645,16 @@ const EditJob = () => {
                   type="button"
                   variant="outlined"
                   startIcon={<Add />}
-                  onClick={
-                    handleAddSkill
-                  }
+                  onClick={handleAddSkill}
                   sx={{
                     minWidth: 130,
-                    borderColor:
-                      "#6366f1",
+                    height: 56,
+                    borderColor: "#6366f1",
                     color: "#a5b4fc",
-                    textTransform:
-                      "none",
+                    textTransform: "none",
 
                     "&:hover": {
-                      borderColor:
-                        "#8b5cf6",
+                      borderColor: "#8b5cf6",
                     },
                   }}
                 >
@@ -903,64 +667,99 @@ const EditJob = () => {
                   direction="row"
                   spacing={1}
                   useFlexGap
-                  flexWrap="wrap"
                   sx={{
+                    flexWrap: "wrap",
                     mt: 2,
                   }}
                 >
-                  {skills.map(
-                    (skill) => (
-                      <Chip
-                        key={skill}
-                        label={skill}
-                        onDelete={() =>
-                          handleRemoveSkill(
-                            skill
-                          )
-                        }
-                        deleteIcon={
-                          <Delete />
-                        }
-                        sx={{
-                          bgcolor:
-                            "rgba(99,102,241,0.15)",
-                          color:
-                            "#a5b4fc",
-                        }}
-                      />
-                    )
-                  )}
+                  {skills.map((skill) => (
+                    <Chip
+                      key={skill}
+                      label={skill}
+                      onDelete={() =>
+                        handleRemoveSkill(skill)
+                      }
+                      deleteIcon={<Delete />}
+                      sx={{
+                        bgcolor:
+                          "rgba(99,102,241,0.15)",
+                        color: "#a5b4fc",
+                      }}
+                    />
+                  ))}
                 </Stack>
               )}
 
-              {/* ===================================
-                  DEADLINE
-              =================================== */}
+              {/* =====================================
+                  STATUS + DEADLINE
+              ====================================== */}
 
-              <Box sx={{ mt: 3 }}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  label="Application Deadline"
-                  name="deadline"
-                  value={
-                    formData.deadline
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  sx={inputStyle}
-                  slotProps={{
-                    inputLabel: {
-                      shrink: true,
-                    },
+              <Grid
+                container
+                spacing={3}
+                sx={{ mt: 1 }}
+              >
+
+                {/* STATUS */}
+
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6,
                   }}
-                />
-              </Box>
+                >
+                  <TextField
+                    fullWidth
+                    select
+                    label="Job Status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    sx={inputStyle}
+                  >
+                    <MenuItem value="draft">
+                      Draft
+                    </MenuItem>
 
-              {/* ===================================
+                    <MenuItem value="published">
+                      Published
+                    </MenuItem>
+
+                    <MenuItem value="closed">
+                      Closed
+                    </MenuItem>
+                  </TextField>
+                </Grid>
+
+                {/* DEADLINE */}
+
+                <Grid
+                  size={{
+                    xs: 12,
+                    md: 6,
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    type="date"
+                    label="Application Deadline"
+                    name="deadline"
+                    value={formData.deadline}
+                    onChange={handleChange}
+                    sx={inputStyle}
+                    slotProps={{
+                      inputLabel: {
+                        shrink: true,
+                      },
+                    }}
+                  />
+                </Grid>
+
+              </Grid>
+
+              {/* =====================================
                   ACTIONS
-              =================================== */}
+              ====================================== */}
 
               <Stack
                 direction={{
@@ -969,8 +768,7 @@ const EditJob = () => {
                 }}
                 spacing={2}
                 sx={{
-                  justifyContent:
-                    "flex-end",
+                  justifyContent: "flex-end",
                   mt: 5,
                 }}
               >
@@ -979,19 +777,14 @@ const EditJob = () => {
                   type="button"
                   variant="outlined"
                   onClick={() =>
-                    navigate(
-                      "/recruiter/jobs"
-                    )
+                    navigate("/recruiter/jobs")
                   }
                   sx={{
                     minWidth: 120,
                     height: 44,
-                    textTransform:
-                      "none",
-                    borderColor:
-                      "#4b5563",
-                    color:
-                      "#d1d5db",
+                    textTransform: "none",
+                    borderColor: "#4b5563",
+                    color: "#d1d5db",
                   }}
                 >
                   Cancel
@@ -1000,15 +793,11 @@ const EditJob = () => {
                 <Button
                   type="submit"
                   variant="contained"
-                  disabled={
-                    updating ||
-                    loading
-                  }
+                  disabled={updating}
                   sx={{
                     minWidth: 150,
                     height: 44,
-                    textTransform:
-                      "none",
+                    textTransform: "none",
                     fontWeight: 600,
 
                     background:
@@ -1046,10 +835,7 @@ const EditJob = () => {
 // SECTION TITLE
 // =====================================================
 
-const SectionTitle = ({
-  icon,
-  title,
-}) => {
+const SectionTitle = ({ icon, title }) => {
   return (
     <Stack
       direction="row"
@@ -1081,6 +867,15 @@ const SectionTitle = ({
       </Typography>
     </Stack>
   );
+};
+
+// =====================================================
+// DIVIDER STYLE
+// =====================================================
+
+const dividerStyle = {
+  my: 4,
+  borderColor: "#374151",
 };
 
 // =====================================================
