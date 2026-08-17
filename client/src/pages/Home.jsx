@@ -63,7 +63,7 @@ const Hero = () => {
       }}
     />
     <Container maxWidth="xl" sx={{ position: "relative", py: { xs: 8, md: 12 } }}>
-      <Grid container spacing={{ xs: 6, md: 8 }} alignItems="center">
+      <Grid container spacing={{ xs: 6, md: 8 }} sx={{alignItems: "center", }}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box
             sx={{
@@ -272,69 +272,187 @@ const Cards = () => {
 
 // ================= ExplainableAI =================
 const Bullet = ({ text }) => (
-  <Stack direction="row" spacing={1.5} alignItems="center">
-    <CheckCircle sx={{ fontSize: 20, color: "#269C8D" }} />
-    <Typography sx={{ color: "#304A61", fontSize: 15, fontWeight: 500 }}>{text}</Typography>
-  </Stack>
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 1.5,
+    }}
+  >
+    <CheckCircle
+      sx={{
+        fontSize: 20,
+        color: "#269C8D",
+        flexShrink: 0,
+      }}
+    />
+
+    <Typography
+      sx={{
+        color: "#304A61",
+        fontSize: 15,
+        fontWeight: 500,
+      }}
+    >
+      {text}
+    </Typography>
+  </Box>
 );
 
 const InsightRow = ({ text, success = false }) => (
-  <Stack direction="row" spacing={1.5} alignItems="center">
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 1.5,
+    }}
+  >
     <Box
       sx={{
-        width: 30, height: 30, borderRadius: "9px",
-        bgcolor: success ? "rgba(103,200,188,0.12)" : "rgba(232,156,80,0.12)",
+        width: 30,
+        height: 30,
+        borderRadius: "9px",
+        bgcolor: success
+          ? "rgba(103,200,188,0.12)"
+          : "rgba(232,156,80,0.12)",
         color: success ? COLORS.teal : "#E6A15F",
-        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
       }}
     >
-      {success ? <CheckCircle sx={{ fontSize: 17 }} /> : <Warning sx={{ fontSize: 17 }} />}
+      {success ? (
+        <CheckCircle sx={{ fontSize: 17 }} />
+      ) : (
+        <Warning sx={{ fontSize: 17 }} />
+      )}
     </Box>
-    <Typography sx={{ color: "#D4DFE9", fontSize: 14 }}>{text}</Typography>
-  </Stack>
+
+    <Typography
+      sx={{
+        color: "#D4DFE9",
+        fontSize: 14,
+      }}
+    >
+      {text}
+    </Typography>
+  </Box>
 );
 
 const InsightCard = () => (
   <Paper
     elevation={0}
     sx={{
-      p: { xs: 3, md: 4 }, borderRadius: "26px", bgcolor: "#10233D",
+      p: { xs: 3, md: 4 },
+      borderRadius: "26px",
+      bgcolor: "#10233D",
       border: "1px solid rgba(115,158,192,0.20)",
       boxShadow: "0 25px 60px rgba(15,31,53,0.16)",
     }}
   >
-    <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 3 }}>
-      <Box sx={{ ...tealIconBox, width: 42, height: 42, borderRadius: "12px" }}>
+    {/* Header */}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 1.5,
+        mb: 3,
+      }}
+    >
+      <Box
+        sx={{
+          ...tealIconBox,
+          width: 42,
+          height: 42,
+          borderRadius: "12px",
+          flexShrink: 0,
+        }}
+      >
         <AutoAwesome />
       </Box>
-      <Typography sx={{ color: COLORS.white, fontSize: 19, fontWeight: 800 }}>
-        Why this candidate matches
-      </Typography>
-    </Stack>
 
-    <Box sx={{ p: 2.5, bgcolor: "rgba(255,255,255,0.045)", borderRadius: "15px", border: "1px solid rgba(255,255,255,0.06)", mb: 3 }}>
-      <Typography sx={{ color: "#AFC1D2", fontSize: 14, lineHeight: 1.8 }}>
-        Strong technical alignment with the role. The candidate has extensive experience with React, Node.js and MongoDB and has completed multiple relevant projects.
+      <Typography
+        sx={{
+          color: COLORS.white,
+          fontSize: 19,
+          fontWeight: 800,
+        }}
+      >
+        Why this candidate matches
       </Typography>
     </Box>
 
-    <Stack spacing={2}>
-      {insightRows.map((row) => <InsightRow key={row.text} {...row} />)}
-    </Stack>
+    {/* Description */}
+    <Box
+      sx={{
+        p: 2.5,
+        bgcolor: "rgba(255,255,255,0.045)",
+        borderRadius: "15px",
+        border: "1px solid rgba(255,255,255,0.06)",
+        mb: 3,
+      }}
+    >
+      <Typography
+        sx={{
+          color: "#AFC1D2",
+          fontSize: 14,
+          lineHeight: 1.8,
+        }}
+      >
+        Strong technical alignment with the role. The candidate has extensive
+        experience with React, Node.js and MongoDB and has completed multiple
+        relevant projects.
+      </Typography>
+    </Box>
+
+    {/* Insights */}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+      }}
+    >
+      {insightRows.map((row) => (
+        <InsightRow
+          key={row.text}
+          text={row.text}
+          success={row.success}
+        />
+      ))}
+    </Box>
   </Paper>
 );
 
 const ExplainableAI = () => (
   <Box sx={sectionSx}>
     <Container maxWidth="xl">
-      <Grid container spacing={8} alignItems="center">
+      <Grid
+        container
+        spacing={8}
+        sx={{
+          alignItems: "center",
+        }}
+      >
+        {/* Left Content */}
         <Grid size={{ xs: 12, md: 6 }}>
           <Box
             sx={{
-              display: "inline-flex", alignItems: "center", gap: 1,
-              px: 1.5, py: 0.8, borderRadius: "20px",
-              bgcolor: "#E5F5F3", color: "#269C8D",
-              fontSize: 12, fontWeight: 800, mb: 2,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 1,
+              px: 1.5,
+              py: 0.8,
+              borderRadius: "20px",
+              bgcolor: "#E5F5F3",
+              color: "#269C8D",
+              fontSize: 12,
+              fontWeight: 800,
+              mb: 2,
             }}
           >
             <Bolt sx={{ fontSize: 16 }} />
@@ -343,22 +461,48 @@ const ExplainableAI = () => (
 
           <Typography
             sx={{
-              color: COLORS.textDark, fontSize: { xs: "2.3rem", md: "3.2rem" },
-              lineHeight: 1.05, letterSpacing: "-2px", fontWeight: 800, mb: 3,
+              color: COLORS.textDark,
+              fontSize: {
+                xs: "2.3rem",
+                md: "3.2rem",
+              },
+              lineHeight: 1.05,
+              letterSpacing: "-2px",
+              fontWeight: 800,
+              mb: 3,
             }}
           >
-            Don't just get<br />a score.<br />Understand why.
+            Don't just get
+            <br />
+            a score.
+            <br />
+            Understand why.
           </Typography>
 
-          <Typography sx={{ color: "#526A80", fontSize: 17, lineHeight: 1.75, maxWidth: 560, mb: 4 }}>
-            Traditional applicant tracking systems tell you who applied. Talvyn explains who fits your requirements and why.
+          <Typography
+            sx={{
+              color: "#526A80",
+              fontSize: 17,
+              lineHeight: 1.75,
+              maxWidth: 560,
+              mb: 4,
+            }}
+          >
+            Traditional applicant tracking systems tell you who applied.
+            Talvyn explains who fits your requirements and why.
           </Typography>
 
           <Stack spacing={2}>
-            {explainableBullets.map((text) => <Bullet key={text} text={text} />)}
+            {explainableBullets.map((text) => (
+              <Bullet
+                key={text}
+                text={text}
+              />
+            ))}
           </Stack>
         </Grid>
 
+        {/* Right Content */}
         <Grid size={{ xs: 12, md: 6 }}>
           <InsightCard />
         </Grid>
@@ -368,67 +512,192 @@ const ExplainableAI = () => (
 );
 
 // ================= AudienceSection =================
-const AudienceCard = ({ icon: Icon, title, description, bullets, button,path }) => {
+const AudienceCard = ({
+  icon: Icon,
+  title,
+  description,
+  bullets,
+  button,
+  path,
+}) => {
   const navigate = useNavigate();
-  return(
-  <Card
-    elevation={0}
-    sx={{
-      ...darkCardBase, ...darkCardHover, height: "100%", borderRadius: "26px",
-      boxShadow: "0 30px 70px rgba(3,16,32,0.28)",
-      "&::before": {
-        content: '""', position: "absolute", width: 320, height: 320,
-        right: -160, top: -180, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(50,135,245,0.13), transparent 70%)",
-        pointerEvents: "none",
-      },
-      "&:hover": {
-        ...darkCardHover["&:hover"],
-        boxShadow: "0 35px 80px rgba(3,16,32,0.38)",
-      },
-    }}
-  >
-    <CardContent sx={{ p: { xs: 3, md: 4 }, position: "relative", zIndex: 1 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-        <Box sx={{ ...tealIconBox, width: 55, height: 55, borderRadius: "15px", border: "1px solid rgba(103,200,188,0.12)" }}>
-          <Icon />
-        </Box>
-        <Box sx={{ px: 1.5, py: 0.7, borderRadius: "20px", bgcolor: "rgba(103,200,188,0.10)", color: COLORS.teal, fontSize: 11, fontWeight: 700, letterSpacing: "0.5px" }}>
-          TALVYN AI
-        </Box>
-      </Stack>
 
-      <Typography sx={{ color: COLORS.white, fontSize: { xs: 25, md: 28 }, fontWeight: 800, letterSpacing: "-0.8px", mb: 1.5 }}>
-        {title}
-      </Typography>
-      <Typography sx={{ color: "#9FB5C9", fontSize: 15, lineHeight: 1.7, mb: 3, maxWidth: 500 }}>
-        {description}
-      </Typography>
+  return (
+    <Card
+      elevation={0}
+      sx={{
+        ...darkCardBase,
+        ...darkCardHover,
+        height: "100%",
+        borderRadius: "26px",
+        boxShadow: "0 30px 70px rgba(3,16,32,0.28)",
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", mb: 3 }} />
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          width: 320,
+          height: 320,
+          right: -160,
+          top: -180,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(50,135,245,0.13), transparent 70%)",
+          pointerEvents: "none",
+        },
 
-      <Stack spacing={1.7} sx={{ mb: 4 }}>
-        {bullets.map((item) => (
-          <Stack key={item} direction="row" spacing={1.5} alignItems="center">
-            <Box sx={{ width: 28, height: 28, borderRadius: "8px", bgcolor: "rgba(103,200,188,0.10)", color: COLORS.teal, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <CheckCircle sx={{ fontSize: 17 }} />
-            </Box>
-            <Typography sx={{ color: "#D2DEE9", fontSize: 14, fontWeight: 500 }}>{item}</Typography>
-          </Stack>
-        ))}
-      </Stack>
-
-      <Button
-        onClick={()=>navigate(path)}
-        variant="contained"
-        endIcon={<ArrowForward />}
-        sx={{ ...primaryButtonSx, px: 2.8, py: 1.3, boxShadow: "0 10px 25px rgba(50,135,245,0.20)", "&:hover": { bgcolor: COLORS.blueDark, boxShadow: "0 12px 30px rgba(50,135,245,0.30)" } }}
+        "&:hover": {
+          ...darkCardHover["&:hover"],
+          boxShadow: "0 35px 80px rgba(3,16,32,0.38)",
+        },
+      }}
+    >
+      <CardContent
+        sx={{
+          p: { xs: 3, md: 4 },
+          position: "relative",
+          zIndex: 1,
+        }}
       >
-        {button}
-      </Button>
-    </CardContent>
-  </Card>
-)};
+        {/* Header */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 3,
+          }}
+        >
+          <Box
+            sx={{
+              ...tealIconBox,
+              width: 55,
+              height: 55,
+              borderRadius: "15px",
+              border: "1px solid rgba(103,200,188,0.12)",
+            }}
+          >
+            <Icon />
+          </Box>
+
+          <Box
+            sx={{
+              px: 1.5,
+              py: 0.7,
+              borderRadius: "20px",
+              bgcolor: "rgba(103,200,188,0.10)",
+              color: COLORS.teal,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.5px",
+            }}
+          >
+            TALVYN AI
+          </Box>
+        </Box>
+
+        {/* Title */}
+        <Typography
+          sx={{
+            color: COLORS.white,
+            fontSize: { xs: 25, md: 28 },
+            fontWeight: 800,
+            letterSpacing: "-0.8px",
+            mb: 1.5,
+          }}
+        >
+          {title}
+        </Typography>
+
+        {/* Description */}
+        <Typography
+          sx={{
+            color: "#9FB5C9",
+            fontSize: 15,
+            lineHeight: 1.7,
+            mb: 3,
+            maxWidth: 500,
+          }}
+        >
+          {description}
+        </Typography>
+
+        <Divider
+          sx={{
+            borderColor: "rgba(255,255,255,0.08)",
+            mb: 3,
+          }}
+        />
+
+        {/* Bullets */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1.7,
+            mb: 4,
+          }}
+        >
+          {bullets.map((item) => (
+            <Box
+              key={item}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: "8px",
+                  bgcolor: "rgba(103,200,188,0.10)",
+                  color: COLORS.teal,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <CheckCircle sx={{ fontSize: 17 }} />
+              </Box>
+
+              <Typography
+                sx={{
+                  color: "#D2DEE9",
+                  fontSize: 14,
+                  fontWeight: 500,
+                }}
+              >
+                {item}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Button */}
+        <Button
+          onClick={() => navigate(path)}
+          variant="contained"
+          endIcon={<ArrowForward />}
+          sx={{
+            ...primaryButtonSx,
+            px: 2.8,
+            py: 1.3,
+            boxShadow: "0 10px 25px rgba(50,135,245,0.20)",
+
+            "&:hover": {
+              bgcolor: COLORS.blueDark,
+              boxShadow: "0 12px 30px rgba(50,135,245,0.30)",
+            },
+          }}
+        >
+          {button}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
 
 const AudienceSection = () => (
   <Box sx={{ bgcolor: COLORS.section, py: 11 }}>
@@ -451,36 +720,90 @@ const AudienceSection = () => (
 
 // ================= CTA =================
 const CTA = () => {
-   const navigate = useNavigate();
-   return(
-  <Box sx={{ bgcolor: COLORS.navy, py: 12 }}>
-    <Container maxWidth="md">
-      <Box sx={{ textAlign: "center" }}>
-        <Typography sx={{ fontSize: { xs: "2.5rem", md: "3.5rem" }, fontWeight: 800, letterSpacing: "-2px", mb: 2 }}>
-          Ready to hire smarter?
-        </Typography>
-        <Typography sx={{ color: "#A9BBCF", fontSize: 17, lineHeight: 1.7, mb: 4 }}>
-          Find better opportunities or discover exceptional talent with Talvyn's intelligent recruitment platform.
-        </Typography>
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center">
-          <Button
-          onClick={()=>navigate("/recruiter/login")}
-            variant="contained"
-            size="large"
-            endIcon={<ArrowForward />}
-            sx={{ ...primaryButtonSx, px: 4, py: 1.6 }}
+  const navigate = useNavigate();
+
+  return (
+    <Box
+      sx={{
+        bgcolor: COLORS.navy,
+        py: 12,
+      }}
+    >
+      <Container maxWidth="md">
+        <Box
+          sx={{
+            textAlign: "center",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: {
+                xs: "2.5rem",
+                md: "3.5rem",
+              },
+              fontWeight: 800,
+              letterSpacing: "-2px",
+              mb: 2,
+            }}
           >
-            Start hiring
-          </Button>
-          <Button 
-          variant="outlined" size="large" sx={{ ...outlineButtonSx, px: 4, py: 1.6 }}>
-            Explore platform
-          </Button>
-        </Stack>
-      </Box>
-    </Container>
-  </Box>
-)};
+            Ready to hire smarter?
+          </Typography>
+
+          <Typography
+            sx={{
+              color: "#A9BBCF",
+              fontSize: 17,
+              lineHeight: 1.7,
+              mb: 4,
+            }}
+          >
+            Find better opportunities or discover exceptional talent with
+            Talvyn's intelligent recruitment platform.
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: {
+                xs: "column",
+                sm: "row",
+              },
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+            }}
+          >
+            <Button
+              onClick={() => navigate("/recruiter/login")}
+              variant="contained"
+              size="large"
+              endIcon={<ArrowForward />}
+              sx={{
+                ...primaryButtonSx,
+                px: 4,
+                py: 1.6,
+              }}
+            >
+              Start hiring
+            </Button>
+
+            <Button
+              variant="outlined"
+              size="large"
+              sx={{
+                ...outlineButtonSx,
+                px: 4,
+                py: 1.6,
+              }}
+            >
+              Explore platform
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
+  );
+};
 
 
 

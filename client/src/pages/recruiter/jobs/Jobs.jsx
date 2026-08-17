@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import Navbar from "../../../components/dashboard/Navbar";
 
 import {
   Alert,
@@ -15,7 +13,6 @@ import {
   Divider,
   Grid,
   IconButton,
-  InputAdornment,
   Menu,
   MenuItem,
   Stack,
@@ -24,6 +21,7 @@ import {
 } from "@mui/material";
 
 import {
+  ArrowBack,
   Add,
   Search,
   MoreVert,
@@ -37,7 +35,7 @@ import {
 } from "@mui/icons-material";
 
 import useJob from "../../../hooks/useJob";
-
+import Navbar from "../../../components/dashboard/Navbar";
 const Jobs = () => {
   const navigate = useNavigate();
 
@@ -46,11 +44,11 @@ const Jobs = () => {
     loading,
     error,
     fetchMyJobs,
-    removeJob,
+    deleteJob,
   } = useJob();
 
   const [search, setSearch] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedJob, setSelectedJob] = useState(null);
 
   // ==========================================
@@ -62,32 +60,45 @@ const Jobs = () => {
   }, [fetchMyJobs]);
 
   // ==========================================
-  // SEARCH
+  // FILTER JOBS
   // ==========================================
 
-  const filteredJobs = jobs.filter((job) => {
-    const query = search.toLowerCase().trim();
+  const filteredJobs = useMemo(() => {
+    if (!Array.isArray(jobs)) return [];
 
-    if (!query) return true;
+    const value = search.toLowerCase().trim();
 
-    return (
-      job.title?.toLowerCase().includes(query) ||
-      job.company?.toLowerCase().includes(query) ||
-      job.location?.toLowerCase().includes(query)
+    if (!value) return jobs;
+
+    return jobs.filter((job) =>
+      [
+        job.title,
+        job.company,
+        job.location,
+        job.jobType,
+        job.status,
+      ]
+        .filter(Boolean)
+        .some((field) =>
+          field
+            .toString()
+            .toLowerCase()
+            .includes(value)
+        )
     );
-  });
+  }, [jobs, search]);
 
   // ==========================================
   // MENU
   // ==========================================
 
   const handleMenuOpen = (event, job) => {
-    setAnchorEl(event.currentTarget);
+    setMenuAnchor(event.currentTarget);
     setSelectedJob(job);
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null);
+    setMenuAnchor(null);
     setSelectedJob(null);
   };
 
@@ -96,88 +107,167 @@ const Jobs = () => {
   // ==========================================
 
   const handleDelete = async () => {
-    if (!selectedJob) return;
-
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${selectedJob.title}"?`
-    );
-
-    if (!confirmed) return;
+    if (!selectedJob?._id) return;
 
     try {
-      await removeJob(selectedJob._id);
+      await deleteJob(selectedJob._id);
       handleMenuClose();
+      await fetchMyJobs();
     } catch (err) {
       console.error("Delete job error:", err);
     }
   };
 
   // ==========================================
+  // STATUS
+  // ==========================================
+
+  const getStatusConfig = (status) => {
+    switch (status) {
+      case "published":
+        return {
+          label: "Published",
+          color: "#4ade80",
+          bg: "rgba(34,197,94,0.12)",
+        };
+
+      case "draft":
+        return {
+          label: "Draft",
+          color: "#fbbf24",
+          bg: "rgba(251,191,36,0.12)",
+        };
+
+      case "closed":
+        return {
+          label: "Closed",
+          color: "#f87171",
+          bg: "rgba(239,68,68,0.12)",
+        };
+
+      default:
+        return {
+          label: status || "Unknown",
+          color: "#9ca3af",
+          bg: "rgba(156,163,175,0.12)",
+        };
+    }
+  };
+
+  // ==========================================
+  // DATE
+  // ==========================================
+
+  const formatDate = (date) => {
+    if (!date) return "Not specified";
+
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
+
+  // ==========================================
   // LOADING
   // ==========================================
 
-  if (loading && jobs.length === 0) {
+  if (loading && !jobs) {
     return (
-      <>
-        <Navbar />
-
-        <Box
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "#111827",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress
+          size={42}
           sx={{
-            minHeight: "calc(100vh - 70px)",
-            bgcolor: "#111827",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            color: "#8b5cf6",
           }}
-        >
-          <CircularProgress
-            size={42}
-            sx={{
-              color: "#8b5cf6",
-            }}
-          />
-        </Box>
-      </>
+        />
+      </Box>
     );
   }
 
+  // ==========================================
+  // UI
+  // ==========================================
+
   return (
     <>
-      {/* KEEP NAVBAR */}
-      <Navbar />
+    <Navbar />
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "#111827",
+        color: "#fff",
+        py: {
+          xs: 3,
+          md: 5,
+        },
+      }}
+    >
+      <Container maxWidth="lg">
 
-      <Box
-        sx={{
-          minHeight: "calc(100vh - 70px)",
-          bgcolor: "#111827",
-          color: "#fff",
-          py: {
-            xs: 3,
-            md: 5,
-          },
-        }}
-      >
-        <Container maxWidth="xl">
+        {/* ======================================
+            HEADER
+        ======================================= */}
 
-          {/* ======================================
-              HEADER
-          ======================================= */}
+        <Stack
+          direction={{
+            xs: "column",
+            sm: "row",
+          }}
+          spacing={3}
+          sx={{
+            justifyContent: "space-between",
+            alignItems: {
+              xs: "flex-start",
+              sm: "center",
+            },
+            mb: 4,
+          }}
+        >
+          {/* LEFT SIDE */}
 
           <Stack
-            direction={{
-              xs: "column",
-              sm: "row",
-            }}
-            spacing={3}
+            direction="row"
+            spacing={2}
             sx={{
-              justifyContent: "space-between",
-              alignItems: {
-                xs: "flex-start",
-                sm: "center",
-              },
-              mb: 4,
+              alignItems: "center",
             }}
           >
+            {/* BACK ARROW */}
+
+            <IconButton
+              onClick={() =>
+                navigate("/recruiter")
+              }
+              sx={{
+                color: "#d1d5db",
+                bgcolor: "#1f2937",
+                border:
+                  "1px solid #374151",
+
+                "&:hover": {
+                  bgcolor: "#374151",
+                  borderColor: "#6366f1",
+                  color: "#a5b4fc",
+                },
+              }}
+            >
+              <ArrowBack />
+            </IconButton>
+
+            {/* TITLE */}
+
             <Box>
               <Typography
                 variant="h4"
@@ -199,627 +289,557 @@ const Jobs = () => {
                   mt: 0.7,
                 }}
               >
-                Create, manage and track your job postings.
+                Create, manage and track
+                your job postings.
               </Typography>
             </Box>
-
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() =>
-                navigate("/recruiter/jobs/create")
-              }
-              sx={{
-                minWidth: 150,
-                px: 2.5,
-                py: 1.2,
-                borderRadius: 2,
-                textTransform: "none",
-                fontWeight: 600,
-                background:
-                  "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                "&:hover": {
-                  background:
-                    "linear-gradient(135deg, #4f46e5, #7c3aed)",
-                },
-              }}
-            >
-              Create Job
-            </Button>
           </Stack>
 
-          {/* ======================================
-              ERROR
-          ======================================= */}
+          {/* CREATE JOB */}
 
-          {error && (
-            <Alert
-              severity="error"
-              sx={{
-                mb: 3,
-                borderRadius: 2,
-              }}
-            >
-              {error}
-            </Alert>
-          )}
-
-          {/* ======================================
-              SEARCH
-          ======================================= */}
-
-          <TextField
-            fullWidth
-            placeholder="Search jobs..."
-            value={search}
-            onChange={(event) =>
-              setSearch(event.target.value)
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={() =>
+              navigate(
+                "/recruiter/jobs/create"
+              )
             }
             sx={{
-              maxWidth: 600,
-              mb: 4,
+              minWidth: 150,
+              px: 2.5,
+              py: 1.2,
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 600,
+              background:
+                "linear-gradient(135deg, #6366f1, #8b5cf6)",
 
-              "& .MuiOutlinedInput-root": {
-                bgcolor: "#1f2937",
-                borderRadius: 2,
-
-                "& fieldset": {
-                  borderColor: "#374151",
-                },
-
-                "&:hover fieldset": {
-                  borderColor: "#6366f1",
-                },
-
-                "&.Mui-focused fieldset": {
-                  borderColor: "#8b5cf6",
-                },
-              },
-
-              "& .MuiInputBase-input": {
-                color: "#fff",
-              },
-
-              "& .MuiInputBase-input::placeholder": {
-                color: "#9ca3af",
-                opacity: 1,
+              "&:hover": {
+                background:
+                  "linear-gradient(135deg, #4f46e5, #7c3aed)",
               },
             }}
-            slotProps={{
-              input: {
+          >
+            Create Job
+          </Button>
+        </Stack>
+
+        {/* ======================================
+            ERROR
+        ======================================= */}
+
+        {error && (
+          <Alert
+            severity="error"
+            sx={{
+              mb: 3,
+              borderRadius: 2,
+            }}
+          >
+            {error}
+          </Alert>
+        )}
+
+        {/* ======================================
+            SEARCH
+        ======================================= */}
+
+        <Card
+          sx={{
+            bgcolor: "#1f2937",
+            border:
+              "1px solid #374151",
+            borderRadius: 3,
+            mb: 3,
+          }}
+        >
+          <CardContent>
+            <TextField
+              fullWidth
+              value={search}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
+              placeholder="Search jobs by title, company, location..."
+              InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
-                    <Search
-                      sx={{
-                        color: "#9ca3af",
-                      }}
-                    />
-                  </InputAdornment>
+                  <Search
+                    sx={{
+                      color: "#9ca3af",
+                      mr: 1,
+                    }}
+                  />
                 ),
-              },
+              }}
+              sx={inputStyle}
+            />
+          </CardContent>
+        </Card>
+
+        {/* ======================================
+            JOB COUNT
+        ======================================= */}
+
+        <Stack
+          direction="row"
+          sx={{
+            justifyContent:
+              "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              color: "#9ca3af",
             }}
-          />
+          >
+            {filteredJobs.length}{" "}
+            {filteredJobs.length === 1
+              ? "job"
+              : "jobs"} found
+          </Typography>
+        </Stack>
 
-          {/* ======================================
-              EMPTY STATE
-          ======================================= */}
+        {/* ======================================
+            NO JOBS
+        ======================================= */}
 
-          {!loading &&
-            filteredJobs.length === 0 &&
-            !error && (
-              <Card
+        {filteredJobs.length === 0 ? (
+          <Card
+            sx={{
+              bgcolor: "#1f2937",
+              border:
+                "1px solid #374151",
+              borderRadius: 3,
+            }}
+          >
+            <CardContent
+              sx={{
+                py: 8,
+                textAlign: "center",
+              }}
+            >
+              <Work
                 sx={{
-                  bgcolor: "#1f2937",
-                  border: "1px solid #374151",
-                  borderRadius: 3,
-                  textAlign: "center",
-                  py: 8,
-                  px: 3,
+                  fontSize: 55,
+                  color: "#6366f1",
+                  mb: 2,
+                }}
+              />
+
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "#fff",
+                  fontWeight: 600,
                 }}
               >
-                <Work
-                  sx={{
-                    fontSize: 60,
-                    color: "#6b7280",
-                    mb: 2,
-                  }}
-                />
+                No jobs found
+              </Typography>
 
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: "#fff",
-                    fontWeight: 600,
-                  }}
-                >
-                  {search
-                    ? "No jobs found"
-                    : "No jobs created yet"}
-                </Typography>
+              <Typography
+                sx={{
+                  color: "#9ca3af",
+                  mt: 1,
+                  mb: 3,
+                }}
+              >
+                Create your first job posting
+                to get started.
+              </Typography>
 
-                <Typography
-                  sx={{
-                    color: "#9ca3af",
-                    mt: 1,
-                  }}
-                >
-                  {search
-                    ? "Try searching with a different keyword."
-                    : "Create your first job posting to get started."}
-                </Typography>
-
-                {!search && (
-                  <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() =>
-                      navigate(
-                        "/recruiter/jobs/create"
-                      )
-                    }
-                    sx={{
-                      mt: 3,
-                      textTransform: "none",
-                      borderRadius: 2,
-                      background:
-                        "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                    }}
-                  >
-                    Create Your First Job
-                  </Button>
-                )}
-              </Card>
-            )}
-
-          {/* ======================================
-              JOB CARDS
-          ======================================= */}
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() =>
+                  navigate(
+                    "/recruiter/jobs/create"
+                  )
+                }
+                sx={{
+                  textTransform: "none",
+                  background:
+                    "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                }}
+              >
+                Create Job
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          /* ======================================
+              JOB LIST
+          ======================================= */
 
           <Grid
             container
             spacing={3}
           >
-            {filteredJobs.map((job) => (
-              <Grid
-                size={{
-                  xs: 12,
-                  md: 6,
-                  lg: 4,
-                }}
-                key={job._id}
-              >
-                <Card
-                  sx={{
-                    height: "100%",
-                    bgcolor: "#1f2937",
-                    color: "#fff",
-                    borderRadius: 3,
-                    border:
-                      "1px solid #374151",
-                    transition:
-                      "all 0.25s ease",
+            {filteredJobs.map((job) => {
+              const status =
+                getStatusConfig(
+                  job.status
+                );
 
-                    "&:hover": {
-                      transform:
-                        "translateY(-4px)",
-                      borderColor:
-                        "#6366f1",
-                      boxShadow:
-                        "0 15px 35px rgba(0,0,0,0.25)",
-                    },
+              return (
+                <Grid
+                  key={job._id}
+                  size={{
+                    xs: 12,
+                    md: 6,
                   }}
                 >
-                  <CardContent sx={{ p: 3 }}>
+                  <Card
+                    sx={{
+                      height: "100%",
+                      bgcolor: "#1f2937",
+                      border:
+                        "1px solid #374151",
+                      borderRadius: 3,
+                      color: "#fff",
+                      transition:
+                        "0.2s",
 
-                    {/* JOB HEADER */}
-
-                    <Stack
-                      direction="row"
-                      spacing={2}
+                      "&:hover": {
+                        borderColor:
+                          "#6366f1",
+                        transform:
+                          "translateY(-2px)",
+                      },
+                    }}
+                  >
+                    <CardContent
                       sx={{
-                        justifyContent:
-                          "space-between",
-                        alignItems:
-                          "flex-start",
+                        p: 3,
                       }}
                     >
+                      {/* TOP */}
+
                       <Stack
                         direction="row"
-                        spacing={2}
                         sx={{
+                          justifyContent:
+                            "space-between",
                           alignItems:
-                            "center",
-                          minWidth: 0,
+                            "flex-start",
                         }}
                       >
-                        <Box
-                          sx={{
-                            width: 48,
-                            height: 48,
-                            minWidth: 48,
-                            borderRadius: 2,
-                            display: "flex",
-                            justifyContent:
-                              "center",
-                            alignItems:
-                              "center",
-                            bgcolor:
-                              "rgba(99,102,241,0.15)",
-                          }}
+                        <Stack
+                          direction="row"
+                          spacing={2}
                         >
-                          <Work
+                          <Box
                             sx={{
-                              color:
-                                "#818cf8",
-                              fontSize: 25,
-                            }}
-                          />
-                        </Box>
-
-                        <Box
-                          sx={{
-                            minWidth: 0,
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              color: "#fff",
-                              fontWeight: 700,
-                              fontSize:
-                                "1.05rem",
-                              overflow:
-                                "hidden",
-                              textOverflow:
-                                "ellipsis",
-                              whiteSpace:
-                                "nowrap",
+                              width: 50,
+                              height: 50,
+                              borderRadius: 2,
+                              display:
+                                "flex",
+                              justifyContent:
+                                "center",
+                              alignItems:
+                                "center",
+                              bgcolor:
+                                "rgba(99,102,241,0.15)",
                             }}
                           >
-                            {job.title ||
-                              "Untitled Job"}
-                          </Typography>
+                            <Work
+                              sx={{
+                                color:
+                                  "#818cf8",
+                              }}
+                            />
+                          </Box>
 
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color:
-                                "#9ca3af",
-                              mt: 0.3,
-                            }}
-                          >
-                            {job.company ||
-                              "Your Company"}
-                          </Typography>
-                        </Box>
+                          <Box>
+                            <Typography
+                              variant="h6"
+                              sx={{
+                                color:
+                                  "#fff",
+                                fontWeight:
+                                  600,
+                              }}
+                            >
+                              {job.title}
+                            </Typography>
+
+                            <Typography
+                              sx={{
+                                color:
+                                  "#9ca3af",
+                                mt: 0.3,
+                              }}
+                            >
+                              {job.company ||
+                                "Your Company"}
+                            </Typography>
+                          </Box>
+                        </Stack>
+
+                        <IconButton
+                          onClick={(event) =>
+                            handleMenuOpen(
+                              event,
+                              job
+                            )
+                          }
+                          sx={{
+                            color:
+                              "#9ca3af",
+                          }}
+                        >
+                          <MoreVert />
+                        </IconButton>
                       </Stack>
 
-                      <IconButton
-                        onClick={(event) =>
-                          handleMenuOpen(
-                            event,
-                            job
-                          )
-                        }
+                      <Divider
                         sx={{
-                          color:
-                            "#9ca3af",
-                        }}
-                      >
-                        <MoreVert />
-                      </IconButton>
-                    </Stack>
-
-                    {/* STATUS */}
-
-                    <Box sx={{ mt: 2 }}>
-                      <Chip
-                        label={
-                          job.status ===
-                          "closed"
-                            ? "Closed"
-                            : "Active"
-                        }
-                        size="small"
-                        sx={{
-                          bgcolor:
-                            job.status ===
-                            "closed"
-                              ? "rgba(239,68,68,0.12)"
-                              : "rgba(34,197,94,0.12)",
-
-                          color:
-                            job.status ===
-                            "closed"
-                              ? "#f87171"
-                              : "#4ade80",
-
-                          fontWeight: 600,
+                          my: 2.5,
+                          borderColor:
+                            "#374151",
                         }}
                       />
-                    </Box>
 
-                    <Divider
-                      sx={{
-                        my: 2.5,
-                        borderColor:
-                          "#374151",
-                      }}
-                    />
+                      {/* JOB INFO */}
 
-                    {/* DETAILS */}
+                      <Stack spacing={1.5}>
+                        <InfoRow
+                          icon={
+                            <LocationOn />
+                          }
+                          text={
+                            job.location ||
+                            "Location not specified"
+                          }
+                        />
 
-                    <Stack spacing={1.5}>
+                        <InfoRow
+                          icon={
+                            <Work />
+                          }
+                          text={
+                            job.jobType ||
+                            "Job type not specified"
+                          }
+                        />
+
+                        <InfoRow
+                          icon={
+                            <CalendarToday />
+                          }
+                          text={`Deadline: ${formatDate(
+                            job.deadline
+                          )}`}
+                        />
+                      </Stack>
+
+                      {/* BOTTOM */}
 
                       <Stack
                         direction="row"
-                        spacing={1}
                         sx={{
+                          justifyContent:
+                            "space-between",
                           alignItems:
                             "center",
+                          mt: 3,
                         }}
                       >
-                        <LocationOn
+                        <Chip
+                          label={
+                            status.label
+                          }
                           sx={{
-                            fontSize: 19,
+                            bgcolor:
+                              status.bg,
                             color:
-                              "#9ca3af",
+                              status.color,
+                            fontWeight:
+                              600,
                           }}
                         />
 
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color:
-                              "#d1d5db",
-                          }}
-                        >
-                          {job.location ||
-                            "Remote"}
-                        </Typography>
-                      </Stack>
-
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        sx={{
-                          alignItems:
-                            "center",
-                        }}
-                      >
-                        <People
-                          sx={{
-                            fontSize: 19,
-                            color:
-                              "#9ca3af",
-                          }}
-                        />
-
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color:
-                              "#d1d5db",
-                          }}
-                        >
-                          {job.applicantsCount ||
-                            0}{" "}
-                          Applicants
-                        </Typography>
-                      </Stack>
-
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        sx={{
-                          alignItems:
-                            "center",
-                        }}
-                      >
-                        <CalendarToday
-                          sx={{
-                            fontSize: 18,
-                            color:
-                              "#9ca3af",
-                          }}
-                        />
-
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color:
-                              "#d1d5db",
-                          }}
-                        >
-                          {job.createdAt
-                            ? new Date(
-                                job.createdAt
-                              ).toLocaleDateString()
-                            : "Recently"}
-                        </Typography>
-                      </Stack>
-
-                    </Stack>
-
-                    {/* SKILLS */}
-
-                    {Array.isArray(
-                      job.skills
-                    ) &&
-                      job.skills.length > 0 && (
                         <Stack
                           direction="row"
                           spacing={1}
-                          useFlexGap
-                          flexWrap="wrap"
-                          sx={{
-                            mt: 2.5,
-                          }}
                         >
-                          {job.skills
-                            .slice(0, 4)
-                            .map(
-                              (
-                                skill,
-                                index
-                              ) => (
-                                <Chip
-                                  key={
-                                    index
-                                  }
-                                  label={
-                                    skill
-                                  }
-                                  size="small"
-                                  sx={{
-                                    bgcolor:
-                                      "rgba(99,102,241,0.12)",
-                                    color:
-                                      "#a5b4fc",
-                                  }}
-                                />
+                          <Button
+                            size="small"
+                            startIcon={
+                              <Visibility />
+                            }
+                            onClick={() =>
+                              navigate(
+                                `/recruiter/jobs/${job._id}`
                               )
-                            )}
+                            }
+                            sx={{
+                              color:
+                                "#a5b4fc",
+                              textTransform:
+                                "none",
+                            }}
+                          >
+                            View
+                          </Button>
+
+                          <Button
+                            size="small"
+                            startIcon={
+                              <Edit />
+                            }
+                            onClick={() =>
+                              navigate(
+                                `/recruiter/jobs/${job._id}/edit`
+                              )
+                            }
+                            sx={{
+                              color:
+                                "#a5b4fc",
+                              textTransform:
+                                "none",
+                            }}
+                          >
+                            Edit
+                          </Button>
                         </Stack>
-                      )}
-
-                    {/* ACTIONS */}
-
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      sx={{ mt: 3 }}
-                    >
-                      <Button
-                        fullWidth
-                        size="small"
-                        variant="outlined"
-                        startIcon={
-                          <Visibility />
-                        }
-                        onClick={() =>
-                          navigate(
-                            `/recruiter/jobs/${job._id}`
-                          )
-                        }
-                        sx={{
-                          textTransform:
-                            "none",
-                          borderColor:
-                            "#4b5563",
-                          color:
-                            "#d1d5db",
-
-                          "&:hover": {
-                            borderColor:
-                              "#818cf8",
-                            color:
-                              "#a5b4fc",
-                          },
-                        }}
-                      >
-                        View
-                      </Button>
-
-                      <Button
-                        fullWidth
-                        size="small"
-                        variant="outlined"
-                        startIcon={
-                          <People />
-                        }
-                        onClick={() =>
-                          navigate(
-                            `/recruiter/jobs/${job._id}/applicants`
-                          )
-                        }
-                        sx={{
-                          textTransform:
-                            "none",
-                          borderColor:
-                            "#4b5563",
-                          color:
-                            "#d1d5db",
-
-                          "&:hover": {
-                            borderColor:
-                              "#818cf8",
-                            color:
-                              "#a5b4fc",
-                          },
-                        }}
-                      >
-                        Applicants
-                      </Button>
-                    </Stack>
-
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
           </Grid>
+        )}
 
-          {/* ======================================
-              MENU
-          ======================================= */}
+        {/* ======================================
+            MENU
+        ======================================= */}
 
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-            PaperProps={{
-              sx: {
-                bgcolor: "#1f2937",
-                color: "#fff",
-                border:
-                  "1px solid #374151",
-              },
+        <Menu
+          anchorEl={menuAnchor}
+          open={Boolean(menuAnchor)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem
+            onClick={() => {
+              navigate(
+                `/recruiter/jobs/${selectedJob?._id}`
+              );
+              handleMenuClose();
             }}
           >
-            <MenuItem
-              onClick={() => {
-                navigate(
-                  `/recruiter/jobs/${selectedJob?._id}`
-                );
-                handleMenuClose();
-              }}
-            >
-              <Visibility
-                sx={{ mr: 1.5 }}
-              />
-              View Job
-            </MenuItem>
+            <Visibility
+              fontSize="small"
+              sx={{ mr: 1 }}
+            />
+            View
+          </MenuItem>
 
-            <MenuItem
-              onClick={() => {
-                navigate(
-                  `/recruiter/jobs/${selectedJob?._id}/edit`
-                );
-                handleMenuClose();
-              }}
-            >
-              <Edit
-                sx={{ mr: 1.5 }}
-              />
-              Edit Job
-            </MenuItem>
+          <MenuItem
+            onClick={() => {
+              navigate(
+                `/recruiter/jobs/${selectedJob?._id}/edit`
+              );
+              handleMenuClose();
+            }}
+          >
+            <Edit
+              fontSize="small"
+              sx={{ mr: 1 }}
+            />
+            Edit
+          </MenuItem>
 
-            <MenuItem
-              onClick={handleDelete}
-              sx={{
-                color: "#f87171",
-              }}
-            >
-              <Delete
-                sx={{ mr: 1.5 }}
-              />
-              Delete Job
-            </MenuItem>
-          </Menu>
-
-        </Container>
-      </Box>
-    </>
+          <MenuItem
+            onClick={handleDelete}
+            sx={{
+              color: "#ef4444",
+            }}
+          >
+            <Delete
+              fontSize="small"
+              sx={{ mr: 1 }}
+            />
+            Delete
+          </MenuItem>
+        </Menu>
+      </Container>
+    </Box>
+  </>
   );
+};
+
+// ==========================================
+// INFO ROW
+// ==========================================
+
+const InfoRow = ({
+  icon,
+  text,
+}) => {
+  return (
+    <Stack
+      direction="row"
+      spacing={1}
+      sx={{
+        alignItems: "center",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          color: "#818cf8",
+        }}
+      >
+        {icon}
+      </Box>
+
+      <Typography
+        variant="body2"
+        sx={{
+          color: "#d1d5db",
+        }}
+      >
+        {text}
+      </Typography>
+    </Stack>
+  );
+};
+
+// ==========================================
+// INPUT STYLE
+// ==========================================
+
+const inputStyle = {
+  "& .MuiOutlinedInput-root": {
+    color: "#fff",
+    bgcolor: "#111827",
+
+    "& fieldset": {
+      borderColor: "#374151",
+    },
+
+    "&:hover fieldset": {
+      borderColor: "#6366f1",
+    },
+
+    "&.Mui-focused fieldset": {
+      borderColor: "#8b5cf6",
+    },
+  },
+
+  "& .MuiInputBase-input": {
+    color: "#fff",
+  },
+
+  "& .MuiInputBase-input::placeholder": {
+    color: "#6b7280",
+    opacity: 1,
+  },
 };
 
 export default Jobs;

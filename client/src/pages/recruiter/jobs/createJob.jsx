@@ -29,6 +29,7 @@ import {
   CalendarToday,
 } from "@mui/icons-material";
 
+import Navbar from "../../../components/dashboard/Navbar";
 import useJob from "../../../hooks/useJob";
 
 const CreateJob = () => {
@@ -180,6 +181,8 @@ const CreateJob = () => {
   };
 
   return (
+    <>
+    <Navbar />
     <Box
       sx={{
         minHeight: "calc(100vh - 70px)",
@@ -699,6 +702,7 @@ const CreateJob = () => {
         </Card>
       </Container>
     </Box>
+    </>
   );
 };
 

@@ -29,6 +29,7 @@ import {
 } from "@mui/icons-material";
 
 import useJob from "../../../hooks/useJob";
+import Navbar from "../../../components/dashboard/Navbar";
 
 const EditJob = () => {
   const navigate = useNavigate();
@@ -307,6 +308,8 @@ const EditJob = () => {
   // =====================================================
 
   return (
+    <>
+    <Navbar></Navbar>
     <Box
       sx={{
         minHeight: "100vh",
@@ -828,6 +831,7 @@ const EditJob = () => {
         </Card>
       </Container>
     </Box>
+    </>
   );
 };
 
@@ -854,6 +858,7 @@ const SectionTitle = ({ icon, title }) => {
         >
           {icon}
         </Box>
+  
       )}
 
       <Typography

@@ -30,6 +30,7 @@ import {
   ListAlt,
 } from "@mui/icons-material";
 
+import Navbar from "../../../components/dashboard/Navbar";
 import useJob from "../../../hooks/useJob";
 
 const ViewJob = () => {
@@ -84,6 +85,7 @@ const ViewJob = () => {
 
   if (error && !currentJob) {
     return (
+   
       <Box
         sx={{
           minHeight: "100vh",
@@ -184,6 +186,8 @@ const ViewJob = () => {
   // ==========================================
 
   return (
+       <>
+      <Navbar></Navbar>
     <Box
       sx={{
         minHeight: "100vh",
@@ -792,6 +796,7 @@ const ViewJob = () => {
 
       </Container>
     </Box>
+    </>
   );
 };
 
@@ -850,6 +855,7 @@ const InfoItem = ({
           {value}
         </Typography>
       </Box>
+    
     </Stack>
   );
 };
