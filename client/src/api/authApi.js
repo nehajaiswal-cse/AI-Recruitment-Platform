@@ -9,8 +9,9 @@ export const loginUser = async (formData) => {
 
     throw new Error(
       error.response?.data?.message ||
-      error.response?.data?.error ||
-      "Login failed. Please try again."
+        error.response?.data?.error ||
+        "Login failed. Please try again.",
+      { cause: error }
     );
   }
 };
@@ -24,23 +25,29 @@ export const registerUser = async (formData) => {
 
     throw new Error(
       error.response?.data?.message ||
-      error.response?.data?.error ||
-      "Registration failed. Please try again."
+        error.response?.data?.error ||
+        "Registration failed. Please try again.",
+      { cause: error }
     );
   }
-}
+};
+
 export const logoutUser = async () => {
   try {
     const response = await api.post("/auth/logout");
     return response.data;
   } catch (error) {
+    console.error("Logout error:", error);
+
     throw new Error(
       error.response?.data?.message ||
-      error.response?.data?.error ||
-      "Logout failed. Please try again."
+        error.response?.data?.error ||
+        "Logout failed. Please try again.",
+      { cause: error }
     );
   }
 };
+
 export const getprofile = async () => {
   try {
     const response = await api.get("/profile");
@@ -50,8 +57,9 @@ export const getprofile = async () => {
 
     throw new Error(
       error.response?.data?.message ||
-      error.response?.data?.error ||
-      "Failed to fetch profile."
+        error.response?.data?.error ||
+        "Failed to fetch profile.",
+      { cause: error }
     );
   }
 };
@@ -65,8 +73,8 @@ export const updateProfile = async (profileData) => {
 
     throw new Error(
       error.response?.data?.message ||
-      error.response?.data?.error ||
-      "Failed to update profile."
+        error.response?.data?.error ||
+        "Failed to update profile."
     );
   }
 };

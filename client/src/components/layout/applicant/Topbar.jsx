@@ -1,12 +1,108 @@
-import SearchBar from "../../common/SearchBar.jsx";
+import Box from '@mui/material/Box'
+import TextField from '@mui/material/TextField'
+import InputAdornment from '@mui/material/InputAdornment'
+import Button from '@mui/material/Button'
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import { brandGradient } from '../../../theme.js'
 
-const Topbar = () => {
+export default function RTopbar() {
   return (
-    <div className="bg-gray-500 h-20 relative flex items-center justify-around">
-      <SearchBar placeholder="Search Candidates" className="w-[50%]"/>
-      
-    </div>
-  );
-};
+  <Box
+  sx={{
+    display: 'flex',
+    flexDirection: {
+      xs: 'column',
+      sm: 'row',
+    },
+    alignItems: 'stretch',
+    gap: 2,
 
-export default Topbar;
+    px: {
+      xs: 2,
+      sm: 3,
+      md: 4,
+    },
+
+    pt: {
+      xs: 2,
+      sm: 2,
+      md: 2,
+    },
+
+    mb: 3,
+  }}
+>
+      <TextField
+        placeholder="Search Jobs"
+        fullWidth
+        size="small"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+            </InputAdornment>
+          ),
+          sx: {
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            height: 44,
+          },
+        }}
+      />
+
+      <Button
+        variant="contained"
+        startIcon={<AddRoundedIcon />}
+        sx={{
+          background: brandGradient,
+          whiteSpace: 'nowrap',
+          px: 2.5,
+          height: 44,
+          width: { xs: '100%', sm: 'auto' },
+          flexShrink: 0,
+          '&:hover': { background: brandGradient, opacity: 0.92 },
+        }}
+      >
+        Apply 
+      </Button>
+    </Box>
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import SearchBar from "../../common/SearchBar.jsx";
+
+// const Topbar = () => {
+//   return (
+//     <div className="bg-gray-500 h-20 relative flex items-center justify-around">
+//       <SearchBar placeholder="Search Candidates" className="w-[50%]"/>
+      
+//     </div>
+//   );
+// };
+
+// export default Topbar;

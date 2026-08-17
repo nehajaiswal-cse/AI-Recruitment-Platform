@@ -1,9 +1,10 @@
-import React from "react";
+//import React from "react";
 import {
   Box, Card, CardContent, Container, Divider, Grid, Paper, Stack, Typography,
 } from "@mui/material";
 import {
-  ArrowForward, AutoAwesome, Bolt, CheckCircle, Warning,
+ // ArrowForward, AutoAwesome, Bolt, CheckCircle, Warning,
+   AutoAwesome, Bolt
 } from "@mui/icons-material";
 import { COLORS } from "../../pages/homeStyles";
 import {
@@ -14,15 +15,51 @@ import { stats, features, steps, matchRows, insightRows } from "../../pages/home
 
 export const MatchRow = ({ label, value }) => (
   <Box sx={{ mb: 2.3 }}>
-    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.9 }}>
-      <Typography sx={{ color: "#B6C7D8", fontSize: 12.5 }}>{label}</Typography>
-      <Typography sx={{ color: COLORS.white, fontSize: 12.5, fontWeight: 700 }}>{value}%</Typography>
-    </Stack>
-    <Box sx={{ width: "100%", height: 7, bgcolor: COLORS.track, borderRadius: "20px", overflow: "hidden" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 0.9,
+      }}
+    >
+      <Typography
+        sx={{
+          color: "#B6C7D8",
+          fontSize: 12.5,
+        }}
+      >
+        {label}
+      </Typography>
+
+      <Typography
+        sx={{
+          color: COLORS.white,
+          fontSize: 12.5,
+          fontWeight: 700,
+        }}
+      >
+        {value}%
+      </Typography>
+    </Box>
+
+    <Box
+      sx={{
+        width: "100%",
+        height: 7,
+        bgcolor: COLORS.track,
+        borderRadius: "20px",
+        overflow: "hidden",
+      }}
+    >
       <Box
         sx={{
-          width: `${value}%`, height: "100%", borderRadius: "20px",
-          background: "linear-gradient(90deg,#58B8B0,#69C9BE)",
+          width: `${value}%`,
+          height: "100%",
+          borderRadius: "20px",
+          background:
+            "linear-gradient(90deg, #58B8B0, #69C9BE)",
         }}
       />
     </Box>
@@ -33,56 +70,224 @@ export const AIMatchCard = () => (
   <Paper
     elevation={0}
     sx={{
-      width: "100%", maxWidth: 570, mx: "auto",
-      p: { xs: 3, md: 4 }, borderRadius: "26px",
-      background: "linear-gradient(145deg, #142A45 0%, #10223A 100%)",
+      width: "100%",
+      maxWidth: 570,
+      mx: "auto",
+      p: { xs: 3, md: 4 },
+      borderRadius: "26px",
+      background:
+        "linear-gradient(145deg, #142A45 0%, #10223A 100%)",
       border: "1px solid rgba(112,167,194,0.25)",
       boxShadow: "0 35px 80px rgba(3,16,32,0.35)",
-      position: "relative", overflow: "hidden",
+      position: "relative",
+      overflow: "hidden",
+
       "&::before": {
-        content: '""', position: "absolute", width: 350, height: 350,
-        right: -180, top: -190, borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(55,136,210,0.16), transparent 70%)",
+        content: '""',
+        position: "absolute",
+        width: 350,
+        height: 350,
+        right: -180,
+        top: -190,
+        borderRadius: "50%",
+        background:
+          "radial-gradient(circle, rgba(55,136,210,0.16), transparent 70%)",
         pointerEvents: "none",
       },
     }}
   >
-    <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2} sx={{ position: "relative", zIndex: 1 }}>
-      <Stack direction="row" alignItems="center" spacing={1.4}>
-        <Box sx={{ ...tealIconBox, width: 38, height: 38, borderRadius: "11px" }}>
+    {/* Header */}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 2,
+        position: "relative",
+        zIndex: 1,
+      }}
+    >
+      {/* Title */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1.4,
+        }}
+      >
+        <Box
+          sx={{
+            ...tealIconBox,
+            width: 38,
+            height: 38,
+            borderRadius: "11px",
+            flexShrink: 0,
+          }}
+        >
           <AutoAwesome sx={{ fontSize: 20 }} />
         </Box>
-        <Typography sx={{ color: COLORS.white, fontSize: 17, fontWeight: 700 }}>Match overview</Typography>
-      </Stack>
-      <Box sx={{ px: 1.5, py: 0.7, borderRadius: "20px", bgcolor: "rgba(103,200,188,0.13)", color: COLORS.teal, fontSize: 12, fontWeight: 700 }}>
-        12 candidates
+
+        <Typography
+          sx={{
+            color: COLORS.white,
+            fontSize: 17,
+            fontWeight: 700,
+          }}
+        >
+          Match overview
+        </Typography>
       </Box>
-    </Stack>
 
-    <Typography sx={{ color: "#819AB4", fontSize: 13, mt: 1, mb: 3 }}>
-      Senior Product Designer
-    </Typography>
-    <Divider sx={{ borderColor: "rgba(255,255,255,0.09)", mb: 3 }} />
-
-    <Box sx={{ p: 2.5, borderRadius: "17px", bgcolor: "rgba(41,70,101,0.65)", border: "1px solid rgba(120,163,197,0.20)" }}>
-      <Stack direction="row" alignItems="center" spacing={2}>
-        <Box sx={{ width: 54, height: 54, borderRadius: "50%", bgcolor: "#D9914E", ...flexCenter, color: COLORS.white, fontWeight: 800, fontSize: 17 }}>
-          AM
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Typography sx={{ color: COLORS.white, fontSize: 16, fontWeight: 700 }}>Alex Morgan</Typography>
-          <Typography sx={{ color: "#91A8C0", fontSize: 13, mt: 0.4 }}>Product designer · 5 years</Typography>
-        </Box>
-        <Typography sx={{ color: COLORS.teal, fontSize: 28, fontWeight: 800 }}>94%</Typography>
-      </Stack>
-      <Box sx={{ mt: 3 }}>
-        {matchRows.map((row) => <MatchRow key={row.label} {...row} />)}
+      {/* Candidates */}
+      <Box
+        sx={{
+          px: 1.5,
+          py: 0.7,
+          borderRadius: "20px",
+          bgcolor: "rgba(103,200,188,0.13)",
+          color: COLORS.teal,
+          fontSize: 12,
+          fontWeight: 700,
+          whiteSpace: "nowrap",
+        }}
+      >
+        12 candidates
       </Box>
     </Box>
 
-    <Box sx={{ mt: 2.5, p: 2, borderRadius: "14px", bgcolor: "rgba(76,140,178,0.13)", display: "flex", alignItems: "center", gap: 1.5 }}>
-      <Bolt sx={{ color: COLORS.teal, fontSize: 20 }} />
-      <Typography sx={{ color: "#B5C9DB", fontSize: 12.5 }}>
+    {/* Job Title */}
+    <Typography
+      sx={{
+        color: "#819AB4",
+        fontSize: 13,
+        mt: 1,
+        mb: 3,
+      }}
+    >
+      Senior Product Designer
+    </Typography>
+
+    <Divider
+      sx={{
+        borderColor: "rgba(255,255,255,0.09)",
+        mb: 3,
+      }}
+    />
+
+    {/* Candidate */}
+    <Box
+      sx={{
+        p: 2.5,
+        borderRadius: "17px",
+        bgcolor: "rgba(41,70,101,0.65)",
+        border: "1px solid rgba(120,163,197,0.20)",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 2,
+        }}
+      >
+        {/* Avatar */}
+        <Box
+          sx={{
+            width: 54,
+            height: 54,
+            borderRadius: "50%",
+            bgcolor: "#D9914E",
+            ...flexCenter,
+            color: COLORS.white,
+            fontWeight: 800,
+            fontSize: 17,
+            flexShrink: 0,
+          }}
+        >
+          AM
+        </Box>
+
+        {/* Candidate Info */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <Typography
+            sx={{
+              color: COLORS.white,
+              fontSize: 16,
+              fontWeight: 700,
+            }}
+          >
+            Alex Morgan
+          </Typography>
+
+          <Typography
+            sx={{
+              color: "#91A8C0",
+              fontSize: 13,
+              mt: 0.4,
+            }}
+          >
+            Product designer · 5 years
+          </Typography>
+        </Box>
+
+        {/* Score */}
+        <Typography
+          sx={{
+            color: COLORS.teal,
+            fontSize: 28,
+            fontWeight: 800,
+            flexShrink: 0,
+          }}
+        >
+          94%
+        </Typography>
+      </Box>
+
+      {/* Match Rows */}
+      <Box sx={{ mt: 3 }}>
+        {matchRows.map((row) => (
+          <MatchRow
+            key={row.label}
+            label={row.label}
+            value={row.value}
+          />
+        ))}
+      </Box>
+    </Box>
+
+    {/* Strong Match */}
+    <Box
+      sx={{
+        mt: 2.5,
+        p: 2,
+        borderRadius: "14px",
+        bgcolor: "rgba(76,140,178,0.13)",
+        display: "flex",
+        alignItems: "center",
+        gap: 1.5,
+      }}
+    >
+      <Bolt
+        sx={{
+          color: COLORS.teal,
+          fontSize: 20,
+          flexShrink: 0,
+        }}
+      />
+
+      <Typography
+        sx={{
+          color: "#B5C9DB",
+          fontSize: 12.5,
+        }}
+      >
         Strong match: 8 of 9 key requirements found.
       </Typography>
     </Box>

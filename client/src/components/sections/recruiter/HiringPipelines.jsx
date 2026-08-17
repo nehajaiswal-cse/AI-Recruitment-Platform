@@ -1,5 +1,5 @@
 
-import HiringPipeline from '../dashboard/HiringPipeline'
+import HiringPipeline from '../../dashboard/HiringPipeline'
 
 const HiringPipelines = () => {
   return <HiringPipeline />

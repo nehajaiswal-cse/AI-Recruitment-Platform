@@ -111,7 +111,7 @@ const LoginForm = ({ role = "applicant" }) => {
           Welcome back to{" "}
           <br />
 
-          <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-amber-300 bg-clip-text text-transparent">
+          <span className="bg-linear-to-br from-blue-400 via-purple-400 to-amber-300 bg-clip-text text-transparent">
             Talvyn
           </span>
         </h1>
