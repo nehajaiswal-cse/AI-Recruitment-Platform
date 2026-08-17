@@ -15,6 +15,7 @@ import RecruiterRegister from './pages/recruiter/RecruiterRegister';
 import ProtectedRoute from './components/dashboard/ProtectedRoute.jsx';
 import ApplicantProfile from './pages/applicant/Profile';
 import RecruiterProfile from './pages/recruiter/Profile';
+import Interviews from './pages/recruiter/Interviews';
 
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/" element={<Home/>} />
         <Route element={<ProtectedRoute allowedRole="recruiter" />}>
         <Route path="/recruiter"element={<RDashboard />}/>
+        <Route path="/recruiter/interviews" element={<Interviews />} />
         </Route>
         <Route element={<ProtectedRoute allowedRole="applicant" />}>
         <Route path="/applicant"element={<ADashboard />}/>
