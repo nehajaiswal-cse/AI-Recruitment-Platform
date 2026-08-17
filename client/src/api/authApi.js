@@ -55,3 +55,18 @@ export const getprofile = async () => {
     );
   }
 };
+
+export const updateProfile = async (profileData) => {
+  try {
+    const response = await api.put("/profile", profileData);
+    return response.data;
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    throw new Error(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      "Failed to update profile."
+    );
+  }
+};

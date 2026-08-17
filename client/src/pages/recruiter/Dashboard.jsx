@@ -1,8 +1,8 @@
 import Box from '@mui/material/Box'
 
-import RNavbar from '../../components/layout/recuriter/Navbar'
-import RSidebar from '../../components/layout/recuriter/Sidebar'
-import Topbar from '../../components/layout/recuriter/Topbar'
+import RNavbar from '../../components/layout/recruiter/Navbar'
+import RSidebar from '../../components/layout/recruiter/Sidebar'
+import Topbar from '../../components/layout/recruiter/Topbar'
 
 import StatsCards from '../../components/sections/StatsCards'
 import ApplicationTrend from '../../components/sections/ApplicationTrend'
