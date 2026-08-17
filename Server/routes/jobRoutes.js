@@ -20,6 +20,7 @@ router.get(
   getMyJobs
 );
 router.get("/:id", getJobById);
+
 router.put(
   "/:id",
   authMiddleware,
@@ -33,5 +34,20 @@ router.delete(
   roleMiddleware("recruiter"),
   deleteJob
 );
+
+// router.get(
+//   "/:id/applicants",
+//   authMiddleware,
+//   roleMiddleware("recruiter"),
+//   getJobApplicants
+// );
+
+// router.patch(
+//   "/:id/status",
+//   authMiddleware,
+//   roleMiddleware("recruiter"),
+//   updateJobStatus
+// );
+
 
 export default router;
