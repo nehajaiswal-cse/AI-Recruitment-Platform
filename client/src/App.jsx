@@ -17,6 +17,7 @@ import ApplicantProfile from "./pages/applicant/Profile";
 import RecruiterProfile from "./pages/recruiter/Profile";
 
 import Interviews from "./pages/recruiter/Interviews";
+import Candidates from "./pages/recruiter/Candidates";
 
 import Jobs from "./pages/recruiter/jobs/Jobs.jsx";
 import CreateJob from "./pages/recruiter/jobs/createJob.jsx";
@@ -61,7 +62,11 @@ export default function App() {
             path="/recruiter/interviews"
             element={<Interviews />}
           />
-
+          {/* Candidates */}
+          <Route
+            path="/recruiter/candidates"
+            element={<Candidates />}
+          />
           {/* Jobs */}
           <Route path="/recruiter/jobs" element={<Jobs />} />
 
