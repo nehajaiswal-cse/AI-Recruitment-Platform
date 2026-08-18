@@ -35,10 +35,6 @@ export default function App() {
         <Route element={<ProtectedRoute allowedRole="applicant" />}>
         <Route path="/applicant" element={<ADashboard />} />   
         <Route path="/applicant/profile" element={<ApplicantProfile />} />
-        <Route path="/recruiter/jobs" element={<Jobs />} />
-        <Route  path="/recruiter/jobs/create"element={<CreateJob />}/>
-         <Route  path="/recruiter/jobs/edit/:id"element={<EditJob />}/>
-         <Route  path="/recruiter/jobs/:id"element={<ViewJob />}/>
         </Route>
         
 
@@ -46,6 +42,20 @@ export default function App() {
         <Route path="/recruiter" element={<RDashboard />} />
         <Route path="/recruiter/profile" element={<RecruiterProfile />} />
         <Route path="/recruiter/analytics" element={<Analytics />} />
+
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+        <Route path="/recruiter/jobs" element={<Jobs />} />
+        </Route>
+        <Route  path="/recruiter/jobs/create"element={<CreateJob />}/>
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+         <Route  path="/recruiter/jobs/edit/:id"element={<EditJob />}/>
+        </Route>
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+         <Route  path="/recruiter/jobs/:id/edit"element={<EditJob />}/>
+        </Route>
+        <Route element={<ProtectedRoute allowedRole="recruiter" />}>
+         <Route  path="/recruiter/jobs/:id"element={<ViewJob />}/>
+        </Route>
         </Route>
 
 
