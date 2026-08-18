@@ -20,92 +20,98 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 
 const initialProfile = {
-  name: "Rahul Verma",
-  email: "rahul.verma@example.com",
-  phone: "+91 98765 12345",
-  location: "Noida, India",
-  companyName: "Tech Solutions Pvt. Ltd.",
-  companyWebsite: "https://techsolutions.com",
-  companyDescription:
-    "Technology company focused on building innovative software products.",
+  name: "",
+  email: "",
+  phone: "",
+  location: "",
+  companyName: "",
+  companyWebsite: "",
+  companyDescription: "",
 };
 
 const fieldSx = {
   "& .MuiInputLabel-root": {
-    color: "#94a3b8",
-  },
-
-  "& .MuiInputLabel-root.Mui-disabled": {
-    color: "#94a3b8",
+    color: "text.secondary",
   },
 
   "& .MuiInputLabel-root.Mui-focused": {
-    color: "#82a9ff",
+    color: "primary.main",
   },
 
   "& .MuiOutlinedInput-root": {
-    color: "#f8fafc",
-    backgroundColor: "#182235",
+    color: "text.primary",
+    backgroundColor: "background.surface",
     borderRadius: 1.5,
 
     "& fieldset": {
-      borderColor: "#475569",
+      borderColor: "divider",
     },
 
     "&:hover fieldset": {
-      borderColor: "#64748b",
+      borderColor: "text.secondary",
     },
 
     "&.Mui-focused fieldset": {
-      borderColor: "#82a9ff",
+      borderColor: "primary.main",
     },
   },
 
   "& .MuiInputBase-input": {
-    color: "#f8fafc",
+    color: "text.primary",
   },
 
   "& .MuiInputBase-input.Mui-disabled": {
-    WebkitTextFillColor: "#e2e8f0",
-    color: "#e2e8f0",
+    WebkitTextFillColor: "inherit",
+    color: "text.primary",
     opacity: 1,
   },
 
+  "& .MuiOutlinedInput-root.Mui-disabled": {
+    backgroundColor: "background.surface",
+  },
+
   "& .MuiOutlinedInput-root.Mui-disabled fieldset": {
-    borderColor: "#475569",
+    borderColor: "divider",
   },
 };
-
 
 const Profile = () => {
   const [profile, setProfile] = useState(initialProfile);
   const [isEditing, setIsEditing] = useState(false);
+  const [savedProfile, setSavedProfile] = useState(initialProfile);
 
   useEffect(() => {
-  const loadProfile = async () => {
-    try {
-      const response = await getprofile();
+    const loadProfile = async () => {
+      try {
+        const response = await getprofile();
 
-      console.log("RECRUITER PROFILE RESPONSE:", response);
+        console.log("RECRUITER PROFILE RESPONSE:", response);
 
-      const user = response.user;
+        const user = response.user;
 
-      setProfile({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        location: user.profile?.location || "",
-        companyName: user.profile?.companyName || "",
-        companyWebsite: user.profile?.companyWebsite || "",
-        companyDescription: user.profile?.companyDescription || "",
-      });
-    } catch (error) {
-      console.error("Failed to load recruiter profile:", error);
-    }
-  };
+        const profileData = {
+          name: user?.name || "",
+          email: user?.email || "",
+          phone: user?.phone || "",
+          location: user?.profile?.location || "",
+          companyName: user?.profile?.companyName || "",
+          companyWebsite: user?.profile?.companyWebsite || "",
+          companyDescription:
+            user?.profile?.companyDescription || "",
+        };
 
-  loadProfile();
-}, []);
+        setProfile(profileData);
+        setSavedProfile(profileData);
+      } catch (error) {
+        console.error(
+          "Failed to load recruiter profile:",
+          error
+        );
+      }
+    };
+
+    loadProfile();
+  }, []);
 
   const handleChange = (field) => (event) => {
     setProfile((prev) => ({
@@ -115,50 +121,64 @@ const Profile = () => {
   };
 
   const handleCancel = () => {
-    setProfile(initialProfile);
+    setProfile(savedProfile);
     setIsEditing(false);
   };
 
   const handleSave = async () => {
-  try {
-    const profileData = {
-      name: profile.name,
-      email: profile.email,
-      phone: profile.phone,
+    try {
+      const profileData = {
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
 
-      profile: {
-        location: profile.location,
-        companyName: profile.companyName,
-        companyWebsite: profile.companyWebsite,
-        companyDescription: profile.companyDescription,
-      },
-    };
+        profile: {
+          location: profile.location,
+          companyName: profile.companyName,
+          companyWebsite: profile.companyWebsite,
+          companyDescription: profile.companyDescription,
+        },
+      };
 
-    const response = await updateProfile(profileData);
+      const response = await updateProfile(profileData);
 
-    console.log("RECRUITER PROFILE UPDATED:", response);
+      console.log(
+        "RECRUITER PROFILE UPDATED:",
+        response
+      );
 
-    const user = response.user;
+      const user = response.user;
 
-    setProfile({
-      name: user.name || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      location: user.profile?.location || "",
-      companyName: user.profile?.companyName || "",
-      companyWebsite: user.profile?.companyWebsite || "",
-      companyDescription: user.profile?.companyDescription || "",
-    });
+      const updatedProfile = {
+        name: user?.name || "",
+        email: user?.email || "",
+        phone: user?.phone || "",
+        location: user?.profile?.location || "",
+        companyName: user?.profile?.companyName || "",
+        companyWebsite:
+          user?.profile?.companyWebsite || "",
+        companyDescription:
+          user?.profile?.companyDescription || "",
+      };
 
-    setIsEditing(false);
-  } catch (error) {
-    console.error("Failed to update recruiter profile:", error);
-  }
-};
+      setProfile(updatedProfile);
+      setSavedProfile(updatedProfile);
+      setIsEditing(false);
+    } catch (error) {
+      console.error(
+        "Failed to update recruiter profile:",
+        error
+      );
+    }
+  };
 
   const getInitials = (name) => {
+    if (!name) return "R";
+
     return name
+      .trim()
       .split(" ")
+      .filter(Boolean)
       .map((word) => word[0])
       .join("")
       .slice(0, 2)
@@ -169,14 +189,24 @@ const Profile = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#111827",
+        bgcolor: "background.default",
+        color: "text.primary",
       }}
     >
+      {/* Navbar */}
       <Navbar />
 
-      <Box sx={{ display: "flex" }}>
+      {/* Sidebar + Main */}
+      <Box
+        sx={{
+          display: "flex",
+          minWidth: 0,
+        }}
+      >
+        {/* Sidebar */}
         <RSidebar />
 
+        {/* Main Content */}
         <Box
           component="main"
           sx={{
@@ -187,6 +217,7 @@ const Profile = () => {
               sm: 3,
               md: 4,
             },
+            bgcolor: "background.default",
           }}
         >
           {/* PAGE HEADER */}
@@ -198,7 +229,7 @@ const Profile = () => {
                   md: "32px",
                 },
                 fontWeight: 700,
-                color: "#f8fafc",
+                color: "text.primary",
                 letterSpacing: "-0.5px",
               }}
             >
@@ -209,7 +240,7 @@ const Profile = () => {
               sx={{
                 mt: 0.5,
                 fontSize: "14px",
-                color: "#94a3b8",
+                color: "text.secondary",
               }}
             >
               Manage your personal and company information.
@@ -226,8 +257,9 @@ const Profile = () => {
               },
               mb: 3,
               borderRadius: 3,
-              backgroundColor: "#1c2535",
-              border: "1px solid #334155",
+              bgcolor: "background.paper",
+              border: 1,
+              borderColor: "divider",
             }}
           >
             <Stack
@@ -241,59 +273,64 @@ const Profile = () => {
                 sm: "center",
               }}
             >
+              {/* Avatar */}
               <Avatar
                 sx={{
                   width: 66,
                   height: 66,
-                  backgroundColor: "#294b86",
-                  color: "#dbeafe",
+                   background:'linear-gradient(135deg, #3b82f6, #9333ea)',
+                  color: "#fff",
                   fontSize: "23px",
                   fontWeight: 700,
                 }}
+                
               >
                 {getInitials(profile.name)}
               </Avatar>
 
+              {/* User Information */}
               <Box sx={{ flex: 1 }}>
                 <Typography
                   sx={{
                     fontSize: "21px",
                     fontWeight: 600,
-                    color: "#f8fafc",
+                    color: "text.primary",
                   }}
                 >
-                  {profile.name}
+                  {profile.name || "Recruiter"}
                 </Typography>
 
                 <Typography
                   sx={{
                     mt: 0.3,
                     fontSize: "14px",
-                    color: "#aeb9ca",
+                    color: "text.secondary",
                   }}
                 >
-                  {profile.email}
+                  {profile.email || "No email available"}
                 </Typography>
 
                 <Typography
                   sx={{
                     mt: 0.4,
                     fontSize: "14px",
-                    color: "#aeb9ca",
+                    color: "text.secondary",
                   }}
                 >
                   Recruiter account
                 </Typography>
               </Box>
 
+              {/* Role */}
               <Chip
                 label="Recruiter"
                 sx={{
-                  backgroundColor: "#124e35",
-                  color: "#65e6a0",
+                  bgcolor: "rgba(16, 185, 129, 0.15)",
+                  color: "success.main",
                   fontWeight: 600,
                   borderRadius: 2,
                   height: 32,
+
                   "& .MuiChip-label": {
                     px: 1.5,
                   },
@@ -311,21 +348,23 @@ const Profile = () => {
                 md: 3,
               },
               borderRadius: 3,
-              backgroundColor: "#1c2535",
-              border: "1px solid #334155",
+              bgcolor: "background.paper",
+              border: 1,
+              borderColor: "divider",
             }}
           >
             <Typography
               sx={{
                 fontSize: "19px",
                 fontWeight: 600,
-                color: "#f8fafc",
+                color: "text.primary",
                 mb: 3,
               }}
             >
               Personal & company information
             </Typography>
 
+            {/* FORM */}
             <Box
               sx={{
                 display: "grid",
@@ -419,40 +458,43 @@ const Profile = () => {
             >
               {isEditing ? (
                 <>
+                  {/* Cancel */}
                   <Button
                     variant="outlined"
                     startIcon={<CloseOutlinedIcon />}
                     onClick={handleCancel}
                     sx={{
-                      color: "#e2e8f0",
-                      borderColor: "#64748b",
+                      color: "text.primary",
+                      borderColor: "divider",
                       textTransform: "none",
                       borderRadius: 1.5,
                       px: 2.5,
 
                       "&:hover": {
-                        borderColor: "#94a3b8",
-                        backgroundColor: "rgba(148,163,184,0.08)",
+                        borderColor: "text.secondary",
+                        backgroundColor: "action.hover",
                       },
                     }}
                   >
                     Cancel
                   </Button>
 
+                  {/* Save */}
                   <Button
                     variant="contained"
                     startIcon={<SaveOutlinedIcon />}
                     onClick={handleSave}
                     sx={{
-                      backgroundColor: "#82a9ff",
-                      color: "#0f172a",
+                      bgcolor: "primary.main",
+                       background:'linear-gradient(135deg, #3b82f6, #9333ea)',
+                      color: "#fff",
                       fontWeight: 700,
                       textTransform: "none",
                       borderRadius: 1.5,
                       px: 2.5,
 
                       "&:hover": {
-                        backgroundColor: "#9bbaff",
+                        bgcolor: "primary.dark",
                       },
                     }}
                   >
@@ -460,6 +502,7 @@ const Profile = () => {
                   </Button>
                 </>
               ) : (
+                /* Edit */
                 <Button
                   variant="contained"
                   startIcon={<EditOutlinedIcon />}
@@ -467,6 +510,7 @@ const Profile = () => {
                   sx={{
                     textTransform: "none",
                     borderRadius: 1.5,
+                     background:'linear-gradient(135deg, #3b82f6, #9333ea)',
                   }}
                 >
                   Edit profile
@@ -481,3 +525,7 @@ const Profile = () => {
 };
 
 export default Profile;
+
+
+
+
