@@ -1,24 +1,39 @@
 import "./index.css";
 import { Routes, Route } from "react-router-dom";
 
+// Dashboards
 import ADashboard from "./pages/applicant/Dashboard";
 import RDashboard from "./pages/recruiter/Dashboard";
+
+// Common
 import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
+import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
 
+// Applicant Auth
 import ApplicantRegister from "./pages/applicant/ApplicantRegister";
 import ApplicantLogin from "./pages/applicant/ApplicantLogin";
+
+// Recruiter Auth
 import RecruiterLogin from "./pages/recruiter/RecruiterLogin";
 import RecruiterRegister from "./pages/recruiter/RecruiterRegister";
 
-import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
-
+// Profiles
 import ApplicantProfile from "./pages/applicant/Profile";
 import RecruiterProfile from "./pages/recruiter/Profile";
 
-import Interviews from "./pages/recruiter/Interviews";
+// Applicant Interviews
+import ApplicantInterviews from "./pages/applicant/Interview/Interviews.jsx";
+import InterviewDetails from "./pages/applicant/Interview/InterviewDetails.jsx";
+import AIInterviewCoach from "./pages/applicant/Interview/AIInterviewCoach.jsx";
+import InterviewFeedback from "./pages/applicant/Interview/InterviewFeedback.jsx";
+import InterviewCalendar from "./pages/applicant/Interview/InterviewCalendar.jsx";
+
+// Recruiter
+import RecruiterInterviews from "./pages/recruiter/Interviews";
 import Candidates from "./pages/recruiter/Candidates";
 
+// Jobs
 import Jobs from "./pages/recruiter/jobs/Jobs.jsx";
 import CreateJob from "./pages/recruiter/jobs/createJob.jsx";
 import EditJob from "./pages/recruiter/jobs/editJob.jsx";
@@ -29,55 +44,73 @@ export default function App() {
     <div>
       <Routes>
 
-        {/* Home */}
+        {/* ================= HOME ================= */}
         <Route path="/" element={<Home />} />
 
-        {/* Auth Routes */}
+        {/* ================= AUTH ROUTES ================= */}
         <Route path="/applicant/register" element={<ApplicantRegister />} />
         <Route path="/applicant/login" element={<ApplicantLogin />} />
 
         <Route path="/recruiter/register" element={<RecruiterRegister />} />
         <Route path="/recruiter/login" element={<RecruiterLogin />} />
 
-        {/* Applicant Routes */}
+        {/* ================= APPLICANT ROUTES ================= */}
         <Route element={<ProtectedRoute allowedRole="applicant" />}>
           <Route path="/applicant" element={<ADashboard />} />
+          <Route path="/applicant-dashboard" element={<ADashboard />} />
+          <Route path="/applicant/profile" element={<ApplicantProfile />} />
+
           <Route
-            path="/applicant/profile"
-            element={<ApplicantProfile />}
+            path="/applicant/interviews"
+            element={<ApplicantInterviews />}
+          />
+
+          <Route
+            path="/applicant/interviews/details/:id"
+            element={<InterviewDetails />}
+          />
+
+          <Route
+            path="/applicant/interviews/coach"
+            element={<AIInterviewCoach />}
+          />
+
+          <Route
+            path="/applicant/interviews/feedback/:id"
+            element={<InterviewFeedback />}
+          />
+
+          <Route
+            path="/applicant/interviews/calendar"
+            element={<InterviewCalendar />}
           />
         </Route>
 
-        {/* Recruiter Routes */}
+        {/* ================= RECRUITER ROUTES ================= */}
         <Route element={<ProtectedRoute allowedRole="recruiter" />}>
           <Route path="/recruiter" element={<RDashboard />} />
+          <Route path="/recruiter-dashboard" element={<RDashboard />} />
 
           <Route
             path="/recruiter/profile"
             element={<RecruiterProfile />}
           />
 
-          {/* Interviews */}
           <Route
             path="/recruiter/interviews"
-            element={<Interviews />}
+            element={<RecruiterInterviews />}
           />
-          {/* Candidates */}
+
           <Route
             path="/recruiter/candidates"
             element={<Candidates />}
           />
-          {/* Jobs */}
+
           <Route path="/recruiter/jobs" element={<Jobs />} />
 
           <Route
             path="/recruiter/jobs/create"
             element={<CreateJob />}
-          />
-
-          <Route
-            path="/recruiter/jobs/edit/:id"
-            element={<EditJob />}
           />
 
           <Route
@@ -91,11 +124,10 @@ export default function App() {
           />
         </Route>
 
-        {/* 404 */}
+        {/* ================= 404 ================= */}
         <Route path="*" element={<NotFound />} />
 
       </Routes>
     </div>
   );
 }
-

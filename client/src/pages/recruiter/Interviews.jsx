@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import { useMemo, useState } from "react";
 
 import {
@@ -23,13 +25,12 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 const Interviews = () => {
+  const navigate = useNavigate();
   /* =========================
      CALENDAR STATE
   ========================= */
 
-  const [currentMonth, setCurrentMonth] = useState(
-    new Date(2026, 7, 1)
-  );
+  const [currentMonth, setCurrentMonth] = useState(new Date(2026, 7, 1));
 
   const [selectedDate, setSelectedDate] = useState(20);
 
@@ -57,8 +58,7 @@ const Interviews = () => {
 
   const [openReschedule, setOpenReschedule] = useState(false);
 
-  const [selectedInterview, setSelectedInterview] =
-    useState(null);
+  const [selectedInterview, setSelectedInterview] = useState(null);
 
   /* =========================
      FORM STATE
@@ -139,20 +139,11 @@ const Interviews = () => {
 
   const month = currentMonth.getMonth();
 
-  const firstDay = new Date(
-    year,
-    month,
-    1
-  ).getDay();
+  const firstDay = new Date(year, month, 1).getDay();
 
-  const daysInMonth = new Date(
-    year,
-    month + 1,
-    0
-  ).getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const startingDay =
-    firstDay === 0 ? 6 : firstDay - 1;
+  const startingDay = firstDay === 0 ? 6 : firstDay - 1;
 
   /* =========================
      FILTERED INTERVIEWS
@@ -163,50 +154,28 @@ const Interviews = () => {
       const searchValue = search.toLowerCase();
 
       const matchesSearch =
-        interview.name
-          .toLowerCase()
-          .includes(searchValue) ||
-        interview.role
-          .toLowerCase()
-          .includes(searchValue) ||
-        interview.interviewer
-          .toLowerCase()
-          .includes(searchValue);
+        interview.name.toLowerCase().includes(searchValue) ||
+        interview.role.toLowerCase().includes(searchValue) ||
+        interview.interviewer.toLowerCase().includes(searchValue);
 
       const matchesStatus =
-        statusFilter === "All" ||
-        interview.status === statusFilter;
+        statusFilter === "All" || interview.status === statusFilter;
 
-      const matchesType =
-        typeFilter === "All" ||
-        interview.type === typeFilter;
+      const matchesType = typeFilter === "All" || interview.type === typeFilter;
 
       const matchesDate =
-        dateFilter === "All" ||
-        interview.date === Number(dateFilter);
+        dateFilter === "All" || interview.date === Number(dateFilter);
 
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesType &&
-        matchesDate
-      );
+      return matchesSearch && matchesStatus && matchesType && matchesDate;
     });
-  }, [
-    interviews,
-    search,
-    statusFilter,
-    typeFilter,
-    dateFilter,
-  ]);
+  }, [interviews, search, statusFilter, typeFilter, dateFilter]);
 
   /* =========================
      SELECTED DATE INTERVIEWS
   ========================= */
 
   const selectedInterviews = interviews.filter(
-    (interview) =>
-      interview.date === selectedDate
+    (interview) => interview.date === selectedDate,
   );
 
   /* =========================
@@ -214,22 +183,15 @@ const Interviews = () => {
   ========================= */
 
   const hasInterview = (date) => {
-    return interviews.some(
-      (interview) =>
-        interview.date === date
-    );
+    return interviews.some((interview) => interview.date === date);
   };
 
   const handlePreviousMonth = () => {
-    setCurrentMonth(
-      new Date(year, month - 1, 1)
-    );
+    setCurrentMonth(new Date(year, month - 1, 1));
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(
-      new Date(year, month + 1, 1)
-    );
+    setCurrentMonth(new Date(year, month + 1, 1));
   };
 
   const handleDateClick = (date) => {
@@ -262,9 +224,7 @@ const Interviews = () => {
       return;
     }
 
-    const dateObject = new Date(
-      `${formData.date}T00:00:00`
-    );
+    const dateObject = new Date(`${formData.date}T00:00:00`);
 
     const newInterview = {
       id: Date.now(),
@@ -283,24 +243,15 @@ const Interviews = () => {
 
       interviewer: formData.interviewer,
 
-      meetingLink:
-        formData.meetingLink ||
-        "https://meet.google.com/",
+      meetingLink: formData.meetingLink || "https://meet.google.com/",
     };
 
-    setInterviews((prev) => [
-      ...prev,
-      newInterview,
-    ]);
+    setInterviews((prev) => [...prev, newInterview]);
 
     setSelectedDate(dateObject.getDate());
 
     setCurrentMonth(
-      new Date(
-        dateObject.getFullYear(),
-        dateObject.getMonth(),
-        1
-      )
+      new Date(dateObject.getFullYear(), dateObject.getMonth(), 1),
     );
 
     setFormData(emptyForm);
@@ -314,16 +265,12 @@ const Interviews = () => {
 
   const handleDelete = (id) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this interview?"
+      "Are you sure you want to delete this interview?",
     );
 
     if (!confirmed) return;
 
-    setInterviews((prev) =>
-      prev.filter(
-        (interview) => interview.id !== id
-      )
-    );
+    setInterviews((prev) => prev.filter((interview) => interview.id !== id));
 
     setOpenDetails(false);
   };
@@ -348,9 +295,7 @@ const Interviews = () => {
     setFormData({
       name: interview.name,
       role: interview.role,
-      date: `2026-08-${String(
-        interview.date
-      ).padStart(2, "0")}`,
+      date: `2026-08-${String(interview.date).padStart(2, "0")}`,
       time: interview.time,
       type: interview.type,
       interviewer: interview.interviewer,
@@ -368,9 +313,7 @@ const Interviews = () => {
   const handleReschedule = () => {
     if (!selectedInterview) return;
 
-    const dateObject = new Date(
-      `${formData.date}T00:00:00`
-    );
+    const dateObject = new Date(`${formData.date}T00:00:00`);
 
     setInterviews((prev) =>
       prev.map((interview) =>
@@ -388,26 +331,18 @@ const Interviews = () => {
 
               type: formData.type,
 
-              interviewer:
-                formData.interviewer,
+              interviewer: formData.interviewer,
 
-              meetingLink:
-                formData.meetingLink,
+              meetingLink: formData.meetingLink,
             }
-          : interview
-      )
+          : interview,
+      ),
     );
 
-    setSelectedDate(
-      dateObject.getDate()
-    );
+    setSelectedDate(dateObject.getDate());
 
     setCurrentMonth(
-      new Date(
-        dateObject.getFullYear(),
-        dateObject.getMonth(),
-        1
-      )
+      new Date(dateObject.getFullYear(), dateObject.getMonth(), 1),
     );
 
     setOpenReschedule(false);
@@ -468,20 +403,16 @@ const Interviews = () => {
               color: "#94a3b8",
             }}
           >
-            Manage, schedule and track candidate
-            interviews.
+            Manage, schedule and track candidate interviews.
           </Typography>
         </Box>
 
         <Button
           variant="contained"
           startIcon={<AddRoundedIcon />}
-          onClick={() =>
-            setOpenSchedule(true)
-          }
+          onClick={() => setOpenSchedule(true)}
           sx={{
-            background:
-              "linear-gradient(135deg, #6366f1, #8b5cf6)",
+            background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
             color: "#fff",
             fontWeight: 600,
             textTransform: "none",
@@ -491,8 +422,7 @@ const Interviews = () => {
             boxShadow: "none",
 
             "&:hover": {
-              background:
-                "linear-gradient(135deg, #5859e8, #7c4ee8)",
+              background: "linear-gradient(135deg, #5859e8, #7c4ee8)",
               boxShadow: "none",
             },
           }}
@@ -517,79 +447,51 @@ const Interviews = () => {
         }}
       >
         {[
-          [
-            "Upcoming",
-            "12",
-            "This week",
-            "#60a5fa",
-          ],
-          [
-            "Today",
-            "3",
-            "Next: 10:30 AM",
-            "#34d399",
-          ],
-          [
-            "Completed",
-            "28",
-            "This month",
-            "#a78bfa",
-          ],
-          [
-            "Needs Action",
-            "4",
-            "Pending",
-            "#f59e0b",
-          ],
-        ].map(
-          ([
-            title,
-            number,
-            subtitle,
-            color,
-          ]) => (
-            <Box
-              key={title}
+          ["Upcoming", "12", "This week", "#60a5fa"],
+          ["Today", "3", "Next: 10:30 AM", "#34d399"],
+          ["Completed", "28", "This month", "#a78bfa"],
+          ["Needs Action", "4", "Pending", "#f59e0b"],
+        ].map(([title, number, subtitle, color]) => (
+          <Box
+            key={title}
+            sx={{
+              p: 2.5,
+              borderRadius: 3,
+              backgroundColor: "#1e293b",
+              border: "1px solid #334155",
+            }}
+          >
+            <Typography
               sx={{
-                p: 2.5,
-                borderRadius: 3,
-                backgroundColor: "#1e293b",
-                border:
-                  "1px solid #334155",
+                color: "#94a3b8",
+                fontSize: "14px",
+                mb: 1,
               }}
             >
-              <Typography
-                sx={{
-                  color: "#94a3b8",
-                  fontSize: "14px",
-                  mb: 1,
-                }}
-              >
-                {title}
-              </Typography>
+              {title}
+            </Typography>
 
-              <Typography
-                sx={{
-                  color: "#f8fafc",
-                  fontSize: "30px",
-                  fontWeight: 700,
-                }}
-              >
-                {number}
-              </Typography>
+            <Typography
+              sx={{
+                color: "#f8fafc",
+                fontSize: "30px",
+                fontWeight: 700,
+              }}
+            >
+              {number}
+            </Typography>
 
-              <Typography
-                sx={{
-                  color,
-                  fontSize: "13px",
-                  mt: 0.5,
-                }}
-              >
-                {subtitle}
-              </Typography>
-            </Box>
-          )
-        )}
+            <Typography
+              sx={{
+                color,
+                fontSize: "13px",
+                mt: 0.5,
+              }}
+            >
+              {subtitle}
+            </Typography>
+          </Box>
+        ))}
       </Box>
 
       {/* =====================================================
@@ -611,9 +513,7 @@ const Interviews = () => {
       >
         <TextField
           value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search candidate, job or interviewer..."
           size="small"
           sx={{
@@ -659,9 +559,7 @@ const Interviews = () => {
           select
           size="small"
           value={statusFilter}
-          onChange={(e) =>
-            setStatusFilter(e.target.value)
-          }
+          onChange={(e) => setStatusFilter(e.target.value)}
           sx={{
             minWidth: 140,
 
@@ -672,27 +570,17 @@ const Interviews = () => {
             },
           }}
         >
-          <MenuItem value="All">
-            All Status
-          </MenuItem>
-          <MenuItem value="Scheduled">
-            Scheduled
-          </MenuItem>
-          <MenuItem value="Confirmed">
-            Confirmed
-          </MenuItem>
-          <MenuItem value="Pending">
-            Pending
-          </MenuItem>
+          <MenuItem value="All">All Status</MenuItem>
+          <MenuItem value="Scheduled">Scheduled</MenuItem>
+          <MenuItem value="Confirmed">Confirmed</MenuItem>
+          <MenuItem value="Pending">Pending</MenuItem>
         </TextField>
 
         <TextField
           select
           size="small"
           value={typeFilter}
-          onChange={(e) =>
-            setTypeFilter(e.target.value)
-          }
+          onChange={(e) => setTypeFilter(e.target.value)}
           sx={{
             minWidth: 160,
 
@@ -703,27 +591,17 @@ const Interviews = () => {
             },
           }}
         >
-          <MenuItem value="All">
-            All Types
-          </MenuItem>
-          <MenuItem value="Technical Interview">
-            Technical
-          </MenuItem>
-          <MenuItem value="HR Interview">
-            HR
-          </MenuItem>
-          <MenuItem value="Managerial Interview">
-            Managerial
-          </MenuItem>
+          <MenuItem value="All">All Types</MenuItem>
+          <MenuItem value="Technical Interview">Technical</MenuItem>
+          <MenuItem value="HR Interview">HR</MenuItem>
+          <MenuItem value="Managerial Interview">Managerial</MenuItem>
         </TextField>
 
         <TextField
           select
           size="small"
           value={dateFilter}
-          onChange={(e) =>
-            setDateFilter(e.target.value)
-          }
+          onChange={(e) => setDateFilter(e.target.value)}
           sx={{
             minWidth: 130,
 
@@ -734,18 +612,10 @@ const Interviews = () => {
             },
           }}
         >
-          <MenuItem value="All">
-            All Dates
-          </MenuItem>
+          <MenuItem value="All">All Dates</MenuItem>
 
-          {Array.from(
-            { length: 31 },
-            (_, index) => index + 1
-          ).map((date) => (
-            <MenuItem
-              key={date}
-              value={date}
-            >
+          {Array.from({ length: 31 }, (_, index) => index + 1).map((date) => (
+            <MenuItem key={date} value={date}>
               Aug {date}
             </MenuItem>
           ))}
@@ -757,8 +627,7 @@ const Interviews = () => {
           sx={{
             display: "flex",
             backgroundColor: "#111827",
-            border:
-              "1px solid #334155",
+            border: "1px solid #334155",
             borderRadius: 2,
             overflow: "hidden",
             ml: {
@@ -768,22 +637,12 @@ const Interviews = () => {
           }}
         >
           <Button
-            startIcon={
-              <ViewListRoundedIcon />
-            }
-            onClick={() =>
-              setViewMode("list")
-            }
+            startIcon={<ViewListRoundedIcon />}
+            onClick={() => setViewMode("list")}
             sx={{
               height: 40,
-              color:
-                viewMode === "list"
-                  ? "#fff"
-                  : "#94a3b8",
-              backgroundColor:
-                viewMode === "list"
-                  ? "#3730a3"
-                  : "transparent",
+              color: viewMode === "list" ? "#fff" : "#94a3b8",
+              backgroundColor: viewMode === "list" ? "#3730a3" : "transparent",
               textTransform: "none",
               borderRadius: 0,
             }}
@@ -792,22 +651,13 @@ const Interviews = () => {
           </Button>
 
           <Button
-            startIcon={
-              <CalendarMonthRoundedIcon />
-            }
-            onClick={() =>
-              setViewMode("calendar")
-            }
+            startIcon={<CalendarMonthRoundedIcon />}
+            onClick={() => setViewMode("calendar")}
             sx={{
               height: 40,
-              color:
-                viewMode === "calendar"
-                  ? "#fff"
-                  : "#94a3b8",
+              color: viewMode === "calendar" ? "#fff" : "#94a3b8",
               backgroundColor:
-                viewMode === "calendar"
-                  ? "#3730a3"
-                  : "transparent",
+                viewMode === "calendar" ? "#3730a3" : "transparent",
               textTransform: "none",
               borderRadius: 0,
             }}
@@ -830,15 +680,13 @@ const Interviews = () => {
           },
           borderRadius: 3,
           backgroundColor: "#1e293b",
-          border:
-            "1px solid #334155",
+          border: "1px solid #334155",
         }}
       >
         <Box
           sx={{
             display: "flex",
-            justifyContent:
-              "space-between",
+            justifyContent: "space-between",
             alignItems: "center",
             mb: 3,
           }}
@@ -891,12 +739,10 @@ const Interviews = () => {
                 width: 52,
                 height: 52,
                 borderRadius: "50%",
-                background:
-                  "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
                 display: "flex",
                 alignItems: "center",
-                justifyContent:
-                  "center",
+                justifyContent: "center",
                 color: "#fff",
                 fontWeight: 700,
               }}
@@ -931,8 +777,7 @@ const Interviews = () => {
                   px: 1.2,
                   py: 0.5,
                   borderRadius: 1.5,
-                  backgroundColor:
-                    "#312e81",
+                  backgroundColor: "#312e81",
                   color: "#c4b5fd",
                   fontSize: "12px",
                 }}
@@ -967,8 +812,7 @@ const Interviews = () => {
                 fontSize: "14px",
               }}
             >
-              👥 Samrat Ashwin + 2
-              Interviewers
+              👥 Samrat Ashwin + 2 Interviewers
             </Typography>
           </Box>
 
@@ -982,8 +826,7 @@ const Interviews = () => {
             <Button
               variant="contained"
               sx={{
-                background:
-                  "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
                 textTransform: "none",
                 boxShadow: "none",
               }}
@@ -994,9 +837,7 @@ const Interviews = () => {
             <Button
               variant="outlined"
               onClick={() =>
-                handleViewDetails(
-                  interviews[1]
-                )
+                navigate(`/applicant/interviews/details/${interviews[1].id}`)
               }
               sx={{
                 color: "#cbd5e1",
@@ -1023,17 +864,14 @@ const Interviews = () => {
               md: 3,
             },
             borderRadius: 3,
-            backgroundColor:
-              "#1e293b",
-            border:
-              "1px solid #334155",
+            backgroundColor: "#1e293b",
+            border: "1px solid #334155",
           }}
         >
           <Box
             sx={{
               display: "flex",
-              justifyContent:
-                "space-between",
+              justifyContent: "space-between",
               alignItems: "center",
               mb: 3,
             }}
@@ -1056,8 +894,7 @@ const Interviews = () => {
                   color: "#94a3b8",
                 }}
               >
-                Your scheduled candidate
-                interviews.
+                Your scheduled candidate interviews.
               </Typography>
             </Box>
 
@@ -1067,8 +904,7 @@ const Interviews = () => {
                 fontSize: "13px",
               }}
             >
-              {filteredInterviews.length}{" "}
-              interviews
+              {filteredInterviews.length} interviews
             </Typography>
           </Box>
 
@@ -1088,170 +924,136 @@ const Interviews = () => {
               </Typography>
             </Box>
           ) : (
-            filteredInterviews.map(
-              (interview) => (
-                <Box
-                  key={interview.id}
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                      xs: "1fr",
-                      md:
-                        "1.4fr 1.2fr 1.2fr auto",
-                    },
-                    alignItems:
-                      "center",
-                    gap: 2,
-                    p: 2,
-                    mb: 2,
-                    borderRadius: 2,
-                    backgroundColor:
-                      "#182235",
-                    border:
-                      "1px solid #334155",
-                  }}
-                >
-                  {/* Candidate */}
+            filteredInterviews.map((interview) => (
+              <Box
+                key={interview.id}
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    md: "1.4fr 1.2fr 1.2fr auto",
+                  },
+                  alignItems: "center",
+                  gap: 2,
+                  p: 2,
+                  mb: 2,
+                  borderRadius: 2,
+                  backgroundColor: "#182235",
+                  border: "1px solid #334155",
+                }}
+              >
+                {/* Candidate */}
 
-                  <Box>
-                    <Typography
-                      sx={{
-                        color: "#f8fafc",
-                        fontSize: "15px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {interview.name}
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        color: "#94a3b8",
-                        fontSize: "13px",
-                      }}
-                    >
-                      {interview.role}
-                    </Typography>
-                  </Box>
-
-                  {/* Date / Time */}
-
-                  <Box>
-                    <Typography
-                      sx={{
-                        color: "#e2e8f0",
-                        fontSize: "13px",
-                      }}
-                    >
-                      📅{" "}
-                      {interview.date}{" "}
-                      Aug 2026
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        color: "#94a3b8",
-                        fontSize: "13px",
-                      }}
-                    >
-                      🕐{" "}
-                      {interview.time}
-                    </Typography>
-                  </Box>
-
-                  {/* Type */}
+                <Box>
+                  <Typography
+                    sx={{
+                      color: "#f8fafc",
+                      fontSize: "15px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {interview.name}
+                  </Typography>
 
                   <Typography
                     sx={{
-                      color: "#cbd5e1",
+                      color: "#94a3b8",
                       fontSize: "13px",
                     }}
                   >
-                    {interview.type}
+                    {interview.role}
                   </Typography>
+                </Box>
 
-                  {/* Actions */}
+                {/* Date / Time */}
 
-                  <Box
+                <Box>
+                  <Typography
                     sx={{
-                      display: "flex",
-                      alignItems:
-                        "center",
-                      gap: 1,
-                      flexWrap:
-                        "wrap",
+                      color: "#e2e8f0",
+                      fontSize: "13px",
                     }}
                   >
-                    <Box
-                      sx={{
-                        px: 1.2,
-                        py: 0.6,
-                        borderRadius: 2,
-                        backgroundColor:
-                          interview.status ===
-                          "Pending"
-                            ? "#422006"
-                            : "#124e35",
-                        color:
-                          interview.status ===
-                          "Pending"
-                            ? "#fbbf24"
-                            : "#65e6a0",
-                        fontSize:
-                          "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {
-                        interview.status
-                      }
-                    </Box>
+                    📅 {interview.date} Aug 2026
+                  </Typography>
 
-                    <Button
-                      size="small"
-                      onClick={() =>
-                        handleViewDetails(
-                          interview
-                        )
-                      }
-                      sx={{
-                        color:
-                          "#cbd5e1",
-                        border:
-                          "1px solid #475569",
-                        textTransform:
-                          "none",
-                      }}
-                    >
-                      View
-                    </Button>
-
-                    <Button
-                      size="small"
-                      onClick={() =>
-                        handleOpenReschedule(
-                          interview
-                        )
-                      }
-                      sx={{
-                        color: "#fff",
-                        backgroundColor:
-                          "#6366f1",
-                        textTransform:
-                          "none",
-
-                        "&:hover": {
-                          backgroundColor:
-                            "#4f46e5",
-                        },
-                      }}
-                    >
-                      Reschedule
-                    </Button>
-                  </Box>
+                  <Typography
+                    sx={{
+                      color: "#94a3b8",
+                      fontSize: "13px",
+                    }}
+                  >
+                    🕐 {interview.time}
+                  </Typography>
                 </Box>
-              )
-            )
+
+                {/* Type */}
+
+                <Typography
+                  sx={{
+                    color: "#cbd5e1",
+                    fontSize: "13px",
+                  }}
+                >
+                  {interview.type}
+                </Typography>
+
+                {/* Actions */}
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      px: 1.2,
+                      py: 0.6,
+                      borderRadius: 2,
+                      backgroundColor:
+                        interview.status === "Pending" ? "#422006" : "#124e35",
+                      color:
+                        interview.status === "Pending" ? "#fbbf24" : "#65e6a0",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {interview.status}
+                  </Box>
+
+                  <Button
+                    size="small"
+                    onClick={() => handleViewDetails(interview)}
+                    sx={{
+                      color: "#cbd5e1",
+                      border: "1px solid #475569",
+                      textTransform: "none",
+                    }}
+                  >
+                    View
+                  </Button>
+
+                  <Button
+                    size="small"
+                    onClick={() => handleOpenReschedule(interview)}
+                    sx={{
+                      color: "#fff",
+                      backgroundColor: "#6366f1",
+                      textTransform: "none",
+
+                      "&:hover": {
+                        backgroundColor: "#4f46e5",
+                      },
+                    }}
+                  >
+                    Reschedule
+                  </Button>
+                </Box>
+              </Box>
+            ))
           )}
         </Box>
       )}
@@ -1278,17 +1080,14 @@ const Interviews = () => {
             sx={{
               p: 2.5,
               borderRadius: 3,
-              backgroundColor:
-                "#1e293b",
-              border:
-                "1px solid #334155",
+              backgroundColor: "#1e293b",
+              border: "1px solid #334155",
             }}
           >
             <Box
               sx={{
                 display: "flex",
-                justifyContent:
-                  "space-between",
+                justifyContent: "space-between",
                 alignItems: "center",
                 mb: 2.5,
               }}
@@ -1300,12 +1099,9 @@ const Interviews = () => {
                   fontWeight: 600,
                 }}
               >
-                {currentMonth.toLocaleString(
-                  "default",
-                  {
-                    month: "long",
-                  }
-                )}{" "}
+                {currentMonth.toLocaleString("default", {
+                  month: "long",
+                })}{" "}
                 {year}
               </Typography>
 
@@ -1316,30 +1112,24 @@ const Interviews = () => {
                 }}
               >
                 <Button
-                  onClick={
-                    handlePreviousMonth
-                  }
+                  onClick={handlePreviousMonth}
                   sx={{
                     minWidth: 36,
                     width: 36,
                     height: 36,
-                    color:
-                      "#94a3b8",
+                    color: "#94a3b8",
                   }}
                 >
                   <ChevronLeftRoundedIcon />
                 </Button>
 
                 <Button
-                  onClick={
-                    handleNextMonth
-                  }
+                  onClick={handleNextMonth}
                   sx={{
                     minWidth: 36,
                     width: 36,
                     height: 36,
-                    color:
-                      "#94a3b8",
+                    color: "#94a3b8",
                   }}
                 >
                   <ChevronRightRoundedIcon />
@@ -1352,28 +1142,16 @@ const Interviews = () => {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns:
-                  "repeat(7, 1fr)",
-                textAlign:
-                  "center",
+                gridTemplateColumns: "repeat(7, 1fr)",
+                textAlign: "center",
               }}
             >
-              {[
-                "Mon",
-                "Tue",
-                "Wed",
-                "Thu",
-                "Fri",
-                "Sat",
-                "Sun",
-              ].map((day) => (
+              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
                 <Typography
                   key={day}
                   sx={{
-                    color:
-                      "#64748b",
-                    fontSize:
-                      "11px",
+                    color: "#64748b",
+                    fontSize: "11px",
                     fontWeight: 600,
                     py: 0.8,
                   }}
@@ -1388,22 +1166,16 @@ const Interviews = () => {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns:
-                  "repeat(7, 1fr)",
+                gridTemplateColumns: "repeat(7, 1fr)",
                 gap: 0.5,
               }}
             >
               {Array.from(
                 {
-                  length:
-                    startingDay +
-                    daysInMonth,
+                  length: startingDay + daysInMonth,
                 },
                 (_, index) => {
-                  const date =
-                    index -
-                    startingDay +
-                    1;
+                  const date = index - startingDay + 1;
 
                   if (date < 1) {
                     return (
@@ -1416,91 +1188,61 @@ const Interviews = () => {
                     );
                   }
 
-                  const isSelected =
-                    selectedDate ===
-                    date;
+                  const isSelected = selectedDate === date;
 
-                  const interviewExists =
-                    hasInterview(date);
+                  const interviewExists = hasInterview(date);
 
                   return (
                     <Box
                       key={index}
-                      onClick={() =>
-                        handleDateClick(
-                          date
-                        )
-                      }
+                      onClick={() => handleDateClick(date)}
                       sx={{
                         height: 38,
                         display: "flex",
-                        alignItems:
-                          "center",
-                        justifyContent:
-                          "center",
-                        position:
-                          "relative",
-                        cursor:
-                          "pointer",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        position: "relative",
+                        cursor: "pointer",
                       }}
                     >
                       <Box
                         sx={{
                           width: 32,
                           height: 32,
-                          display:
-                            "flex",
-                          alignItems:
-                            "center",
-                          justifyContent:
-                            "center",
-                          borderRadius:
-                            "50%",
-                          backgroundColor:
-                            isSelected
-                              ? "#6366f1"
-                              : "transparent",
-                          color:
-                            isSelected
-                              ? "#fff"
-                              : "#e2e8f0",
-                          fontSize:
-                            "13px",
-                          fontWeight:
-                            isSelected
-                              ? 700
-                              : 400,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "50%",
+                          backgroundColor: isSelected
+                            ? "#6366f1"
+                            : "transparent",
+                          color: isSelected ? "#fff" : "#e2e8f0",
+                          fontSize: "13px",
+                          fontWeight: isSelected ? 700 : 400,
 
                           "&:hover": {
-                            backgroundColor:
-                              isSelected
-                                ? "#6366f1"
-                                : "#182235",
+                            backgroundColor: isSelected ? "#6366f1" : "#182235",
                           },
                         }}
                       >
                         {date}
                       </Box>
 
-                      {interviewExists &&
-                        !isSelected && (
-                          <Box
-                            sx={{
-                              position:
-                                "absolute",
-                              bottom: 1,
-                              width: 4,
-                              height: 4,
-                              borderRadius:
-                                "50%",
-                              backgroundColor:
-                                "#6366f1",
-                            }}
-                          />
-                        )}
+                      {interviewExists && !isSelected && (
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            bottom: 1,
+                            width: 4,
+                            height: 4,
+                            borderRadius: "50%",
+                            backgroundColor: "#6366f1",
+                          }}
+                        />
+                      )}
                     </Box>
                   );
-                }
+                },
               )}
             </Box>
           </Box>
@@ -1511,10 +1253,8 @@ const Interviews = () => {
             sx={{
               p: 2.5,
               borderRadius: 3,
-              backgroundColor:
-                "#1e293b",
-              border:
-                "1px solid #334155",
+              backgroundColor: "#1e293b",
+              border: "1px solid #334155",
             }}
           >
             <Typography
@@ -1525,137 +1265,96 @@ const Interviews = () => {
                 mb: 2,
               }}
             >
-              Interviews on{" "}
-              {selectedDate}{" "}
-              {currentMonth.toLocaleString(
-                "default",
-                {
-                  month: "short",
-                }
-              )}{" "}
+              Interviews on {selectedDate}{" "}
+              {currentMonth.toLocaleString("default", {
+                month: "short",
+              })}{" "}
               {year}
             </Typography>
 
-            {selectedInterviews.length ===
-            0 ? (
+            {selectedInterviews.length === 0 ? (
               <Typography
                 sx={{
-                  color:
-                    "#64748b",
-                  textAlign:
-                    "center",
+                  color: "#64748b",
+                  textAlign: "center",
                   py: 5,
                 }}
               >
-                No interviews
-                scheduled for
-                this date.
+                No interviews scheduled for this date.
               </Typography>
             ) : (
-              selectedInterviews.map(
-                (interview) => (
+              selectedInterviews.map((interview) => (
+                <Box
+                  key={interview.id}
+                  sx={{
+                    p: 1.5,
+                    mb: 1.5,
+                    borderRadius: 2,
+                    backgroundColor: "#182235",
+                    border: "1px solid #334155",
+                  }}
+                >
                   <Box
-                    key={
-                      interview.id
-                    }
                     sx={{
-                      p: 1.5,
-                      mb: 1.5,
-                      borderRadius: 2,
-                      backgroundColor:
-                        "#182235",
-                      border:
-                        "1px solid #334155",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
-                    <Box
-                      sx={{
-                        display:
-                          "flex",
-                        justifyContent:
-                          "space-between",
-                        alignItems:
-                          "center",
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          color:
-                            "#818cf8",
-                          fontSize:
-                            "13px",
-                          fontWeight:
-                            600,
-                        }}
-                      >
-                        {
-                          interview.time
-                        }
-                      </Typography>
-
-                      <Typography
-                        sx={{
-                          color:
-                            interview.status ===
-                            "Pending"
-                              ? "#f59e0b"
-                              : "#65e6a0",
-                          fontSize:
-                            "11px",
-                          fontWeight:
-                            600,
-                        }}
-                      >
-                        {
-                          interview.status
-                        }
-                      </Typography>
-                    </Box>
-
                     <Typography
                       sx={{
-                        color:
-                          "#f8fafc",
-                        fontSize:
-                          "14px",
-                        fontWeight:
-                          600,
-                        mt: 1,
+                        color: "#818cf8",
+                        fontSize: "13px",
+                        fontWeight: 600,
                       }}
                     >
-                      {
-                        interview.name
-                      }
+                      {interview.time}
                     </Typography>
 
                     <Typography
                       sx={{
                         color:
-                          "#64748b",
-                        fontSize:
-                          "12px",
+                          interview.status === "Pending"
+                            ? "#f59e0b"
+                            : "#65e6a0",
+                        fontSize: "11px",
+                        fontWeight: 600,
                       }}
                     >
-                      {
-                        interview.type
-                      }
+                      {interview.status}
                     </Typography>
                   </Box>
-                )
-              )
+
+                  <Typography
+                    sx={{
+                      color: "#f8fafc",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      mt: 1,
+                    }}
+                  >
+                    {interview.name}
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      color: "#64748b",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {interview.type}
+                  </Typography>
+                </Box>
+              ))
             )}
 
             <Button
               fullWidth
-              onClick={() =>
-                setOpenSchedule(true)
-              }
+              onClick={() => setOpenSchedule(true)}
               sx={{
                 mt: 1,
-                color:
-                  "#818cf8",
-                textTransform:
-                  "none",
+                color: "#818cf8",
+                textTransform: "none",
                 fontWeight: 600,
               }}
             >
@@ -1671,15 +1370,11 @@ const Interviews = () => {
 
       <Dialog
         open={openSchedule}
-        onClose={() =>
-          setOpenSchedule(false)
-        }
+        onClose={() => setOpenSchedule(false)}
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>
-          Schedule Interview
-        </DialogTitle>
+        <DialogTitle>Schedule Interview</DialogTitle>
 
         <DialogContent>
           <TextField
@@ -1740,13 +1435,9 @@ const Interviews = () => {
             onChange={handleFormChange}
             margin="normal"
           >
-            <MenuItem value="Technical Interview">
-              Technical Interview
-            </MenuItem>
+            <MenuItem value="Technical Interview">Technical Interview</MenuItem>
 
-            <MenuItem value="HR Interview">
-              HR Interview
-            </MenuItem>
+            <MenuItem value="HR Interview">HR Interview</MenuItem>
 
             <MenuItem value="Managerial Interview">
               Managerial Interview
@@ -1758,9 +1449,7 @@ const Interviews = () => {
             required
             label="Interviewer"
             name="interviewer"
-            value={
-              formData.interviewer
-            }
+            value={formData.interviewer}
             onChange={handleFormChange}
             margin="normal"
           />
@@ -1769,9 +1458,7 @@ const Interviews = () => {
             fullWidth
             label="Meeting Link"
             name="meetingLink"
-            value={
-              formData.meetingLink
-            }
+            value={formData.meetingLink}
             onChange={handleFormChange}
             margin="normal"
           />
@@ -1785,17 +1472,11 @@ const Interviews = () => {
             onChange={handleFormChange}
             margin="normal"
           >
-            <MenuItem value="Scheduled">
-              Scheduled
-            </MenuItem>
+            <MenuItem value="Scheduled">Scheduled</MenuItem>
 
-            <MenuItem value="Confirmed">
-              Confirmed
-            </MenuItem>
+            <MenuItem value="Confirmed">Confirmed</MenuItem>
 
-            <MenuItem value="Pending">
-              Pending
-            </MenuItem>
+            <MenuItem value="Pending">Pending</MenuItem>
           </TextField>
         </DialogContent>
 
@@ -1813,8 +1494,7 @@ const Interviews = () => {
             variant="contained"
             onClick={handleSchedule}
             sx={{
-              background:
-                "linear-gradient(135deg, #6366f1, #8b5cf6)",
+              background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
             }}
           >
             Schedule Interview
@@ -1828,26 +1508,20 @@ const Interviews = () => {
 
       <Dialog
         open={openDetails}
-        onClose={() =>
-          setOpenDetails(false)
-        }
+        onClose={() => setOpenDetails(false)}
         fullWidth
         maxWidth="sm"
       >
         <DialogTitle
           sx={{
             display: "flex",
-            justifyContent:
-              "space-between",
+            justifyContent: "space-between",
             alignItems: "center",
           }}
         >
           Interview Details
-
           <Button
-            onClick={() =>
-              setOpenDetails(false)
-            }
+            onClick={() => setOpenDetails(false)}
             sx={{
               minWidth: 40,
               color: "#64748b",
@@ -1866,9 +1540,7 @@ const Interviews = () => {
                 mb: 1,
               }}
             >
-              {
-                selectedInterview.name
-              }
+              {selectedInterview.name}
             </Typography>
 
             <Typography
@@ -1877,50 +1549,30 @@ const Interviews = () => {
                 mb: 3,
               }}
             >
-              {
-                selectedInterview.role
-              }
+              {selectedInterview.role}
             </Typography>
 
-            <Typography>
-              📅{" "}
-              {selectedInterview.date}{" "}
-              Aug 2026
+            <Typography>📅 {selectedInterview.date} Aug 2026</Typography>
+
+            <Typography sx={{ mt: 1 }}>🕐 {selectedInterview.time}</Typography>
+
+            <Typography sx={{ mt: 1 }}>💼 {selectedInterview.type}</Typography>
+
+            <Typography sx={{ mt: 1 }}>
+              👤 {selectedInterview.interviewer}
             </Typography>
 
             <Typography sx={{ mt: 1 }}>
-              🕐{" "}
-              {selectedInterview.time}
-            </Typography>
-
-            <Typography sx={{ mt: 1 }}>
-              💼{" "}
-              {selectedInterview.type}
-            </Typography>
-
-            <Typography sx={{ mt: 1 }}>
-              👤{" "}
-              {
-                selectedInterview.interviewer
-              }
-            </Typography>
-
-            <Typography sx={{ mt: 1 }}>
-              📌{" "}
-              {selectedInterview.status}
+              📌 {selectedInterview.status}
             </Typography>
 
             <Typography
               sx={{
                 mt: 1,
-                wordBreak:
-                  "break-all",
+                wordBreak: "break-all",
               }}
             >
-              🔗{" "}
-              {
-                selectedInterview.meetingLink
-              }
+              🔗 {selectedInterview.meetingLink}
             </Typography>
           </DialogContent>
         )}
@@ -1930,11 +1582,7 @@ const Interviews = () => {
             <>
               <Button
                 color="error"
-                onClick={() =>
-                  handleDelete(
-                    selectedInterview.id
-                  )
-                }
+                onClick={() => handleDelete(selectedInterview.id)}
               >
                 Delete
               </Button>
@@ -1943,20 +1591,13 @@ const Interviews = () => {
                 onClick={() => {
                   setOpenDetails(false);
 
-                  handleOpenReschedule(
-                    selectedInterview
-                  );
+                  handleOpenReschedule(selectedInterview);
                 }}
               >
                 Reschedule
               </Button>
 
-              <Button
-                variant="contained"
-                onClick={() =>
-                  setOpenDetails(false)
-                }
-              >
+              <Button variant="contained" onClick={() => setOpenDetails(false)}>
                 Close
               </Button>
             </>
@@ -1970,15 +1611,11 @@ const Interviews = () => {
 
       <Dialog
         open={openReschedule}
-        onClose={() =>
-          setOpenReschedule(false)
-        }
+        onClose={() => setOpenReschedule(false)}
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>
-          Reschedule Interview
-        </DialogTitle>
+        <DialogTitle>Reschedule Interview</DialogTitle>
 
         <DialogContent>
           <TextField
@@ -2008,10 +1645,10 @@ const Interviews = () => {
             onChange={handleFormChange}
             margin="normal"
             slotProps={{
-                inputLabel: {
+              inputLabel: {
                 shrink: true,
-            },
-        }}
+              },
+            }}
           />
 
           <TextField
@@ -2036,13 +1673,9 @@ const Interviews = () => {
             onChange={handleFormChange}
             margin="normal"
           >
-            <MenuItem value="Technical Interview">
-              Technical Interview
-            </MenuItem>
+            <MenuItem value="Technical Interview">Technical Interview</MenuItem>
 
-            <MenuItem value="HR Interview">
-              HR Interview
-            </MenuItem>
+            <MenuItem value="HR Interview">HR Interview</MenuItem>
 
             <MenuItem value="Managerial Interview">
               Managerial Interview
@@ -2053,27 +1686,16 @@ const Interviews = () => {
             fullWidth
             label="Interviewer"
             name="interviewer"
-            value={
-              formData.interviewer
-            }
+            value={formData.interviewer}
             onChange={handleFormChange}
             margin="normal"
           />
         </DialogContent>
 
         <DialogActions>
-          <Button
-            onClick={() =>
-              setOpenReschedule(false)
-            }
-          >
-            Cancel
-          </Button>
+          <Button onClick={() => setOpenReschedule(false)}>Cancel</Button>
 
-          <Button
-            variant="contained"
-            onClick={handleReschedule}
-          >
+          <Button variant="contained" onClick={handleReschedule}>
             Save Changes
           </Button>
         </DialogActions>
