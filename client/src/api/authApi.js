@@ -65,7 +65,6 @@ export const getprofile = async () => {
   }
 };
 
-<<<<<<< HEAD
 
 
 // export const loginUser = async (formData) => {
@@ -123,7 +122,6 @@ export const getprofile = async () => {
 //     );
 //   }
 // };
-=======
 export const updateProfile = async (profileData) => {
   try {
     const response = await api.put("/profile", profileData);
@@ -138,4 +136,3 @@ export const updateProfile = async (profileData) => {
     );
   }
 };
->>>>>>> e6de717310eb4a41138d2441497d2c44bf1565cd
