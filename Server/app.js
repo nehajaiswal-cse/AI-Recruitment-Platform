@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
+
 import authRoutes from "./routes/authRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
 import interviewRoutes from "./routes/interviewRoutes.js";
+import Candidate from "./routes/candidateRoute.js";
 
 const app = express();
 
@@ -14,12 +16,18 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
+
 app.use("/api", protectedRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/uploads", express.static("uploads"));
 
+// Candidate routes
+app.use("/candidates", Candidate);
+
+// Interview routes
 app.use("/api/interviews", interviewRoutes);
 
 app.get("/", (req, res) => {
@@ -32,7 +40,7 @@ app.get("/", (req, res) => {
 app.get("/home", (req, res) => {
   res.json({
     success: true,
-    message: "AI Recruitment Platform API is running"
+    message: "AI Recruitment Platform API is running",
   });
 });
 
