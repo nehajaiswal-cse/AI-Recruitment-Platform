@@ -17,6 +17,9 @@ import Jobs from "./pages/recruiter/jobs/Jobs.jsx"
 import CreateJob from "./pages/recruiter/jobs/createJob.jsx"
 import EditJob from "./pages/recruiter/jobs/editJob.jsx"
 import ViewJob from "./pages/recruiter/jobs/ViewJob.jsx"
+import FindJobs from "./pages/applicant/jobs/FindJobs.jsx"
+import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx"
+import Apply from "./pages/applicant/jobs/apply.jsx"
 
 
 export default function App() {
@@ -56,9 +59,16 @@ export default function App() {
         </Route>
         </Route>
 
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant/jobs" element={<FindJobs />} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant/jobs/:jobId" element={<ApplicantviewJob />} />
+        </Route>  
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant/jobs/:jobId/apply" element={<Apply />} />
+        </Route>
 
-
-        
       </Routes>
 
      
