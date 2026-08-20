@@ -1,362 +1,395 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
   TextField,
   Typography,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Menu,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
-import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
-import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
-import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded";
-import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
-import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import VideoCameraFrontRoundedIcon from "@mui/icons-material/VideoCameraFrontRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 
-const Candidates = () => {
-  /* ================= STATES ================= */
+const API_URL = "http://localhost:5000";
+
+const Interviews = () => {
+  /* =====================================================
+     STATE
+  ===================================================== */
+
+  const [interviews, setInterviews] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
-  const [jobFilter, setJobFilter] = useState("All Jobs");
-  const [experienceFilter, setExperienceFilter] =
-    useState("All Experience");
 
-  const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("All");
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const candidatesPerPage = 2;
+  const [typeFilter, setTypeFilter] = useState("All");
 
-  const [candidates, setCandidates] = useState([
-    {
-      name: "pawan Sharma",
-      email: "pawan.sharma@email.com",
-      role: "Backend Developer",
-      skills: "Node.js, Express, MongoDB",
-      experience: "3.2 Years",
-      status: "Under Review",
-      applied: "20 Aug 2026",
-      initials: "RS",
-    },
-    {
-      name: "Priya Singh",
-      email: "priya.singh@email.com",
-      role: "Frontend Developer",
-      skills: "React, JavaScript, Tailwind",
-      experience: "2.5 Years",
-      status: "Shortlisted",
-      applied: "19 Aug 2026",
-      initials: "PS",
-    },
-    {
-      name: "Amit Kumar",
-      email: "amit.kumar@email.com",
-      role: "Full Stack Developer",
-      skills: "MERN Stack",
-      experience: "4.1 Years",
-      status: "Hired",
-      applied: "18 Aug 2026",
-      initials: "AK",
-    },
-    {
-      name: "Sneha Sharma",
-      email: "sneha.sharma@email.com",
-      role: "UI/UX Designer",
-      skills: "Figma, Adobe XD",
-      experience: "2.0 Years",
-      status: "Under Review",
-      applied: "17 Aug 2026",
-      initials: "SS",
-    },
-    {
-      name: "Rohit Kumar",
-      email: "rohit.kumar@email.com",
-      role: "DevOps Engineer",
-      skills: "AWS, Docker, Kubernetes",
-      experience: "3.6 Years",
-      status: "Shortlisted",
-      applied: "16 Aug 2026",
-      initials: "RK",
-    },
-    {
-      name: "Vikram Joshi",
-      email: "vikram.joshi@email.com",
-      role: "Backend Developer",
-      skills: "Python, Django, PostgreSQL",
-      experience: "2.8 Years",
-      status: "Rejected",
-      applied: "15 Aug 2026",
-      initials: "VK",
-    },
-  ]);
+  const [openSchedule, setOpenSchedule] = useState(false);
 
-  /* ================= ADD CANDIDATE ================= */
+  const [openDetails, setOpenDetails] = useState(false);
 
-  const [openAddCandidate, setOpenAddCandidate] = useState(false);
+  const [selectedInterview, setSelectedInterview] = useState(null);
 
-  const [newCandidate, setNewCandidate] = useState({
-    name: "",
-    email: "",
-    role: "",
-    skills: "",
-    experience: "",
-  });
+  const [submitting, setSubmitting] = useState(false);
 
-  /* ================= VIEW CANDIDATE ================= */
+  /* =====================================================
+     FORM
+  ===================================================== */
 
-  const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [openView, setOpenView] = useState(false);
+  const emptyForm = {
+    candidate: "",
+    job: "",
+    date: "",
+    time: "",
+    type: "Technical Interview",
+    interviewer: "",
+    meetingLink: "",
+    duration: "45 min",
+  };
 
-  /* ================= ACTION MENU ================= */
+  const [formData, setFormData] = useState(emptyForm);
 
-  const [actionAnchor, setActionAnchor] = useState(null);
-  const [actionCandidate, setActionCandidate] = useState(null);
+  /* =====================================================
+     GET TOKEN
+  ===================================================== */
 
-  /* ================= SNACKBAR ================= */
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  /* =====================================================
+     FETCH RECRUITER INTERVIEWS
+  ===================================================== */
 
-  /* ================= FILTER ================= */
+  const fetchInterviews = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-  const filteredCandidates = useMemo(() => {
-    return candidates.filter((candidate) => {
+      const token = getToken();
+
+      if (!token) {
+        setError("Please login first.");
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/api/interviews/recruiter`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("Recruiter interviews:", data);
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to fetch interviews"
+        );
+      }
+
+      setInterviews(data.interviews || []);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to load interviews");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* =====================================================
+     LOAD INTERVIEWS
+  ===================================================== */
+
+  useEffect(() => {
+    fetchInterviews();
+  }, []);
+
+  /* =====================================================
+     FORM CHANGE
+  ===================================================== */
+
+  const handleFormChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  /* =====================================================
+     SCHEDULE INTERVIEW
+  ===================================================== */
+
+  const handleSchedule = async () => {
+    if (
+      !formData.candidate ||
+      !formData.job ||
+      !formData.date ||
+      !formData.time ||
+      !formData.type ||
+      !formData.interviewer
+    ) {
+      alert("Please fill all required fields.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const token = getToken();
+
+      if (!token) {
+        alert("Please login first.");
+        return;
+      }
+
+      const response = await fetch(
+        `${API_URL}/api/interviews`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+
+          body: JSON.stringify({
+            candidate: formData.candidate,
+            job: formData.job,
+            date: formData.date,
+            time: formData.time,
+            type: formData.type,
+            interviewer: formData.interviewer,
+            meetingLink:
+              formData.meetingLink ||
+              "https://meet.google.com/example",
+            duration: formData.duration,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("Schedule response:", data);
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to schedule interview"
+        );
+      }
+
+      alert("Interview scheduled successfully!");
+
+      setFormData(emptyForm);
+
+      setOpenSchedule(false);
+
+      await fetchInterviews();
+    } catch (err) {
+      console.error("Schedule interview error:", err);
+
+      alert(err.message || "Failed to schedule interview");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  /* =====================================================
+     FILTER
+  ===================================================== */
+
+  const filteredInterviews = useMemo(() => {
+    return interviews.filter((interview) => {
+      const candidateName =
+        interview.candidate?.name || "";
+
+      const candidateEmail =
+        interview.candidate?.email || "";
+
+      const jobTitle =
+        interview.job?.title || "";
+
+      const interviewer =
+        interview.interviewer || "";
+
       const searchValue = search.toLowerCase();
 
       const matchesSearch =
-        candidate.name.toLowerCase().includes(searchValue) ||
-        candidate.email.toLowerCase().includes(searchValue) ||
-        candidate.role.toLowerCase().includes(searchValue) ||
-        candidate.skills.toLowerCase().includes(searchValue);
+        candidateName
+          .toLowerCase()
+          .includes(searchValue) ||
+        candidateEmail
+          .toLowerCase()
+          .includes(searchValue) ||
+        jobTitle
+          .toLowerCase()
+          .includes(searchValue) ||
+        interviewer
+          .toLowerCase()
+          .includes(searchValue);
 
       const matchesStatus =
-        statusFilter === "All Status" ||
-        candidate.status === statusFilter;
+        statusFilter === "All" ||
+        interview.status === statusFilter;
 
-      const matchesJob =
-        jobFilter === "All Jobs" ||
-        candidate.role === jobFilter;
-
-      const experience = parseFloat(candidate.experience);
-
-      const matchesExperience =
-        experienceFilter === "All Experience" ||
-        (experienceFilter === "0-2" && experience <= 2) ||
-        (experienceFilter === "2-4" &&
-          experience > 2 &&
-          experience <= 4) ||
-        (experienceFilter === "4+" && experience > 4);
+      const matchesType =
+        typeFilter === "All" ||
+        interview.type === typeFilter;
 
       return (
         matchesSearch &&
         matchesStatus &&
-        matchesJob &&
-        matchesExperience
+        matchesType
       );
     });
   }, [
-    candidates,
+    interviews,
     search,
     statusFilter,
-    jobFilter,
-    experienceFilter,
+    typeFilter,
   ]);
 
-  /* ================= PAGINATION ================= */
+  /* =====================================================
+     STATS
+  ===================================================== */
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredCandidates.length / candidatesPerPage)
-  );
+  const upcomingCount = interviews.filter(
+    (item) =>
+      item.status === "Scheduled" ||
+      item.status === "Confirmed"
+  ).length;
 
-  const startIndex =
-    (currentPage - 1) * candidatesPerPage;
+  const confirmedCount = interviews.filter(
+    (item) => item.status === "Confirmed"
+  ).length;
 
-  const paginatedCandidates = filteredCandidates.slice(
-    startIndex,
-    startIndex + candidatesPerPage
-  );
+  const completedCount = interviews.filter(
+    (item) => item.status === "Completed"
+  ).length;
 
-  /* ================= RESET PAGE ================= */
+  const pendingCount = interviews.filter(
+    (item) =>
+      item.status === "Pending"
+  ).length;
 
-  const handleSearch = (value) => {
-    setSearch(value);
-    setCurrentPage(1);
+  /* =====================================================
+     NEXT INTERVIEW
+  ===================================================== */
+
+  const nextInterview = useMemo(() => {
+    return [...interviews]
+      .filter(
+        (interview) =>
+          interview.status === "Scheduled" ||
+          interview.status === "Confirmed"
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.date) - new Date(b.date)
+      )[0];
+  }, [interviews]);
+
+  /* =====================================================
+     FORMAT DATE
+  ===================================================== */
+
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
   };
 
-  const handleStatusFilter = (value) => {
-    setStatusFilter(value);
-    setCurrentPage(1);
+  /* =====================================================
+     VIEW DETAILS
+  ===================================================== */
+
+  const handleViewDetails = (interview) => {
+    setSelectedInterview(interview);
+    setOpenDetails(true);
   };
 
-  const handleJobFilter = (value) => {
-    setJobFilter(value);
-    setCurrentPage(1);
-  };
-
-  const handleExperienceFilter = (value) => {
-    setExperienceFilter(value);
-    setCurrentPage(1);
-  };
-
-  /* ================= STATUS STYLE ================= */
+  /* =====================================================
+     STATUS STYLE
+  ===================================================== */
 
   const getStatusStyle = (status) => {
-    if (status === "Hired") {
-      return {
-        backgroundColor: "#124e35",
-        color: "#65e6a0",
-      };
+    switch (status) {
+      case "Confirmed":
+        return {
+          backgroundColor: "#064e3b",
+          color: "#6ee7b7",
+        };
+
+      case "Scheduled":
+        return {
+          backgroundColor: "#172554",
+          color: "#60a5fa",
+        };
+
+      case "Pending":
+        return {
+          backgroundColor: "#422006",
+          color: "#fbbf24",
+        };
+
+      case "Completed":
+        return {
+          backgroundColor: "#052e16",
+          color: "#4ade80",
+        };
+
+      case "Cancelled":
+        return {
+          backgroundColor: "#450a0a",
+          color: "#f87171",
+        };
+
+      default:
+        return {
+          backgroundColor: "#334155",
+          color: "#cbd5e1",
+        };
     }
-
-    if (status === "Shortlisted") {
-      return {
-        backgroundColor: "#312e81",
-        color: "#a5b4fc",
-      };
-    }
-
-    if (status === "Rejected") {
-      return {
-        backgroundColor: "#451a1a",
-        color: "#f87171",
-      };
-    }
-
-    return {
-      backgroundColor: "#422006",
-      color: "#fbbf24",
-    };
   };
 
-  /* ================= ADD CANDIDATE ================= */
-
-  const handleAddCandidate = () => {
-    if (
-      !newCandidate.name ||
-      !newCandidate.email ||
-      !newCandidate.role
-    ) {
-      setSnackbar({
-        open: true,
-        message: "Please fill all required fields.",
-        severity: "warning",
-      });
-
-      return;
-    }
-
-    const initials = newCandidate.name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-
-    const candidate = {
-      ...newCandidate,
-      experience:
-        newCandidate.experience || "0 Years",
-      status: "Under Review",
-      applied: "18 Aug 2026",
-      initials,
-    };
-
-    setCandidates((prev) => [candidate, ...prev]);
-
-    setNewCandidate({
-      name: "",
-      email: "",
-      role: "",
-      skills: "",
-      experience: "",
-    });
-
-    setOpenAddCandidate(false);
-    setCurrentPage(1);
-
-    setSnackbar({
-      open: true,
-      message: "Candidate added successfully.",
-      severity: "success",
-    });
-  };
-
-  /* ================= VIEW ================= */
-
-  const handleView = (candidate) => {
-    setSelectedCandidate(candidate);
-    setOpenView(true);
-  };
-
-  /* ================= EMAIL ================= */
-
-  const handleEmail = (candidate) => {
-    setSnackbar({
-      open: true,
-      message: `Email action opened for ${candidate.name}.`,
-      severity: "info",
-    });
-  };
-
-  /* ================= MORE ACTION ================= */
-
-  const handleMore = (event, candidate) => {
-    setActionAnchor(event.currentTarget);
-    setActionCandidate(candidate);
-  };
-
-  const closeActionMenu = () => {
-    setActionAnchor(null);
-    setActionCandidate(null);
-  };
-
-  const updateCandidateStatus = (status) => {
-    if (!actionCandidate) return;
-
-    setCandidates((prev) =>
-      prev.map((candidate) =>
-        candidate.email === actionCandidate.email
-          ? { ...candidate, status }
-          : candidate
-      )
-    );
-
-    setSnackbar({
-      open: true,
-      message: `${actionCandidate.name} marked as ${status}.`,
-      severity: "success",
-    });
-
-    closeActionMenu();
-  };
-
-  /* ================= RETURN ================= */
+  /* =====================================================
+     UI
+  ===================================================== */
 
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#0f172a",
+        backgroundColor: "#0f172a",
+        color: "#f8fafc",
         p: {
           xs: 2,
           sm: 3,
@@ -364,7 +397,9 @@ const Candidates = () => {
         },
       }}
     >
-      {/* ================= PAGE HEADER ================= */}
+      {/* =================================================
+          HEADER
+      ================================================= */}
 
       <Box
         sx={{
@@ -386,55 +421,73 @@ const Candidates = () => {
           <Typography
             sx={{
               fontSize: {
-                xs: "30px",
-                md: "34px",
+                xs: 30,
+                md: 34,
               },
               fontWeight: 700,
               color: "#f8fafc",
-              letterSpacing: "-0.5px",
             }}
           >
-            Candidates
+            Interviews
           </Typography>
 
           <Typography
             sx={{
               mt: 0.5,
-              fontSize: "15px",
               color: "#94a3b8",
+              fontSize: 15,
             }}
           >
-            Manage and track candidates who applied for your jobs.
+            Manage, schedule and track candidate interviews.
           </Typography>
         </Box>
 
         <Button
           variant="contained"
           startIcon={<AddRoundedIcon />}
-          onClick={() => setOpenAddCandidate(true)}
+          onClick={() => setOpenSchedule(true)}
           sx={{
             background:
-              "linear-gradient(135deg, #6366f1, #8b5cf6)",
-            color: "#fff",
-            fontWeight: 600,
+              "linear-gradient(135deg,#6366f1,#8b5cf6)",
             textTransform: "none",
+            fontWeight: 600,
             borderRadius: 2,
             px: 2.5,
             py: 1.2,
             boxShadow: "none",
-
-            "&:hover": {
-              background:
-                "linear-gradient(135deg, #5859e8, #7c4ee8)",
-              boxShadow: "none",
-            },
           }}
         >
-          Add Candidate
+          Schedule Interview
         </Button>
       </Box>
 
-      {/* ================= STATS ================= */}
+      {/* =================================================
+          ERROR
+      ================================================= */}
+
+      {error && (
+        <Box
+          sx={{
+            mb: 3,
+            p: 2,
+            borderRadius: 2,
+            backgroundColor: "#450a0a",
+            border: "1px solid #7f1d1d",
+          }}
+        >
+          <Typography
+            sx={{
+              color: "#fca5a5",
+            }}
+          >
+            {error}
+          </Typography>
+        </Box>
+      )}
+
+      {/* =================================================
+          STATS
+      ================================================= */}
 
       <Box
         sx={{
@@ -442,328 +495,64 @@ const Candidates = () => {
           gridTemplateColumns: {
             xs: "1fr",
             sm: "1fr 1fr",
-            lg: "repeat(5, 1fr)",
+            lg: "repeat(4,1fr)",
           },
           gap: 2,
+          mb: 3,
         }}
       >
-        {/* TOTAL */}
+        <StatCard
+          title="Upcoming"
+          value={upcomingCount}
+          subtitle="Scheduled / Confirmed"
+          color="#60a5fa"
+        />
 
-        <Box
-          sx={{
-            p: 2.5,
-            borderRadius: 3,
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-              mb: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                width: 42,
-                height: 42,
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#312e81",
-                color: "#a5b4fc",
-              }}
-            >
-              <PeopleAltOutlinedIcon />
-            </Box>
+        <StatCard
+          title="Confirmed"
+          value={confirmedCount}
+          subtitle="Confirmed interviews"
+          color="#34d399"
+        />
 
-            <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
-              Total Candidates
-            </Typography>
-          </Box>
+        <StatCard
+          title="Completed"
+          value={completedCount}
+          subtitle="Completed interviews"
+          color="#a78bfa"
+        />
 
-          <Typography
-            sx={{
-              color: "#f8fafc",
-              fontSize: "30px",
-              fontWeight: 700,
-            }}
-          >
-            256
-          </Typography>
-
-          <Typography
-            sx={{
-              color: "#34d399",
-              fontSize: "13px",
-              mt: 0.5,
-            }}
-          >
-            +12 this week
-          </Typography>
-        </Box>
-
-        {/* UNDER REVIEW */}
-
-        <Box
-          sx={{
-            p: 2.5,
-            borderRadius: 3,
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-              mb: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                width: 42,
-                height: 42,
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#172554",
-                color: "#60a5fa",
-              }}
-            >
-              <AccessTimeRoundedIcon />
-            </Box>
-
-            <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
-              Under Review
-            </Typography>
-          </Box>
-
-          <Typography
-            sx={{
-              color: "#f8fafc",
-              fontSize: "30px",
-              fontWeight: 700,
-            }}
-          >
-            64
-          </Typography>
-
-          <Typography
-            sx={{
-              color: "#60a5fa",
-              fontSize: "13px",
-              mt: 0.5,
-            }}
-          >
-            25% of total
-          </Typography>
-        </Box>
-
-        {/* SHORTLISTED */}
-
-        <Box
-          sx={{
-            p: 2.5,
-            borderRadius: 3,
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-              mb: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                width: 42,
-                height: 42,
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#312e81",
-                color: "#a78bfa",
-              }}
-            >
-              <PersonAddAltRoundedIcon />
-            </Box>
-
-            <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
-              Shortlisted
-            </Typography>
-          </Box>
-
-          <Typography
-            sx={{
-              color: "#f8fafc",
-              fontSize: "30px",
-              fontWeight: 700,
-            }}
-          >
-            38
-          </Typography>
-
-          <Typography
-            sx={{
-              color: "#a78bfa",
-              fontSize: "13px",
-              mt: 0.5,
-            }}
-          >
-            15% of total
-          </Typography>
-        </Box>
-
-        {/* HIRED */}
-
-        <Box
-          sx={{
-            p: 2.5,
-            borderRadius: 3,
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-              mb: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                width: 42,
-                height: 42,
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#124e35",
-                color: "#65e6a0",
-              }}
-            >
-              <CheckCircleOutlineRoundedIcon />
-            </Box>
-
-            <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
-              Hired
-            </Typography>
-          </Box>
-
-          <Typography
-            sx={{
-              color: "#f8fafc",
-              fontSize: "30px",
-              fontWeight: 700,
-            }}
-          >
-            18
-          </Typography>
-
-          <Typography
-            sx={{
-              color: "#34d399",
-              fontSize: "13px",
-              mt: 0.5,
-            }}
-          >
-            7% of total
-          </Typography>
-        </Box>
-
-        {/* REJECTED */}
-
-        <Box
-          sx={{
-            p: 2.5,
-            borderRadius: 3,
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1.5,
-              mb: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                width: 42,
-                height: 42,
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#451a1a",
-                color: "#f87171",
-              }}
-            >
-              <CancelOutlinedIcon />
-            </Box>
-
-            <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
-              Rejected
-            </Typography>
-          </Box>
-
-          <Typography
-            sx={{
-              color: "#f8fafc",
-              fontSize: "30px",
-              fontWeight: 700,
-            }}
-          >
-            136
-          </Typography>
-
-          <Typography
-            sx={{
-              color: "#f87171",
-              fontSize: "13px",
-              mt: 0.5,
-            }}
-          >
-            53% of total
-          </Typography>
-        </Box>
+        <StatCard
+          title="Needs Action"
+          value={pendingCount}
+          subtitle="Pending interviews"
+          color="#f59e0b"
+        />
       </Box>
 
-      {/* ================= SEARCH & FILTERS ================= */}
+      {/* =================================================
+          SEARCH
+      ================================================= */}
 
       <Box
         sx={{
-          mt: 3,
           p: 2,
+          mb: 3,
           borderRadius: 3,
           backgroundColor: "#172033",
           border: "1px solid #334155",
           display: "flex",
-          alignItems: "center",
           gap: 1.5,
           flexWrap: "wrap",
+          alignItems: "center",
         }}
       >
-        {/* SEARCH */}
-
         <TextField
           value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Search candidate, email, skills..."
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          placeholder="Search candidate, job or interviewer..."
           size="small"
           sx={{
             flex: 1,
@@ -776,14 +565,6 @@ const Candidates = () => {
 
               "& fieldset": {
                 borderColor: "#334155",
-              },
-
-              "&:hover fieldset": {
-                borderColor: "#475569",
-              },
-
-              "&.Mui-focused fieldset": {
-                borderColor: "#6366f1",
               },
             },
 
@@ -804,336 +585,115 @@ const Candidates = () => {
           }}
         />
 
-        {/* JOB */}
-
         <TextField
           select
-          value={jobFilter}
-          onChange={(e) => handleJobFilter(e.target.value)}
           size="small"
-          sx={{
-            minWidth: 145,
-
-            "& .MuiOutlinedInput-root": {
-              color: "#e2e8f0",
-              backgroundColor: "#111827",
-              borderRadius: 2,
-
-              "& fieldset": {
-                borderColor: "#334155",
-              },
-            },
-          }}
-        >
-          <MenuItem value="All Jobs">All Jobs</MenuItem>
-          <MenuItem value="Backend Developer">
-            Backend Developer
-          </MenuItem>
-          <MenuItem value="Frontend Developer">
-            Frontend Developer
-          </MenuItem>
-          <MenuItem value="Full Stack Developer">
-            Full Stack Developer
-          </MenuItem>
-          <MenuItem value="UI/UX Designer">
-            UI/UX Designer
-          </MenuItem>
-          <MenuItem value="DevOps Engineer">
-            DevOps Engineer
-          </MenuItem>
-        </TextField>
-
-        {/* STATUS */}
-
-        <TextField
-          select
           value={statusFilter}
-          onChange={(e) => handleStatusFilter(e.target.value)}
-          size="small"
+          onChange={(e) =>
+            setStatusFilter(e.target.value)
+          }
           sx={{
-            minWidth: 135,
+            minWidth: 150,
 
             "& .MuiOutlinedInput-root": {
               color: "#e2e8f0",
               backgroundColor: "#111827",
               borderRadius: 2,
-
-              "& fieldset": {
-                borderColor: "#334155",
-              },
             },
           }}
         >
-          <MenuItem value="All Status">All Status</MenuItem>
-          <MenuItem value="Under Review">Under Review</MenuItem>
-          <MenuItem value="Shortlisted">Shortlisted</MenuItem>
-          <MenuItem value="Hired">Hired</MenuItem>
-          <MenuItem value="Rejected">Rejected</MenuItem>
-        </TextField>
+          <MenuItem value="All">
+            All Status
+          </MenuItem>
 
-        {/* EXPERIENCE */}
+          <MenuItem value="Scheduled">
+            Scheduled
+          </MenuItem>
+
+          <MenuItem value="Confirmed">
+            Confirmed
+          </MenuItem>
+
+          <MenuItem value="Pending">
+            Pending
+          </MenuItem>
+
+          <MenuItem value="Completed">
+            Completed
+          </MenuItem>
+        </TextField>
 
         <TextField
           select
-          value={experienceFilter}
-          onChange={(e) =>
-            handleExperienceFilter(e.target.value)
-          }
           size="small"
+          value={typeFilter}
+          onChange={(e) =>
+            setTypeFilter(e.target.value)
+          }
           sx={{
-            minWidth: 145,
+            minWidth: 170,
 
             "& .MuiOutlinedInput-root": {
               color: "#e2e8f0",
               backgroundColor: "#111827",
               borderRadius: 2,
-
-              "& fieldset": {
-                borderColor: "#334155",
-              },
             },
           }}
         >
-          <MenuItem value="All Experience">
-            All Experience
+          <MenuItem value="All">
+            All Types
           </MenuItem>
-          <MenuItem value="0-2">0 - 2 Years</MenuItem>
-          <MenuItem value="2-4">2 - 4 Years</MenuItem>
-          <MenuItem value="4+">4+ Years</MenuItem>
+
+          <MenuItem value="Technical Interview">
+            Technical
+          </MenuItem>
+
+          <MenuItem value="HR Interview">
+            HR
+          </MenuItem>
+
+          <MenuItem value="Managerial Interview">
+            Managerial
+          </MenuItem>
         </TextField>
-
-        {/* MORE FILTERS */}
-
-        <Button
-          variant="outlined"
-          onClick={() =>
-            setShowMoreFilters((prev) => !prev)
-          }
-          endIcon={
-            <KeyboardArrowDownRoundedIcon
-              sx={{
-                transform: showMoreFilters
-                  ? "rotate(180deg)"
-                  : "rotate(0deg)",
-              }}
-            />
-          }
-          sx={{
-            height: 40,
-            color: "#e2e8f0",
-            borderColor: "#334155",
-            backgroundColor: "#111827",
-            textTransform: "none",
-            borderRadius: 2,
-
-            "&:hover": {
-              borderColor: "#6366f1",
-              backgroundColor: "#182235",
-            },
-          }}
-        >
-          More Filters
-        </Button>
-
-        {/* EXTRA FILTERS */}
-
-        {showMoreFilters && (
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              gap: 1.5,
-              flexWrap: "wrap",
-              pt: 1,
-              borderTop: "1px solid #334155",
-            }}
-          >
-            <TextField
-              select
-              size="small"
-              defaultValue="All Sources"
-              sx={{
-                minWidth: 150,
-                "& .MuiOutlinedInput-root": {
-                  color: "#e2e8f0",
-                  backgroundColor: "#111827",
-                  borderRadius: 2,
-                  "& fieldset": {
-                    borderColor: "#334155",
-                  },
-                },
-              }}
-            >
-              <MenuItem value="All Sources">
-                All Sources
-              </MenuItem>
-              <MenuItem value="LinkedIn">LinkedIn</MenuItem>
-              <MenuItem value="Referral">Referral</MenuItem>
-              <MenuItem value="Website">Website</MenuItem>
-            </TextField>
-
-            <TextField
-              select
-              size="small"
-              defaultValue="Any Date"
-              sx={{
-                minWidth: 150,
-                "& .MuiOutlinedInput-root": {
-                  color: "#e2e8f0",
-                  backgroundColor: "#111827",
-                  borderRadius: 2,
-                  "& fieldset": {
-                    borderColor: "#334155",
-                  },
-                },
-              }}
-            >
-              <MenuItem value="Any Date">Any Date</MenuItem>
-              <MenuItem value="Today">Today</MenuItem>
-              <MenuItem value="This Week">This Week</MenuItem>
-              <MenuItem value="This Month">This Month</MenuItem>
-            </TextField>
-
-            <Button
-              variant="outlined"
-              onClick={() => {
-                setSearch("");
-                setStatusFilter("All Status");
-                setJobFilter("All Jobs");
-                setExperienceFilter("All Experience");
-                setCurrentPage(1);
-              }}
-              sx={{
-                color: "#f87171",
-                borderColor: "#451a1a",
-                textTransform: "none",
-                borderRadius: 2,
-              }}
-            >
-              Clear Filters
-            </Button>
-          </Box>
-        )}
       </Box>
 
-      {/* ================= CANDIDATES LIST ================= */}
+      {/* =================================================
+          NEXT INTERVIEW
+      ================================================= */}
 
       <Box
         sx={{
-          mt: 3,
+          mb: 3,
+          p: {
+            xs: 2,
+            md: 3,
+          },
           borderRadius: 3,
           backgroundColor: "#1e293b",
           border: "1px solid #334155",
-          overflow: "hidden",
         }}
       >
-        {/* HEADER */}
-
-        <Box
+        <Typography
           sx={{
-            p: {
-              xs: 2,
-              md: 2.5,
-            },
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            fontSize: 20,
+            fontWeight: 600,
+            mb: 3,
           }}
         >
-          <Box>
-            <Typography
-              sx={{
-                color: "#f8fafc",
-                fontSize: "20px",
-                fontWeight: 600,
-              }}
-            >
-              All Candidates
-            </Typography>
+          Next Interview ⭐
+        </Typography>
 
-            <Typography
-              sx={{
-                color: "#94a3b8",
-                fontSize: "13px",
-                mt: 0.4,
-              }}
-            >
-              Review and manage candidate applications.
-            </Typography>
-          </Box>
-
-          <Typography
-            sx={{
-              color: "#818cf8",
-              fontSize: "13px",
-              fontWeight: 600,
-            }}
-          >
-            {filteredCandidates.length} Candidates
-          </Typography>
-        </Box>
-
-        {/* TABLE HEADER */}
-
-        <Box
-          sx={{
-            display: {
-              xs: "none",
-              md: "grid",
-            },
-            gridTemplateColumns:
-              "1.7fr 1.5fr 1fr 1fr 1fr 0.8fr",
-            px: 2.5,
-            py: 1.5,
-            backgroundColor: "#172033",
-            borderTop: "1px solid #334155",
-            borderBottom: "1px solid #334155",
-          }}
-        >
-          {[
-            "Candidate",
-            "Job Applied",
-            "Experience",
-            "Status",
-            "Applied On",
-            "Actions",
-          ].map((heading) => (
-            <Typography
-              key={heading}
-              sx={{
-                color: "#64748b",
-                fontSize: "12px",
-                fontWeight: 600,
-              }}
-            >
-              {heading}
-            </Typography>
-          ))}
-        </Box>
-
-        {/* CANDIDATE ROWS */}
-
-        {paginatedCandidates.map((candidate) => (
+        {nextInterview ? (
           <Box
-            key={candidate.email}
             sx={{
               display: "grid",
               gridTemplateColumns: {
                 xs: "1fr",
-                md: "1.7fr 1.5fr 1fr 1fr 1fr 0.8fr",
+                md: "1.3fr 1fr auto",
               },
-              gap: {
-                xs: 1.5,
-                md: 0,
-              },
+              gap: 3,
               alignItems: "center",
-              px: 2.5,
-              py: 2,
-              borderBottom: "1px solid #263449",
-
-              "&:hover": {
-                backgroundColor: "#182235",
-              },
             }}
           >
             {/* Candidate */}
@@ -1147,427 +707,486 @@ const Candidates = () => {
             >
               <Box
                 sx={{
-                  width: 40,
-                  height: 40,
+                  width: 52,
+                  height: 52,
                   borderRadius: "50%",
                   background:
-                    "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                    "linear-gradient(135deg,#6366f1,#8b5cf6)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#fff",
-                  fontSize: "13px",
                   fontWeight: 700,
-                  flexShrink: 0,
                 }}
               >
-                {candidate.initials}
+                {(nextInterview.candidate?.name ||
+                  "NA")
+                  .substring(0, 2)
+                  .toUpperCase()}
               </Box>
 
               <Box>
                 <Typography
                   sx={{
-                    color: "#f8fafc",
-                    fontSize: "14px",
                     fontWeight: 600,
+                    fontSize: 16,
                   }}
                 >
-                  {candidate.name}
+                  {nextInterview.candidate?.name ||
+                    "Unknown Candidate"}
                 </Typography>
 
                 <Typography
                   sx={{
-                    color: "#64748b",
-                    fontSize: "12px",
-                    mt: 0.3,
+                    color: "#a5b4fc",
+                    fontSize: 14,
                   }}
                 >
-                  {candidate.email}
+                  {nextInterview.job?.title ||
+                    "Unknown Job"}
                 </Typography>
+
+                <Box
+                  sx={{
+                    display: "inline-block",
+                    mt: 1,
+                    px: 1.2,
+                    py: 0.5,
+                    borderRadius: 1.5,
+                    backgroundColor: "#312e81",
+                    color: "#c4b5fd",
+                    fontSize: 12,
+                  }}
+                >
+                  {nextInterview.type}
+                </Box>
               </Box>
             </Box>
 
-            {/* Job */}
+            {/* Date */}
 
             <Box>
-              <Typography
-                sx={{
-                  color: "#e2e8f0",
-                  fontSize: "13px",
-                }}
-              >
-                {candidate.role}
+              <Typography sx={{ fontSize: 14 }}>
+                📅 {formatDate(nextInterview.date)}
+              </Typography>
+
+              <Typography sx={{ fontSize: 14 }}>
+                🕐 {nextInterview.time}
               </Typography>
 
               <Typography
                 sx={{
-                  color: "#64748b",
-                  fontSize: "12px",
-                  mt: 0.4,
+                  color: "#94a3b8",
+                  fontSize: 14,
                 }}
               >
-                {candidate.skills}
+                👤 {nextInterview.interviewer}
               </Typography>
             </Box>
 
-            {/* Experience */}
-
-            <Typography
-              sx={{
-                color: "#cbd5e1",
-                fontSize: "13px",
-              }}
-            >
-              {candidate.experience}
-            </Typography>
-
-            {/* Status */}
-
-            <Box
-              sx={{
-                justifySelf: {
-                  md: "start",
-                },
-                display: "inline-flex",
-                width: "fit-content",
-                px: 1.2,
-                py: 0.6,
-                borderRadius: 2,
-                fontSize: "11px",
-                fontWeight: 600,
-                ...getStatusStyle(candidate.status),
-              }}
-            >
-              {candidate.status}
-            </Box>
-
-            {/* Applied */}
-
-            <Typography
-              sx={{
-                color: "#94a3b8",
-                fontSize: "13px",
-              }}
-            >
-              {candidate.applied}
-            </Typography>
-
-            {/* ACTIONS */}
+            {/* Action */}
 
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
-                gap: 0.5,
+                gap: 1,
+                flexWrap: "wrap",
               }}
             >
-              {/* VIEW */}
-
               <Button
-                size="small"
-                onClick={() => handleView(candidate)}
-                sx={{
-                  minWidth: 32,
-                  width: 32,
-                  color: "#94a3b8",
-                  p: 0.5,
-
-                  "&:hover": {
-                    color: "#818cf8",
-                    backgroundColor: "#182235",
-                  },
-                }}
-              >
-                <VisibilityOutlinedIcon fontSize="small" />
-              </Button>
-
-              {/* EMAIL */}
-
-              <Button
-                size="small"
-                onClick={() => handleEmail(candidate)}
-                sx={{
-                  minWidth: 32,
-                  width: 32,
-                  color: "#94a3b8",
-                  p: 0.5,
-
-                  "&:hover": {
-                    color: "#818cf8",
-                    backgroundColor: "#182235",
-                  },
-                }}
-              >
-                <MailOutlineRoundedIcon fontSize="small" />
-              </Button>
-
-              {/* MORE */}
-
-              <Button
-                size="small"
-                onClick={(event) =>
-                  handleMore(event, candidate)
+                variant="contained"
+                href={nextInterview.meetingLink}
+                target="_blank"
+                rel="noreferrer"
+                startIcon={
+                  <VideoCameraFrontRoundedIcon />
                 }
                 sx={{
-                  minWidth: 32,
-                  width: 32,
-                  color: "#94a3b8",
-                  p: 0.5,
-
-                  "&:hover": {
-                    color: "#818cf8",
-                    backgroundColor: "#182235",
-                  },
+                  background:
+                    "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                  textTransform: "none",
+                  boxShadow: "none",
                 }}
               >
-                <MoreVertRoundedIcon fontSize="small" />
+                Join Interview
+              </Button>
+
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  handleViewDetails(nextInterview)
+                }
+                sx={{
+                  color: "#cbd5e1",
+                  borderColor: "#475569",
+                  textTransform: "none",
+                }}
+              >
+                View Details
               </Button>
             </Box>
           </Box>
-        ))}
-
-        {/* EMPTY */}
-
-        {filteredCandidates.length === 0 && (
-          <Box
+        ) : (
+          <Typography
             sx={{
-              py: 8,
-              textAlign: "center",
+              color: "#94a3b8",
             }}
           >
-            <Typography
-              sx={{
-                color: "#94a3b8",
-                fontSize: "14px",
-              }}
-            >
-              No candidates found.
-            </Typography>
-          </Box>
-        )}
-
-        {/* ================= PAGINATION ================= */}
-
-        {filteredCandidates.length > 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 1,
-              py: 2.5,
-            }}
-          >
-            {/* PREVIOUS */}
-
-            <Button
-              disabled={currentPage === 1}
-              onClick={() =>
-                setCurrentPage((prev) =>
-                  Math.max(prev - 1, 1)
-                )
-              }
-              sx={{
-                minWidth: 36,
-                width: 36,
-                height: 36,
-                color:
-                  currentPage === 1
-                    ? "#334155"
-                    : "#94a3b8",
-              }}
-            >
-              <ArrowBackIosNewRoundedIcon
-                sx={{ fontSize: 14 }}
-              />
-            </Button>
-
-            {/* PAGE NUMBERS */}
-
-            {Array.from(
-              { length: totalPages },
-              (_, index) => index + 1
-            ).map((page) => (
-              <Button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                sx={{
-                  minWidth: 36,
-                  width: 36,
-                  height: 36,
-                  borderRadius: 1.5,
-                  color:
-                    currentPage === page
-                      ? "#fff"
-                      : "#94a3b8",
-                  backgroundColor:
-                    currentPage === page
-                      ? "#6366f1"
-                      : "transparent",
-
-                  "&:hover": {
-                    backgroundColor:
-                      currentPage === page
-                        ? "#6366f1"
-                        : "#182235",
-                  },
-                }}
-              >
-                {page}
-              </Button>
-            ))}
-
-            {/* NEXT */}
-
-            <Button
-              disabled={
-                currentPage === totalPages
-              }
-              onClick={() =>
-                setCurrentPage((prev) =>
-                  Math.min(prev + 1, totalPages)
-                )
-              }
-              sx={{
-                minWidth: 36,
-                width: 36,
-                height: 36,
-                color:
-                  currentPage === totalPages
-                    ? "#334155"
-                    : "#94a3b8",
-              }}
-            >
-              <ArrowForwardIosRoundedIcon
-                sx={{ fontSize: 14 }}
-              />
-            </Button>
-          </Box>
+            No upcoming interviews.
+          </Typography>
         )}
       </Box>
 
-      {/* ================= ADD CANDIDATE DIALOG ================= */}
+      {/* =================================================
+          INTERVIEW LIST
+      ================================================= */}
 
-      <Dialog
-        open={openAddCandidate}
-        onClose={() => setOpenAddCandidate(false)}
-        fullWidth
-        maxWidth="sm"
-        PaperProps={{
-          sx: {
-            backgroundColor: "#1e293b",
-            color: "#fff",
-            border: "1px solid #334155",
-            borderRadius: 3,
+      <Box
+        sx={{
+          p: {
+            xs: 2,
+            md: 3,
           },
+          borderRadius: 3,
+          backgroundColor: "#1e293b",
+          border: "1px solid #334155",
         }}
       >
-        <DialogTitle
+        <Box
           sx={{
-            color: "#f8fafc",
-            fontWeight: 700,
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 3,
           }}
         >
-          Add Candidate
+          <Box>
+            <Typography
+              sx={{
+                fontSize: 20,
+                fontWeight: 600,
+              }}
+            >
+              Upcoming Interviews
+            </Typography>
+
+            <Typography
+              sx={{
+                mt: 0.5,
+                color: "#94a3b8",
+                fontSize: 14,
+              }}
+            >
+              Your scheduled candidate interviews.
+            </Typography>
+          </Box>
+
+          <Typography
+            sx={{
+              color: "#94a3b8",
+              fontSize: 13,
+            }}
+          >
+            {filteredInterviews.length} interviews
+          </Typography>
+        </Box>
+
+        {loading ? (
+          <Typography
+            sx={{
+              color: "#94a3b8",
+              textAlign: "center",
+              py: 5,
+            }}
+          >
+            Loading interviews...
+          </Typography>
+        ) : filteredInterviews.length === 0 ? (
+          <Typography
+            sx={{
+              color: "#94a3b8",
+              textAlign: "center",
+              py: 5,
+            }}
+          >
+            No interviews found.
+          </Typography>
+        ) : (
+          filteredInterviews.map((interview) => (
+            <Box
+              key={interview._id}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  md: "1.5fr 1.2fr 1.2fr auto",
+                },
+                gap: 2,
+                alignItems: "center",
+                p: 2,
+                mb: 2,
+                borderRadius: 2,
+                backgroundColor: "#182235",
+                border: "1px solid #334155",
+              }}
+            >
+              {/* Candidate */}
+
+              <Box>
+                <Typography
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: 15,
+                  }}
+                >
+                  {interview.candidate?.name ||
+                    "Unknown Candidate"}
+                </Typography>
+
+                <Typography
+                  sx={{
+                    color: "#94a3b8",
+                    fontSize: 13,
+                  }}
+                >
+                  {interview.candidate?.email ||
+                    ""}
+                </Typography>
+
+                <Typography
+                  sx={{
+                    color: "#a5b4fc",
+                    fontSize: 13,
+                  }}
+                >
+                  {interview.job?.title ||
+                    "Unknown Job"}
+                </Typography>
+              </Box>
+
+              {/* Date */}
+
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                  }}
+                >
+                  📅 {formatDate(interview.date)}
+                </Typography>
+
+                <Typography
+                  sx={{
+                    color: "#94a3b8",
+                    fontSize: 13,
+                  }}
+                >
+                  🕐 {interview.time}
+                </Typography>
+              </Box>
+
+              {/* Type */}
+
+              <Box>
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    color: "#cbd5e1",
+                  }}
+                >
+                  {interview.type}
+                </Typography>
+
+                <Typography
+                  sx={{
+                    color: "#94a3b8",
+                    fontSize: 12,
+                  }}
+                >
+                  👤 {interview.interviewer}
+                </Typography>
+              </Box>
+
+              {/* Actions */}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                <Box
+                  sx={{
+                    px: 1.2,
+                    py: 0.6,
+                    borderRadius: 2,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    ...getStatusStyle(
+                      interview.status
+                    ),
+                  }}
+                >
+                  {interview.status}
+                </Box>
+
+                <Button
+                  size="small"
+                  onClick={() =>
+                    handleViewDetails(interview)
+                  }
+                  sx={{
+                    color: "#cbd5e1",
+                    border: "1px solid #475569",
+                    textTransform: "none",
+                  }}
+                >
+                  View
+                </Button>
+              </Box>
+            </Box>
+          ))
+        )}
+      </Box>
+
+      {/* =================================================
+          SCHEDULE DIALOG
+      ================================================= */}
+
+      <Dialog
+        open={openSchedule}
+        onClose={() =>
+          !submitting &&
+          setOpenSchedule(false)
+        }
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          Schedule Interview
         </DialogTitle>
 
         <DialogContent>
-          <Box
+          <Typography
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              mt: 1,
+              color: "#64748b",
+              fontSize: 13,
+              mb: 1,
             }}
           >
-            <TextField
-              label="Candidate Name *"
-              value={newCandidate.name}
-              onChange={(e) =>
-                setNewCandidate({
-                  ...newCandidate,
-                  name: e.target.value,
-                })
-              }
-              fullWidth
-            />
+            Enter the Candidate ID and Job ID from
+            MongoDB/Postman.
+          </Typography>
 
-            <TextField
-              label="Email *"
-              type="email"
-              value={newCandidate.email}
-              onChange={(e) =>
-                setNewCandidate({
-                  ...newCandidate,
-                  email: e.target.value,
-                })
-              }
-              fullWidth
-            />
+          <TextField
+            fullWidth
+            required
+            label="Candidate ID"
+            name="candidate"
+            value={formData.candidate}
+            onChange={handleFormChange}
+            margin="normal"
+            placeholder="e.g. 6a8158798be1a5ce140c2355"
+          />
 
-            <TextField
-              select
-              label="Job Role *"
-              value={newCandidate.role}
-              onChange={(e) =>
-                setNewCandidate({
-                  ...newCandidate,
-                  role: e.target.value,
-                })
-              }
-              fullWidth
-            >
-              <MenuItem value="Backend Developer">
-                Backend Developer
-              </MenuItem>
-              <MenuItem value="Frontend Developer">
-                Frontend Developer
-              </MenuItem>
-              <MenuItem value="Full Stack Developer">
-                Full Stack Developer
-              </MenuItem>
-              <MenuItem value="UI/UX Designer">
-                UI/UX Designer
-              </MenuItem>
-              <MenuItem value="DevOps Engineer">
-                DevOps Engineer
-              </MenuItem>
-            </TextField>
+          <TextField
+            fullWidth
+            required
+            label="Job ID"
+            name="job"
+            value={formData.job}
+            onChange={handleFormChange}
+            margin="normal"
+            placeholder="e.g. 6a873283a6f8c70918405caf"
+          />
 
-            <TextField
-              label="Skills"
-              placeholder="React, Node.js, MongoDB..."
-              value={newCandidate.skills}
-              onChange={(e) =>
-                setNewCandidate({
-                  ...newCandidate,
-                  skills: e.target.value,
-                })
-              }
-              fullWidth
-            />
+          <TextField
+            fullWidth
+            required
+            type="date"
+            label="Interview Date"
+            name="date"
+            value={formData.date}
+            onChange={handleFormChange}
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
 
-            <TextField
-              label="Experience"
-              placeholder="3.5 Years"
-              value={newCandidate.experience}
-              onChange={(e) =>
-                setNewCandidate({
-                  ...newCandidate,
-                  experience: e.target.value,
-                })
-              }
-              fullWidth
-            />
-          </Box>
+          <TextField
+            fullWidth
+            required
+            type="time"
+            label="Interview Time"
+            name="time"
+            value={formData.time}
+            onChange={handleFormChange}
+            margin="normal"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+
+          <TextField
+            fullWidth
+            required
+            select
+            label="Interview Type"
+            name="type"
+            value={formData.type}
+            onChange={handleFormChange}
+            margin="normal"
+          >
+            <MenuItem value="Technical Interview">
+              Technical Interview
+            </MenuItem>
+
+            <MenuItem value="HR Interview">
+              HR Interview
+            </MenuItem>
+
+            <MenuItem value="Managerial Interview">
+              Managerial Interview
+            </MenuItem>
+          </TextField>
+
+          <TextField
+            fullWidth
+            required
+            label="Interviewer"
+            name="interviewer"
+            value={formData.interviewer}
+            onChange={handleFormChange}
+            margin="normal"
+          />
+
+          <TextField
+            fullWidth
+            label="Meeting Link"
+            name="meetingLink"
+            value={formData.meetingLink}
+            onChange={handleFormChange}
+            margin="normal"
+            placeholder="https://meet.google.com/..."
+          />
+
+          <TextField
+            fullWidth
+            label="Duration"
+            name="duration"
+            value={formData.duration}
+            onChange={handleFormChange}
+            margin="normal"
+          />
         </DialogContent>
 
-        <DialogActions sx={{ p: 2.5 }}>
+        <DialogActions>
           <Button
-            onClick={() => setOpenAddCandidate(false)}
-            sx={{
-              color: "#94a3b8",
-              textTransform: "none",
+            disabled={submitting}
+            onClick={() => {
+              setFormData(emptyForm);
+              setOpenSchedule(false);
             }}
           >
             Cancel
@@ -1575,226 +1194,187 @@ const Candidates = () => {
 
           <Button
             variant="contained"
-            onClick={handleAddCandidate}
+            disabled={submitting}
+            onClick={handleSchedule}
             sx={{
               background:
-                "linear-gradient(135deg, #6366f1, #8b5cf6)",
-              textTransform: "none",
-              fontWeight: 600,
+                "linear-gradient(135deg,#6366f1,#8b5cf6)",
             }}
           >
-            Add Candidate
+            {submitting
+              ? "Scheduling..."
+              : "Schedule Interview"}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* ================= VIEW CANDIDATE ================= */}
+      {/* =================================================
+          DETAILS DIALOG
+      ================================================= */}
 
       <Dialog
-        open={openView}
-        onClose={() => setOpenView(false)}
+        open={openDetails}
+        onClose={() =>
+          setOpenDetails(false)
+        }
         fullWidth
         maxWidth="sm"
-        PaperProps={{
-          sx: {
-            backgroundColor: "#1e293b",
-            color: "#fff",
-            border: "1px solid #334155",
-            borderRadius: 3,
-          },
-        }}
       >
         <DialogTitle
           sx={{
-            color: "#f8fafc",
-            fontWeight: 700,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
-          Candidate Details
+          Interview Details
+
+          <Button
+            onClick={() =>
+              setOpenDetails(false)
+            }
+            sx={{
+              minWidth: 40,
+              color: "#64748b",
+            }}
+          >
+            <CloseRoundedIcon />
+          </Button>
         </DialogTitle>
 
-        <DialogContent>
-          {selectedCandidate && (
-            <Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  mb: 3,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 58,
-                    height: 58,
-                    borderRadius: "50%",
-                    background:
-                      "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#fff",
-                    fontWeight: 700,
-                  }}
-                >
-                  {selectedCandidate.initials}
-                </Box>
+        {selectedInterview && (
+          <DialogContent>
+            <Typography
+              sx={{
+                fontSize: 22,
+                fontWeight: 700,
+              }}
+            >
+              {selectedInterview.candidate?.name ||
+                "Unknown Candidate"}
+            </Typography>
 
-                <Box>
-                  <Typography
-                    sx={{
-                      color: "#f8fafc",
-                      fontWeight: 700,
-                      fontSize: 18,
-                    }}
-                  >
-                    {selectedCandidate.name}
-                  </Typography>
+            <Typography
+              sx={{
+                color: "#94a3b8",
+                mb: 3,
+              }}
+            >
+              {selectedInterview.job?.title ||
+                "Unknown Job"}
+            </Typography>
 
-                  <Typography
-                    sx={{
-                      color: "#94a3b8",
-                      fontSize: 13,
-                    }}
-                  >
-                    {selectedCandidate.email}
-                  </Typography>
-                </Box>
-              </Box>
+            <Typography>
+              📅 {formatDate(selectedInterview.date)}
+            </Typography>
 
-              {[
-                ["Job Role", selectedCandidate.role],
-                ["Skills", selectedCandidate.skills],
-                [
-                  "Experience",
-                  selectedCandidate.experience,
-                ],
-                ["Status", selectedCandidate.status],
-                ["Applied On", selectedCandidate.applied],
-              ].map(([label, value]) => (
-                <Box
-                  key={label}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: 2,
-                    py: 1.2,
-                    borderBottom:
-                      "1px solid #334155",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      color: "#64748b",
-                      fontSize: 13,
-                    }}
-                  >
-                    {label}
-                  </Typography>
+            <Typography sx={{ mt: 1 }}>
+              🕐 {selectedInterview.time}
+            </Typography>
 
-                  <Typography
-                    sx={{
-                      color: "#e2e8f0",
-                      fontSize: 13,
-                      textAlign: "right",
-                    }}
-                  >
-                    {value}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          )}
-        </DialogContent>
+            <Typography sx={{ mt: 1 }}>
+              💼 {selectedInterview.type}
+            </Typography>
 
-        <DialogActions sx={{ p: 2.5 }}>
+            <Typography sx={{ mt: 1 }}>
+              👤 {selectedInterview.interviewer}
+            </Typography>
+
+            <Typography sx={{ mt: 1 }}>
+              📌 {selectedInterview.status}
+            </Typography>
+
+            <Typography
+              sx={{
+                mt: 1,
+                wordBreak: "break-all",
+              }}
+            >
+              🔗{" "}
+              {selectedInterview.meetingLink ||
+                "No meeting link"}
+            </Typography>
+          </DialogContent>
+        )}
+
+        <DialogActions>
           <Button
-            onClick={() => setOpenView(false)}
-            sx={{
-              color: "#818cf8",
-              textTransform: "none",
-            }}
+            onClick={() =>
+              setOpenDetails(false)
+            }
           >
             Close
           </Button>
+
+          {selectedInterview?.meetingLink && (
+            <Button
+              variant="contained"
+              href={selectedInterview.meetingLink}
+              target="_blank"
+              rel="noreferrer"
+              startIcon={
+                <VideoCameraFrontRoundedIcon />
+              }
+            >
+              Join Interview
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
-
-      {/* ================= ACTION MENU ================= */}
-
-      <Menu
-        anchorEl={actionAnchor}
-        open={Boolean(actionAnchor)}
-        onClose={closeActionMenu}
-        PaperProps={{
-          sx: {
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-            color: "#e2e8f0",
-          },
-        }}
-      >
-        <MenuItem
-          onClick={() =>
-            updateCandidateStatus("Shortlisted")
-          }
-        >
-          Shortlist Candidate
-        </MenuItem>
-
-        <MenuItem
-          onClick={() =>
-            updateCandidateStatus("Hired")
-          }
-        >
-          Mark as Hired
-        </MenuItem>
-
-        <MenuItem
-          onClick={() =>
-            updateCandidateStatus("Rejected")
-          }
-        >
-          Reject Candidate
-        </MenuItem>
-
-        <MenuItem
-          onClick={() =>
-            updateCandidateStatus("Under Review")
-          }
-        >
-          Move to Under Review
-        </MenuItem>
-      </Menu>
-
-      {/* ================= SNACKBAR ================= */}
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() =>
-          setSnackbar({
-            ...snackbar,
-            open: false,
-          })
-        }
-      >
-        <Alert
-          severity={snackbar.severity}
-          variant="filled"
-          onClose={() =>
-            setSnackbar({
-              ...snackbar,
-              open: false,
-            })
-          }
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };
 
-export default Candidates;
+/* =========================================================
+   STAT CARD
+========================================================= */
+
+const StatCard = ({
+  title,
+  value,
+  subtitle,
+  color,
+}) => {
+  return (
+    <Box
+      sx={{
+        p: 2.5,
+        borderRadius: 3,
+        backgroundColor: "#1e293b",
+        border: "1px solid #334155",
+      }}
+    >
+      <Typography
+        sx={{
+          color: "#94a3b8",
+          fontSize: 14,
+          mb: 1,
+        }}
+      >
+        {title}
+      </Typography>
+
+      <Typography
+        sx={{
+          color: "#f8fafc",
+          fontSize: 30,
+          fontWeight: 700,
+        }}
+      >
+        {value}
+      </Typography>
+
+      <Typography
+        sx={{
+          color,
+          fontSize: 13,
+          mt: 0.5,
+        }}
+      >
+        {subtitle}
+      </Typography>
+    </Box>
+  );
+};
+
+export default Interviews;

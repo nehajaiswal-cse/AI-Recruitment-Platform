@@ -134,3 +134,4 @@ export const updateProfile = async (profileData) => {
         "Failed to update profile."
     );
   }
+}
