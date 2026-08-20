@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import {
+  getAllJobs,
   getMyJobs,
   getJobById,
   createJob,
@@ -23,6 +24,35 @@ export const JobProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+
+  // ==========================================
+// GET ALL JOBS - FIND JOBS
+// ==========================================
+
+const fetchAllJobs = useCallback(async () => {
+  try {
+    setLoading(true);
+    setError("");
+
+    const data = await getAllJobs();
+
+    setJobs(data.jobs || data || []);
+
+    return data;
+  } catch (err) {
+    console.error("Fetch all jobs error:", err);
+
+    setError(
+      err.response?.data?.message ||
+        "Failed to fetch jobs."
+    );
+
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   // ==========================================
   // GET MY JOBS
@@ -327,7 +357,8 @@ export const JobProvider = ({ children }) => {
 
         loading,
         error,
-
+    
+        fetchAllJobs,
         fetchMyJobs,
         fetchJobById,
 
