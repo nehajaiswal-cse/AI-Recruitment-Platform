@@ -8,6 +8,7 @@ import AuthContextProvider from "./context/AuthContext.jsx";
 import { ThemeModeProvider } from './context/ThemeModeContext.jsx'
 import AppTheme from './components/common/AppTheme.jsx'
 import { JobProvider } from './context/jobContext.jsx';
+import { CandidateProvider } from './context/CandidateContext.jsx';
 
 ReactDOM.createRoot(
   document.getElementById('root')
@@ -15,13 +16,15 @@ ReactDOM.createRoot(
   <React.StrictMode>
     <AuthContextProvider>
       <JobProvider>
-        <BrowserRouter>
+        <CandidateProvider>
+          <BrowserRouter>
           <ThemeModeProvider>
             <AppTheme>
               <App />
             </AppTheme>
           </ThemeModeProvider>
-      </BrowserRouter>
+          </BrowserRouter>
+        </CandidateProvider>
     </JobProvider>
 
     </AuthContextProvider>
