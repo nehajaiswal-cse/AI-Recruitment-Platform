@@ -2,110 +2,9 @@ import Candidate from "../models/Candidate.js";
 import Application from "../models/applications.js";
 import Job from "../models/job.js";
 
-/*
-|--------------------------------------------------------------------------
-| CREATE CANDIDATE FROM APPLICATION
-|--------------------------------------------------------------------------
-*/
 
-export const createManualCandidate = async (req, res) => {
-  try {
-    const {
-      applicantId,
-      jobId,
-      skills,
-      experience,
-      recruiterNotes,
-      status,
-    } = req.body;
 
-    // Validate required fields
-    if (!applicantId || !jobId) {
-      return res.status(400).json({
-        success: false,
-        message: "Applicant ID and Job ID are required",
-      });
-    }
 
-    // Logged-in recruiter
-    const recruiterId = req.user._id;
-
-    // Check job
-    const job = await Job.findById(jobId);
-
-    if (!job) {
-      return res.status(404).json({
-        success: false,
-        message: "Job not found",
-      });
-    }
-
-    // Make sure recruiter owns the job
-    if (
-      job.recruiterId.toString() !==
-      recruiterId.toString()
-    ) {
-      return res.status(403).json({
-        success: false,
-        message:
-          "You are not authorized to add candidate to this job",
-      });
-    }
-
-    // Create candidate
-    const candidate = await Candidate.create({
-      applicationId: undefined,
-      applicantId,
-      jobId,
-      recruiterId,
-
-      skills: skills || [],
-
-      experience:
-        experience !== undefined
-          ? experience
-          : undefined,
-
-      recruiterNotes:
-        recruiterNotes || "",
-
-      status: status || "applied",
-    });
-
-    const populatedCandidate =
-      await Candidate.findById(candidate._id)
-        .populate(
-          "applicantId",
-          "name email phone"
-        )
-        .populate(
-          "jobId",
-          "title company"
-        )
-        .populate(
-          "recruiterId",
-          "name email"
-        );
-
-    return res.status(201).json({
-      success: true,
-      message: "Candidate added successfully",
-      candidate: populatedCandidate,
-    });
-
-  } catch (error) {
-    console.error(
-      "Create manual candidate error:",
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-      message: "Failed to add candidate",
-      error: error.message,
-    });
-  }
-};
 
 export const createCandidate = async (req, res) => {
   try {
@@ -119,7 +18,8 @@ export const createCandidate = async (req, res) => {
     }
 
     // Find application
-    const application = await Application.findById(applicationId);
+    const application =
+      await Application.findById(applicationId);
 
     if (!application) {
       return res.status(404).json({
@@ -129,20 +29,24 @@ export const createCandidate = async (req, res) => {
     }
 
     // Prevent duplicate candidate
-    const existingCandidate = await Candidate.findOne({
-      applicationId
-    });
+    const existingCandidate =
+      await Candidate.findOne({
+        applicationId: application._id
+      });
 
     if (existingCandidate) {
       return res.status(409).json({
         success: false,
-        message: "Candidate already exists for this application",
+        message:
+          "Candidate already exists for this application",
         candidate: existingCandidate
       });
     }
 
-    // Find job
-    const job = await Job.findById(application.jobId);
+    // Find the job
+    const job = await Job.findById(
+      application.jobId
+    );
 
     if (!job) {
       return res.status(404).json({
@@ -151,43 +55,49 @@ export const createCandidate = async (req, res) => {
       });
     }
 
-    /*
-      Assuming logged-in recruiter is available as:
-      req.user._id
-    */
+    // Get recruiter from Job
+    const recruiterId = job.recruiterId;
 
-    const recruiterId = req.user._id;
-
-    // Make sure recruiter owns this job
-    if (job.recruiterId.toString() !== recruiterId.toString()) {
-      return res.status(403).json({
+    if (!recruiterId) {
+      return res.status(400).json({
         success: false,
-        message: "You are not authorized to manage this application"
+        message:
+          "Recruiter ID is missing from this job"
       });
     }
 
-    const candidate = await Candidate.create({
-      applicationId: application._id,
-      applicantId: application.applicantId,
-      jobId: application.jobId,
-      recruiterId,
+    // Create candidate
+    const candidate =
+      await Candidate.create({
+        applicationId: application._id,
+        applicantId: application.applicantId,
+        jobId: application.jobId,
+        recruiterId: recruiterId,
 
-      // If application already contains extracted skills
-      skills: application.skills || [],
+        skills: application.skills || [],
 
-      // If application contains experience
-      experience: application.experience || undefined,
+        experience:
+          application.experience || undefined,
 
-      status: "applied"
-    });
+        status: "applied"
+      });
 
-    const populatedCandidate = await Candidate.findById(
-      candidate._id
-    )
-      .populate("applicationId")
-      .populate("applicantId", "name email")
-      .populate("jobId", "title company")
-      .populate("recruiterId", "name email");
+    // Populate
+    const populatedCandidate =
+      await Candidate.findById(candidate._id)
+        .populate("applicationId")
+        .populate(
+          "applicantId",
+          "name email"
+        )
+        .populate(
+          "jobId",
+          "title company"
+        )
+        .populate(
+          "recruiterId",
+          "name email"
+        );
 
     return res.status(201).json({
       success: true,
@@ -196,7 +106,10 @@ export const createCandidate = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Create candidate error:", error);
+    console.error(
+      "Create candidate error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
@@ -214,7 +127,7 @@ export const createCandidate = async (req, res) => {
 */
 export const getCandidates = async (req, res) => {
   try {
-    const recruiterId = req.user._id;
+    const recruiterId = req.user.id;
 
     const candidates = await Candidate.find({
       recruiterId

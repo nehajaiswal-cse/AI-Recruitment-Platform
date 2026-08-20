@@ -19,7 +19,7 @@ app.use("/api", protectedRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/uploads", express.static("uploads"));
-app.use("/candidates",Candidate)
+app.use("/api/candidates",Candidate)
 
 app.get("/", (req, res) => {
   res.json({
