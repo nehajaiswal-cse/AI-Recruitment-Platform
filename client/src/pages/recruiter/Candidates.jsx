@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import {
   Box,
   Card,
@@ -37,7 +38,8 @@ const Candidate = () => {
       candidate?.applicantId?.fullName ||
       "";
 
-    const email = candidate?.applicantId?.email || "";
+    const email =
+      candidate?.applicantId?.email || "";
 
     const jobTitle =
       candidate?.jobId?.title ||
@@ -84,20 +86,26 @@ const Candidate = () => {
 
         {/* Search */}
         <TextField
-  fullWidth
-  placeholder="Search candidates by name or email..."
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-  slotProps={{
-    input: {
-      startAdornment: (
-        <InputAdornment position="start">
-          <SearchRoundedIcon color="action" />
-        </InputAdornment>
-      ),
-    },
-  }}
-/>
+          fullWidth
+          placeholder="Search candidates by name or email..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          sx={{
+            maxWidth: {
+              xs: "100%",
+              md: 400,
+            },
+          }}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchRoundedIcon color="action" />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
       </Box>
 
       {/* Loading */}
@@ -140,11 +148,17 @@ const Candidate = () => {
                 }}
               />
 
-              <Typography variant="h6" fontWeight={600}>
+              <Typography
+                variant="h6"
+                fontWeight={600}
+              >
                 No candidates found
               </Typography>
 
-              <Typography color="text.secondary" sx={{ mt: 1 }}>
+              <Typography
+                color="text.secondary"
+                sx={{ mt: 1 }}
+              >
                 Candidates will appear here automatically when applicants
                 apply for your jobs.
               </Typography>
@@ -176,7 +190,8 @@ const Candidate = () => {
                 applicant.fullName ||
                 "Unknown Candidate";
 
-              const email = applicant.email || "No email";
+              const email =
+                applicant.email || "No email";
 
               const jobTitle =
                 job.title ||
