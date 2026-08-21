@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -6,6 +6,9 @@ import {
   Button,
   Typography,
   Chip,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
@@ -18,68 +21,146 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
 
-const interviewData = [
-  {
-    id: "1",
-    company: "InnovateX Solutions",
-    role: "Frontend Developer",
-    date: "22 Aug 2026",
-    day: "Friday",
-    time: "02:00 PM",
-    duration: "60 min",
-    type: "Technical Interview",
-    status: "Scheduled",
-    mode: "Google Meet",
-    location: "Online",
-    interviewer: "Rahul Verma",
-    interviewerRole: "Senior Frontend Engineer",
-    email: "rahul.verma@innovatex.com",
-  },
-  {
-    id: "2",
-    company: "CloudStack Technologies",
-    role: "Full Stack Developer",
-    date: "25 Aug 2026",
-    day: "Monday",
-    time: "11:30 AM",
-    duration: "30 min",
-    type: "HR Interview",
-    status: "Scheduled",
-    mode: "Google Meet",
-    location: "Online",
-    interviewer: "Priya Sharma",
-    interviewerRole: "HR Manager",
-    email: "priya.sharma@cloudstack.com",
-  },
-  {
-    id: "3",
-    company: "WebCraft Solutions",
-    role: "Software Engineer",
-    date: "28 Aug 2026",
-    day: "Thursday",
-    time: "04:00 PM",
-    duration: "45 min",
-    type: "Technical Interview",
-    status: "Confirmed",
-    mode: "Google Meet",
-    location: "Online",
-    interviewer: "Arjun Mehta",
-    interviewerRole: "Engineering Manager",
-    email: "arjun.mehta@webcraft.com",
-  },
-];
+import useInterview from "../../../hooks/useInterview";
+
 
 const InterviewDetails = () => {
-  const { id } = useParams();
+  console.log("🔥🔥 INTERVIEW DETAILS MOUNTED 🔥🔥");
 
-  const interview = interviewData.find(
-    (item) => item.id === id
-  );
+  const { id:interviewId } = useParams();
 
+  console.log("🔥 interviewId:", interviewId);
+  const{fetchInterviewById} = useInterview();
+
+  const [interview, setInterview] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [joined, setJoined] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  // Invalid interview ID
-  if (!interview) {
+  // =====================================================
+  // FETCH INTERVIEW
+  // =====================================================
+
+  useEffect(() => {
+  console.log("🔥 EFFECT RUNNING");
+  console.log("🔥 interviewId:", interviewId);
+  console.log("🔥 fetchInterviewById:", fetchInterviewById);
+
+  const fetchInterview = async () => {
+    try {
+      console.log("🔥 FETCH START");
+
+      setLoading(true);
+      setError("");
+
+      const data = await fetchInterviewById(interviewId);
+
+      console.log("🔥 API DATA:", data);
+      console.log("🔥 INTERVIEW:", data?.interview);
+
+      setInterview(data?.interview);
+
+    } catch (err) {
+      console.error("🔥 FETCH ERROR:", err);
+
+      setError(
+        err?.response?.data?.message ||
+        "Failed to load interview details."
+      );
+    } finally {
+      console.log("🔥 FINALLY - LOADING FALSE");
+      setLoading(false);
+    }
+  };
+
+  if (interviewId) {
+    fetchInterview();
+  } else {
+    console.log("❌ interviewId is undefined");
+    setLoading(false);
+    setError("Interview ID is missing.");
+  }
+}, [interviewId]);
+
+  // =====================================================
+  // DATE FORMAT
+  // =====================================================
+
+  const formatDate = (date) => {
+    if (!date) return "Not specified";
+
+    return new Date(date).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+
+  const formatDay = (date) => {
+    if (!date) return "";
+
+    return new Date(date).toLocaleDateString("en-IN", {
+      weekday: "long",
+    });
+  };
+
+
+  const formatTime = (date) => {
+    if (!date) return "Not specified";
+
+    return new Date(date).toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+
+  // =====================================================
+  // COPY MEETING LINK
+  // =====================================================
+
+  const handleCopyLink = async () => {
+    if (!interview?.meetingLink) return;
+
+    try {
+      await navigator.clipboard.writeText(
+        interview.meetingLink
+      );
+
+      setCopied(true);
+    } catch (error) {
+      console.error("Failed to copy link:", error);
+    }
+  };
+
+
+  // =====================================================
+  // JOIN MEETING
+  // =====================================================
+
+  const handleJoinMeeting = () => {
+    if (!interview?.meetingLink) {
+      setError("Meeting link is not available.");
+      return;
+    }
+
+    setJoined(true);
+
+    window.open(
+      interview.meetingLink,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+
+  // =====================================================
+  // LOADING
+  // =====================================================
+
+  if (loading) {
     return (
       <Box
         sx={{
@@ -89,45 +170,80 @@ const InterviewDetails = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          p: 3,
         }}
       >
-        <Box sx={{ textAlign: "center" }}>
-          <Typography
+        <Box
+          sx={{
+            textAlign: "center",
+          }}
+        >
+          <CircularProgress
             sx={{
-              fontSize: 28,
-              fontWeight: 700,
-              mb: 1,
+              color: "#8b5cf6",
             }}
-          >
-            Interview Not Found
-          </Typography>
+          />
 
           <Typography
             sx={{
+              mt: 2,
               color: "#94a3b8",
-              mb: 3,
             }}
           >
-            The interview you are looking for does not exist.
+            Loading interview details...
           </Typography>
-
-          <Button
-            startIcon={<ArrowBackRoundedIcon />}
-            onClick={() =>
-              window.history.back()
-            }
-            sx={{
-              color: "#a78bfa",
-              textTransform: "none",
-            }}
-          >
-            Back to Interviews
-          </Button>
         </Box>
       </Box>
     );
   }
+
+
+  // =====================================================
+  // INTERVIEW NOT FOUND
+  // =====================================================
+
+   if (!interviewId) {
+    console.log("❌ interviewId is undefined");
+
+    setError("Interview ID is missing.");
+    setInterview(null);
+    setLoading(false);
+
+    return;
+  }
+  // =====================================================
+  // DATA FROM BACKEND
+  // =====================================================
+
+  const company =
+  interview?.job?.company ||
+  interview?.job?.companyName ||
+  interview?.company ||
+  "Company";
+
+const role =
+  interview?.job?.title ||
+  interview?.job?.jobTitle ||
+  interview?.role ||
+  "Job Position";
+
+  const interviewer =
+    interview?.recruiter?.name ||
+    interview?.recruiter?.fullName ||
+    "Recruiter";
+
+  const interviewerEmail =
+    interview?.recruiter?.email ||
+    "";
+
+  const interviewerRole =
+    interview?.recruiter?.role ||
+    "Recruiter";
+
+  const interviewDate = interview?.date;
+
+  const meetingLink =
+    interview?.meetingLink || "";
+
 
   return (
     <Box
@@ -142,6 +258,7 @@ const InterviewDetails = () => {
         },
       }}
     >
+
       {/* =====================================================
           TOP HEADER
       ===================================================== */}
@@ -180,7 +297,12 @@ const InterviewDetails = () => {
         </Button>
 
         <Chip
-          label={interview.status}
+          label={
+            interview?.status
+              ? interview.status.charAt(0).toUpperCase() +
+                interview.status.slice(1)
+              : "Scheduled"
+          }
           icon={
             <CheckCircleRoundedIcon
               sx={{
@@ -198,6 +320,7 @@ const InterviewDetails = () => {
         />
       </Box>
 
+
       {/* =====================================================
           MAIN INTERVIEW CARD
       ===================================================== */}
@@ -214,6 +337,7 @@ const InterviewDetails = () => {
             "radial-gradient(circle at 90% 0%, rgba(99,102,241,0.16), transparent 35%), linear-gradient(135deg,#111a30,#0c1728)",
         }}
       >
+
         {/* Company Header */}
 
         <Box
@@ -238,11 +362,12 @@ const InterviewDetails = () => {
               flexShrink: 0,
             }}
           >
-            {interview.company
+            {company
               .split(" ")
               .map((word) => word[0])
               .slice(0, 2)
-              .join("")}
+              .join("")
+              .toUpperCase()}
           </Box>
 
           <Box>
@@ -252,7 +377,7 @@ const InterviewDetails = () => {
                 fontSize: 13,
               }}
             >
-              {interview.company}
+              {company}
             </Typography>
 
             <Typography
@@ -265,7 +390,7 @@ const InterviewDetails = () => {
                 mt: 0.3,
               }}
             >
-              {interview.role}
+              {role}
             </Typography>
 
             <Typography
@@ -275,10 +400,11 @@ const InterviewDetails = () => {
                 mt: 0.4,
               }}
             >
-              {interview.type}
+              {interview?.type || "Interview"}
             </Typography>
           </Box>
         </Box>
+
 
         {/* Interview Information */}
 
@@ -297,31 +423,39 @@ const InterviewDetails = () => {
           <InfoCard
             icon={<CalendarMonthRoundedIcon />}
             title="Interview Date"
-            value={interview.date}
-            subtitle={interview.day}
+            value={formatDate(interviewDate)}
+            subtitle={formatDay(interviewDate)}
           />
 
           <InfoCard
             icon={<AccessTimeRoundedIcon />}
             title="Interview Time"
-            value={interview.time}
-            subtitle={interview.duration}
+            value={formatTime(interviewDate)}
+            subtitle={
+              interview?.duration
+                ? `${interview.duration} min`
+                : "Duration not specified"
+            }
           />
 
           <InfoCard
             icon={<VideoCameraFrontRoundedIcon />}
             title="Interview Mode"
-            value={interview.mode}
+            value={interview?.mode || "Online"}
             subtitle="Online Interview"
           />
 
           <InfoCard
             icon={<LocationOnRoundedIcon />}
             title="Location"
-            value={interview.location}
+            value={
+              interview?.location ||
+              "Online"
+            }
             subtitle="Join remotely"
           />
         </Box>
+
 
         {/* Main Action */}
 
@@ -334,7 +468,7 @@ const InterviewDetails = () => {
           }}
         >
           <Button
-            onClick={() => setJoined(true)}
+            onClick={handleJoinMeeting}
             startIcon={
               <VideoCameraFrontRoundedIcon />
             }
@@ -361,8 +495,10 @@ const InterviewDetails = () => {
           </Button>
 
           <Button
+            onClick={handleCopyLink}
             startIcon={<LinkRoundedIcon />}
             variant="outlined"
+            disabled={!meetingLink}
             sx={{
               color: "#c4b5fd",
               borderColor: "#6366f1",
@@ -375,10 +511,13 @@ const InterviewDetails = () => {
               },
             }}
           >
-            Copy Meeting Link
+            {copied
+              ? "Link Copied"
+              : "Copy Meeting Link"}
           </Button>
         </Box>
       </Box>
+
 
       {/* =====================================================
           CONTENT GRID
@@ -396,11 +535,13 @@ const InterviewDetails = () => {
           alignItems: "start",
         }}
       >
+
         {/* =================================================
             LEFT COLUMN
         ================================================= */}
 
         <Box>
+
           {/* Interview Agenda */}
 
           <SectionCard
@@ -416,7 +557,7 @@ const InterviewDetails = () => {
             <AgendaItem
               number="02"
               title="Technical Discussion"
-              description={`Questions related to ${interview.role}, APIs and databases.`}
+              description={`Questions related to ${role}, APIs and databases.`}
             />
 
             <AgendaItem
@@ -431,6 +572,7 @@ const InterviewDetails = () => {
               description="Time for you to ask questions about the role and company."
             />
           </SectionCard>
+
 
           {/* Preparation */}
 
@@ -459,6 +601,7 @@ const InterviewDetails = () => {
             />
           </SectionCard>
 
+
           {/* Requirements */}
 
           <SectionCard
@@ -470,13 +613,16 @@ const InterviewDetails = () => {
             <RequirementItem text="Updated resume" />
             <RequirementItem text="Laptop or desktop recommended" />
           </SectionCard>
+
         </Box>
+
 
         {/* =================================================
             RIGHT COLUMN
         ================================================= */}
 
         <Box>
+
           {/* Interviewer */}
 
           <SectionCard
@@ -504,11 +650,12 @@ const InterviewDetails = () => {
                   fontSize: 17,
                 }}
               >
-                {interview.interviewer
+                {interviewer
                   .split(" ")
                   .map((word) => word[0])
                   .slice(0, 2)
-                  .join("")}
+                  .join("")
+                  .toUpperCase()}
               </Box>
 
               <Box>
@@ -518,7 +665,7 @@ const InterviewDetails = () => {
                     fontSize: 15,
                   }}
                 >
-                  {interview.interviewer}
+                  {interviewer}
                 </Typography>
 
                 <Typography
@@ -528,21 +675,24 @@ const InterviewDetails = () => {
                     mt: 0.3,
                   }}
                 >
-                  {interview.interviewerRole}
+                  {interviewerRole}
                 </Typography>
 
-                <Typography
-                  sx={{
-                    color: "#64748b",
-                    fontSize: 12,
-                    mt: 0.3,
-                  }}
-                >
-                  {interview.email}
-                </Typography>
+                {interviewerEmail && (
+                  <Typography
+                    sx={{
+                      color: "#64748b",
+                      fontSize: 12,
+                      mt: 0.3,
+                    }}
+                  >
+                    {interviewerEmail}
+                  </Typography>
+                )}
               </Box>
             </Box>
           </SectionCard>
+
 
           {/* Quick Info */}
 
@@ -553,27 +703,28 @@ const InterviewDetails = () => {
             <QuickInfo
               icon={<CalendarMonthRoundedIcon />}
               label="Date"
-              value={interview.date}
+              value={formatDate(interviewDate)}
             />
 
             <QuickInfo
               icon={<AccessTimeRoundedIcon />}
               label="Time"
-              value={interview.time}
+              value={formatTime(interviewDate)}
             />
 
             <QuickInfo
               icon={<VideoCameraFrontRoundedIcon />}
               label="Platform"
-              value={interview.mode}
+              value={interview?.mode || "Online"}
             />
 
             <QuickInfo
               icon={<BusinessRoundedIcon />}
               label="Company"
-              value={interview.company}
+              value={interview?.company || company}
             />
           </SectionCard>
+
 
           {/* Meeting Link */}
 
@@ -603,13 +754,14 @@ const InterviewDetails = () => {
                 lineHeight: 1.6,
               }}
             >
-              Join a few minutes early and make sure everything
-              is ready before the interviewer joins.
+              Join a few minutes early and make sure
+              everything is ready before the interviewer joins.
             </Typography>
 
             <Button
-              onClick={() => setJoined(true)}
+              onClick={handleJoinMeeting}
               fullWidth
+              disabled={!meetingLink}
               startIcon={
                 <VideoCameraFrontRoundedIcon />
               }
@@ -633,8 +785,10 @@ const InterviewDetails = () => {
                 : "Join Meeting"}
             </Button>
           </Box>
+
         </Box>
       </Box>
+
 
       {/* =====================================================
           BOTTOM NOTE
@@ -682,9 +836,29 @@ const InterviewDetails = () => {
           </Typography>
         </Box>
       </Box>
+
+
+      {/* =====================================================
+          SNACKBAR
+      ===================================================== */}
+
+      <Snackbar
+        open={copied}
+        autoHideDuration={2000}
+        onClose={() => setCopied(false)}
+      >
+        <Alert
+          severity="success"
+          onClose={() => setCopied(false)}
+        >
+          Meeting link copied!
+        </Alert>
+      </Snackbar>
+
     </Box>
   );
 };
+
 
 /* =========================================================
    INFO CARD
@@ -747,6 +921,7 @@ const InfoCard = ({
   );
 };
 
+
 /* =========================================================
    SECTION CARD
 ========================================================= */
@@ -793,6 +968,7 @@ const SectionCard = ({
     </Box>
   );
 };
+
 
 /* =========================================================
    AGENDA ITEM
@@ -854,6 +1030,7 @@ const AgendaItem = ({
   );
 };
 
+
 /* =========================================================
    PREPARATION ITEM
 ========================================================= */
@@ -903,6 +1080,7 @@ const PreparationItem = ({
   );
 };
 
+
 /* =========================================================
    REQUIREMENT
 ========================================================= */
@@ -935,6 +1113,7 @@ const RequirementItem = ({ text }) => {
     </Box>
   );
 };
+
 
 /* =========================================================
    QUICK INFO
@@ -992,5 +1171,6 @@ const QuickInfo = ({
     </Box>
   );
 };
+
 
 export default InterviewDetails;

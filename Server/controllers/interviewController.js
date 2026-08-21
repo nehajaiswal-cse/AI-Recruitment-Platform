@@ -94,13 +94,14 @@ const getMyInterviews = async (req, res) => {
 
 const getInterviewById = async (req, res) => {
   try {
+    console.log("PARAM ID:", req.params.id);
+    console.log("USER ID:", req.user.id);
     const interview = await Interview.findOne({
       _id: req.params.id,
       candidate: req.user.id
     })
       .populate("job", "title location employmentType")
       .populate("recruiter", "name email");
-
     if (!interview) {
       return res.status(404).json({
         message: "Interview not found"
@@ -116,6 +117,42 @@ const getInterviewById = async (req, res) => {
     res.status(500).json({
       message: "Failed to fetch interview",
       error: error.message
+    });
+  }
+};
+
+export const updateInterview = async (req, res) => {
+  try {
+    const { interviewId } = req.params;
+
+    const updatedInterview = await Interview.findByIdAndUpdate(
+      interviewId,
+      req.body,
+      {
+         returnDocument: "after",
+        runValidators: true,
+      }
+    )
+      .populate("candidate", "name email")
+      .populate("recruiter", "name email")
+      .populate("job", "title");
+
+    if (!updatedInterview) {
+      return res.status(404).json({
+        message: "Interview not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Interview updated successfully",
+      interview: updatedInterview,
+    });
+  } catch (error) {
+    console.error("Update interview error:", error);
+
+    res.status(500).json({
+      message: "Failed to update interview",
+      error: error.message,
     });
   }
 };
@@ -166,11 +203,40 @@ const updateInterviewStatus = async (req, res) => {
   }
 };
 
+export const deleteInterview = async (req, res) => {
+  try {
+    const { interviewId } = req.params;
+
+    const deletedInterview = await Interview.findByIdAndDelete(
+      interviewId
+    );
+
+    if (!deletedInterview) {
+      return res.status(404).json({
+        message: "Interview not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Interview deleted successfully",
+      interview: deletedInterview,
+    });
+  } catch (error) {
+    console.error("Delete interview error:", error);
+
+    return res.status(500).json({
+      message: "Failed to delete interview",
+      error: error.message,
+    });
+  }
+};
+
 const getRecruiterInterviews = async (req, res) => {
   try {
     const interviews = await Interview.find({
       recruiter: req.user.id
     })
+  
       .populate("candidate", "name email phone")
       .populate("job", "title location employmentType")
       .sort({ date: 1 });

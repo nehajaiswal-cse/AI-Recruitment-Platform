@@ -21,48 +21,67 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import VideoCameraFrontRoundedIcon from "@mui/icons-material/VideoCameraFrontRounded";
 
-const API_URL = "http://localhost:5000";
+import { useInterviewContext } from "../../context/InterviewContext";
 
 const Interviews = () => {
-  /* =====================================================
-     CALENDAR
-  ===================================================== */
+  // ===================================================
+  // INTERVIEW CONTEXT
+  // ===================================================
 
-  const [currentMonth, setCurrentMonth] = useState(new Date(2026, 7, 1));
-  const [selectedDate, setSelectedDate] = useState(20);
+  const {
+    interviews,
+    loading,
+    error,
+    fetchRecruiterInterviews,
+    createInterview,
+    recruiterRescheduleInterview,
+    deleteInterview,
+    clearError,
+  } = useInterviewContext();
 
-  /* =====================================================
-     VIEW / FILTER
-  ===================================================== */
+  // ===================================================
+  // CALENDAR
+  // ===================================================
+
+  const [currentMonth, setCurrentMonth] = useState(
+    new Date()
+  );
+
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().getDate()
+  );
+
+  // ===================================================
+  // VIEW / FILTER
+  // ===================================================
 
   const [viewMode, setViewMode] = useState("list");
+
   const [search, setSearch] = useState("");
+
   const [statusFilter, setStatusFilter] = useState("All");
+
   const [typeFilter, setTypeFilter] = useState("All");
 
-  /* =====================================================
-     DATA
-  ===================================================== */
+  // ===================================================
+  // DIALOG
+  // ===================================================
 
-  const [interviews, setInterviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [openSchedule, setOpenSchedule] =
+    useState(false);
 
-  /* =====================================================
-     DIALOG
-  ===================================================== */
+  const [openDetails, setOpenDetails] =
+    useState(false);
 
-  const [openSchedule, setOpenSchedule] = useState(false);
-  const [openDetails, setOpenDetails] = useState(false);
-  const [openReschedule, setOpenReschedule] = useState(false);
+  const [openReschedule, setOpenReschedule] =
+    useState(false);
 
-  const [selectedInterview, setSelectedInterview] = useState(null);
+  const [selectedInterview, setSelectedInterview] =
+    useState(null);
 
-  const [submitting, setSubmitting] = useState(false);
-
-  /* =====================================================
-     FORM
-  ===================================================== */
+  // ===================================================
+  // FORM
+  // ===================================================
 
   const emptyForm = {
     candidate: "",
@@ -74,114 +93,20 @@ const Interviews = () => {
     meetingLink: "",
   };
 
-  const [formData, setFormData] = useState(emptyForm);
+  const [formData, setFormData] =
+    useState(emptyForm);
 
-  /* =====================================================
-     TOKEN
-  ===================================================== */
-
-  const getToken = () => {
-    return localStorage.getItem("token");
-  };
-
-  /* =====================================================
-     FETCH INTERVIEWS
-  ===================================================== */
-
-  const fetchInterviews = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const token = getToken();
-
-      if (!token) {
-        setError("Recruiter token not found. Please login again.");
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/api/interviews/recruiter`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      console.log("Recruiter interviews:", data);
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to fetch recruiter interviews");
-      }
-
-      const formattedInterviews = (data.interviews || []).map((item) => {
-        const interviewDate = new Date(item.date);
-
-        return {
-          id: item._id,
-
-          fullDate: interviewDate,
-
-          date: interviewDate.getDate(),
-
-          name: item.candidate?.name || "Unknown Candidate",
-
-          email: item.candidate?.email || "",
-
-          candidateId: item.candidate?._id || item.candidate || "",
-
-          role: item.job?.title || "Unknown Job",
-
-          location: item.job?.location || "",
-
-          jobId: item.job?._id || item.job || "",
-
-          time: item.time || "",
-
-          type: item.type || "",
-
-          status: item.status || "Scheduled",
-
-          interviewer: item.interviewer || "",
-
-          meetingLink: item.meetingLink || "",
-        };
-      });
-
-      setInterviews(formattedInterviews);
-
-      /* Set calendar according to first interview */
-
-      if (formattedInterviews.length > 0) {
-        const firstInterview = formattedInterviews[0].fullDate;
-
-        setCurrentMonth(
-          new Date(firstInterview.getFullYear(), firstInterview.getMonth(), 1),
-        );
-
-        setSelectedDate(firstInterview.getDate());
-      }
-    } catch (err) {
-      console.error("Fetch interviews error:", err);
-
-      setError(err.message || "Failed to load recruiter interviews");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /* =====================================================
-     INITIAL LOAD
-  ===================================================== */
+  // ===================================================
+  // FETCH RECRUITER INTERVIEWS
+  // ===================================================
 
   useEffect(() => {
-    fetchInterviews();
-  }, []);
+    fetchRecruiterInterviews();
+  }, [fetchRecruiterInterviews]);
 
-  /* =====================================================
-     FORM CHANGE
-  ===================================================== */
+  // ===================================================
+  // FORM CHANGE
+  // ===================================================
 
   const handleFormChange = (event) => {
     const { name, value } = event.target;
@@ -192,30 +117,33 @@ const Interviews = () => {
     }));
   };
 
-  /* =====================================================
-     OPEN SCHEDULE DIALOG
-  ===================================================== */
+  // ===================================================
+  // OPEN SCHEDULE
+  // ===================================================
 
   const handleOpenSchedule = () => {
+    clearError();
+
     setFormData(emptyForm);
-    setError("");
+
     setOpenSchedule(true);
   };
 
-  /* =====================================================
-     CLOSE SCHEDULE DIALOG
-  ===================================================== */
+  // ===================================================
+  // CLOSE SCHEDULE
+  // ===================================================
 
   const handleCloseSchedule = () => {
-    if (submitting) return;
+    clearError();
 
     setFormData(emptyForm);
+
     setOpenSchedule(false);
   };
 
-  /* =====================================================
-     SCHEDULE INTERVIEW
-  ===================================================== */
+  // ===================================================
+  // SCHEDULE INTERVIEW
+  // ===================================================
 
   const handleSchedule = async () => {
     if (
@@ -231,16 +159,7 @@ const Interviews = () => {
     }
 
     try {
-      setSubmitting(true);
-
-      const token = getToken();
-
-      if (!token) {
-        alert("Recruiter token not found. Please login again.");
-        return;
-      }
-
-      const requestBody = {
+      await createInterview({
         candidate: formData.candidate.trim(),
 
         job: formData.job.trim(),
@@ -251,256 +170,429 @@ const Interviews = () => {
 
         type: formData.type,
 
-        interviewer: formData.interviewer.trim(),
+        interviewer:
+          formData.interviewer.trim(),
 
         meetingLink:
-          formData.meetingLink.trim() || "https://meet.google.com/example",
-      };
-
-      console.log("Scheduling interview:", requestBody);
-
-      const response = await fetch(`${API_URL}/api/interviews`, {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-
-          Authorization: `Bearer ${token}`,
-        },
-
-        body: JSON.stringify(requestBody),
+          formData.meetingLink.trim(),
       });
 
-      const data = await response.json();
-
-      console.log("Schedule response:", data);
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to schedule interview");
-      }
-
-      alert("Interview scheduled successfully!");
+      alert(
+        "Interview scheduled successfully!"
+      );
 
       setFormData(emptyForm);
 
       setOpenSchedule(false);
-
-      await fetchInterviews();
-    } catch (err) {
-      console.error("Schedule interview error:", err);
-
-      alert(err.message || "Failed to schedule interview");
-    } finally {
-      setSubmitting(false);
+    } catch (error) {
+      alert(
+        error.message ||
+          "Failed to schedule interview"
+      );
     }
   };
 
-  /* =====================================================
-     FILTERED INTERVIEWS
-  ===================================================== */
+  // ===================================================
+  // FILTERED INTERVIEWS
+  // ===================================================
 
   const filteredInterviews = useMemo(() => {
-    const searchValue = search.toLowerCase().trim();
+    const searchValue =
+      search.toLowerCase().trim();
 
     return interviews.filter((interview) => {
+      const candidateName =
+        interview.candidate?.name ||
+        interview.applicant?.name ||
+        interview.name ||
+        "";
+
+      const candidateEmail =
+        interview.candidate?.email ||
+        interview.applicant?.email ||
+        interview.email ||
+        "";
+
+      const jobTitle =
+        interview.job?.title ||
+        interview.role ||
+        "";
+
+      const interviewer =
+        interview.interviewer || "";
+
+      const interviewType =
+        interview.type || "";
+
+      const status =
+        interview.status || "";
+
       const matchesSearch =
-        interview.name.toLowerCase().includes(searchValue) ||
-        interview.email.toLowerCase().includes(searchValue) ||
-        interview.role.toLowerCase().includes(searchValue) ||
-        interview.interviewer.toLowerCase().includes(searchValue);
+        candidateName
+          .toLowerCase()
+          .includes(searchValue) ||
+        candidateEmail
+          .toLowerCase()
+          .includes(searchValue) ||
+        jobTitle
+          .toLowerCase()
+          .includes(searchValue) ||
+        interviewer
+          .toLowerCase()
+          .includes(searchValue);
 
       const matchesStatus =
-        statusFilter === "All" || interview.status === statusFilter;
+        statusFilter === "All" ||
+        status === statusFilter;
 
-      const matchesType = typeFilter === "All" || interview.type === typeFilter;
+      const matchesType =
+        typeFilter === "All" ||
+        interviewType === typeFilter;
 
-      return matchesSearch && matchesStatus && matchesType;
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesType
+      );
     });
-  }, [interviews, search, statusFilter, typeFilter]);
+  }, [
+    interviews,
+    search,
+    statusFilter,
+    typeFilter,
+  ]);
 
-  /* =====================================================
-     STATS
-  ===================================================== */
+  // ===================================================
+  // STATS
+  // ===================================================
 
   const upcomingCount = interviews.filter(
     (interview) =>
-      interview.status === "Scheduled" || interview.status === "Confirmed",
+      interview.status === "Scheduled" ||
+      interview.status === "Confirmed"
   ).length;
 
   const confirmedCount = interviews.filter(
-    (interview) => interview.status === "Confirmed",
+    (interview) =>
+      interview.status === "Confirmed"
   ).length;
 
   const completedCount = interviews.filter(
-    (interview) => interview.status === "Completed",
+    (interview) =>
+      interview.status === "Completed"
   ).length;
 
   const pendingCount = interviews.filter(
-    (interview) => interview.status === "Pending",
+    (interview) =>
+      interview.status === "Pending"
   ).length;
 
-  /* =====================================================
-     NEXT INTERVIEW
-  ===================================================== */
+  // ===================================================
+  // NEXT INTERVIEW
+  // ===================================================
 
   const nextInterview = useMemo(() => {
     const upcoming = interviews.filter(
       (interview) =>
-        interview.status === "Scheduled" || interview.status === "Confirmed",
+        interview.status === "Scheduled" ||
+        interview.status === "Confirmed"
     );
 
-    upcoming.sort((a, b) => a.fullDate.getTime() - b.fullDate.getTime());
+    const sorted = [...upcoming].sort(
+      (a, b) =>
+        new Date(a.date).getTime() -
+        new Date(b.date).getTime()
+    );
 
-    return upcoming[0] || null;
+    return sorted[0] || null;
   }, [interviews]);
 
-  /* =====================================================
-     DATE FORMAT
-  ===================================================== */
+  // ===================================================
+  // FORMAT DATE
+  // ===================================================
 
   const formatDate = (date) => {
     if (!date) return "N/A";
 
-    return new Date(date).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
   };
 
-  /* =====================================================
-     CALENDAR VALUES
-  ===================================================== */
+  // ===================================================
+  // GET CANDIDATE NAME
+  // ===================================================
 
-  const year = currentMonth.getFullYear();
-
-  const month = currentMonth.getMonth();
-
-  const firstDay = new Date(year, month, 1).getDay();
-
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  const startingDay = firstDay === 0 ? 6 : firstDay - 1;
-
-  /* =====================================================
-     SELECTED DATE INTERVIEWS
-  ===================================================== */
-
-  const selectedInterviews = interviews.filter((interview) => {
-    const date = interview.fullDate;
-
+  const getCandidateName = (interview) => {
     return (
-      date.getFullYear() === year &&
-      date.getMonth() === month &&
-      date.getDate() === selectedDate
+      interview.candidate?.name ||
+      interview.applicant?.name ||
+      interview.name ||
+      "Unknown Candidate"
     );
-  });
+  };
 
-  /* =====================================================
-     HAS INTERVIEW
-  ===================================================== */
+  // ===================================================
+  // GET CANDIDATE EMAIL
+  // ===================================================
 
-  const hasInterview = (date) => {
-    return interviews.some((interview) => {
-      const interviewDate = interview.fullDate;
+  const getCandidateEmail = (interview) => {
+    return (
+      interview.candidate?.email ||
+      interview.applicant?.email ||
+      interview.email ||
+      ""
+    );
+  };
+
+  // ===================================================
+  // GET JOB TITLE
+  // ===================================================
+
+  const getJobTitle = (interview) => {
+    return (
+      interview.job?.title ||
+      interview.role ||
+      "Unknown Job"
+    );
+  };
+
+  // ===================================================
+  // CALENDAR VALUES
+  // ===================================================
+
+  const year =
+    currentMonth.getFullYear();
+
+  const month =
+    currentMonth.getMonth();
+
+  const firstDay =
+    new Date(year, month, 1).getDay();
+
+  const daysInMonth =
+    new Date(
+      year,
+      month + 1,
+      0
+    ).getDate();
+
+  const startingDay =
+    firstDay === 0
+      ? 6
+      : firstDay - 1;
+
+  // ===================================================
+  // SELECTED DATE INTERVIEWS
+  // ===================================================
+
+  const selectedInterviews =
+    interviews.filter((interview) => {
+      const date = new Date(
+        interview.date
+      );
 
       return (
-        interviewDate.getFullYear() === year &&
-        interviewDate.getMonth() === month &&
-        interviewDate.getDate() === date
+        date.getFullYear() === year &&
+        date.getMonth() === month &&
+        date.getDate() === selectedDate
       );
     });
+
+  // ===================================================
+  // HAS INTERVIEW
+  // ===================================================
+
+  const hasInterview = (date) => {
+    return interviews.some(
+      (interview) => {
+        const interviewDate =
+          new Date(interview.date);
+
+        return (
+          interviewDate.getFullYear() ===
+            year &&
+          interviewDate.getMonth() ===
+            month &&
+          interviewDate.getDate() === date
+        );
+      }
+    );
   };
 
-  /* =====================================================
-     CALENDAR NAVIGATION
-  ===================================================== */
+  // ===================================================
+  // CALENDAR NAVIGATION
+  // ===================================================
 
   const handlePreviousMonth = () => {
-    setCurrentMonth(new Date(year, month - 1, 1));
+    setCurrentMonth(
+      new Date(year, month - 1, 1)
+    );
 
     setSelectedDate(1);
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(new Date(year, month + 1, 1));
+    setCurrentMonth(
+      new Date(year, month + 1, 1)
+    );
 
     setSelectedDate(1);
   };
 
-  const handleDateClick = (date) => {
-    setSelectedDate(date);
-  };
+  // ===================================================
+  // VIEW DETAILS
+  // ===================================================
 
-  /* =====================================================
-     VIEW DETAILS
-  ===================================================== */
-
-  const handleViewDetails = (interview) => {
+  const handleViewDetails = (
+    interview
+  ) => {
     setSelectedInterview(interview);
 
     setOpenDetails(true);
   };
 
-  /* =====================================================
-     DELETE
-     NOTE:
-     This currently removes it only from UI.
-     We will connect DELETE API after confirming
-     your backend DELETE route.
-  ===================================================== */
+  // ===================================================
+  // OPEN RESCHEDULE
+  // ===================================================
 
-  const handleDelete = (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this interview?",
-    );
-
-    if (!confirmed) return;
-
-    setInterviews((prev) => prev.filter((interview) => interview.id !== id));
-
-    setOpenDetails(false);
-  };
-
-  /* =====================================================
-     OPEN RESCHEDULE
-  ===================================================== */
-
-  const handleOpenReschedule = (interview) => {
+  const handleOpenReschedule = (
+    interview
+  ) => {
     setSelectedInterview(interview);
 
-    const date = interview.fullDate;
+    const date = new Date(
+      interview.date
+    );
 
-    const formattedDate = `${date.getFullYear()}-${String(
-      date.getMonth() + 1,
-    ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const formattedDate =
+      `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}-${String(
+        date.getDate()
+      ).padStart(2, "0")}`;
 
     setFormData({
-      candidate: interview.candidateId || "",
+      candidate:
+        interview.candidate?._id ||
+        interview.candidate ||
+        interview.applicant?._id ||
+        interview.applicant ||
+        "",
 
-      job: interview.jobId || "",
-
-      name: interview.name || "",
-
-      role: interview.role || "",
+      job:
+        interview.job?._id ||
+        interview.job ||
+        "",
 
       date: formattedDate,
 
       time: interview.time || "",
 
-      type: interview.type || "Technical Interview",
+      type:
+        interview.type ||
+        "Technical Interview",
 
-      interviewer: interview.interviewer || "",
+      interviewer:
+        interview.interviewer || "",
 
-      meetingLink: interview.meetingLink || "",
+      meetingLink:
+        interview.meetingLink || "",
     });
 
     setOpenReschedule(true);
   };
 
-  /* =====================================================
-     STATUS STYLE
-  ===================================================== */
+  // ===================================================
+  // RESCHEDULE
+  // ===================================================
+
+  const handleReschedule = async () => {
+    if (!selectedInterview) return;
+
+    if (!formData.date || !formData.time) {
+      alert(
+        "Please select date and time."
+      );
+      return;
+    }
+
+    try {
+      await recruiterRescheduleInterview(
+        selectedInterview._id ||
+          selectedInterview.id,
+        {
+          date: formData.date,
+
+          time: formData.time,
+
+          type: formData.type,
+
+          interviewer:
+            formData.interviewer,
+
+          meetingLink:
+            formData.meetingLink,
+        }
+      );
+
+      alert(
+        "Interview rescheduled successfully!"
+      );
+
+      setOpenReschedule(false);
+
+      setSelectedInterview(null);
+
+      setFormData(emptyForm);
+    } catch (error) {
+      alert(
+        error.message ||
+          "Failed to reschedule interview"
+      );
+    }
+  };
+
+  // ===================================================
+  // DELETE
+  // ===================================================
+
+  const handleDelete = async (
+    interviewId
+  ) => {
+    const confirmed =
+      window.confirm(
+        "Are you sure you want to delete this interview?"
+      );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteInterview(interviewId);
+
+      alert(
+        "Interview deleted successfully."
+      );
+
+      setOpenDetails(false);
+
+      setSelectedInterview(null);
+    } catch (error) {
+      alert(
+        error.message ||
+          "Failed to delete interview"
+      );
+    }
+  };
+
+  // ===================================================
+  // STATUS STYLE
+  // ===================================================
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -542,11 +634,11 @@ const Interviews = () => {
     }
   };
 
-  /* =====================================================
-     LOADING
-  ===================================================== */
+  // ===================================================
+  // LOADING
+  // ===================================================
 
-  if (loading) {
+  if (loading && interviews.length === 0) {
     return (
       <Box
         sx={{
@@ -568,9 +660,9 @@ const Interviews = () => {
     );
   }
 
-  /* =====================================================
-     UI
-  ===================================================== */
+  // ===================================================
+  // UI
+  // ===================================================
 
   return (
     <Box
@@ -584,9 +676,9 @@ const Interviews = () => {
         },
       }}
     >
-      {/* =====================================================
+      {/* =================================================
           HEADER
-      ===================================================== */}
+      ================================================= */}
 
       <Box
         sx={{
@@ -625,19 +717,19 @@ const Interviews = () => {
               color: "#94a3b8",
             }}
           >
-            Manage, schedule and track candidate interviews.
+            Manage, schedule and track
+            candidate interviews.
           </Typography>
         </Box>
 
-        {/* IMPORTANT:
-            This button now has a real handler */}
         <Button
           type="button"
           variant="contained"
           startIcon={<AddRoundedIcon />}
           onClick={handleOpenSchedule}
           sx={{
-            background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+            background:
+              "linear-gradient(135deg,#6366f1,#8b5cf6)",
             color: "#fff",
             fontWeight: 600,
             textTransform: "none",
@@ -647,7 +739,8 @@ const Interviews = () => {
             boxShadow: "none",
 
             "&:hover": {
-              background: "linear-gradient(135deg,#5859e8,#7c3aed)",
+              background:
+                "linear-gradient(135deg,#5859e8,#7c3aed)",
               boxShadow: "none",
             },
           }}
@@ -656,9 +749,9 @@ const Interviews = () => {
         </Button>
       </Box>
 
-      {/* =====================================================
+      {/* =================================================
           ERROR
-      ===================================================== */}
+      ================================================= */}
 
       {error && (
         <Box
@@ -667,7 +760,8 @@ const Interviews = () => {
             p: 2,
             borderRadius: 2,
             backgroundColor: "#3f1111",
-            border: "1px solid #7f1d1d",
+            border:
+              "1px solid #7f1d1d",
           }}
         >
           <Typography
@@ -680,9 +774,9 @@ const Interviews = () => {
         </Box>
       )}
 
-      {/* =====================================================
+      {/* =================================================
           STATS
-      ===================================================== */}
+      ================================================= */}
 
       <Box
         sx={{
@@ -696,59 +790,85 @@ const Interviews = () => {
         }}
       >
         {[
-          ["Upcoming", upcomingCount, "Scheduled / Confirmed", "#60a5fa"],
-
-          ["Confirmed", confirmedCount, "Confirmed interviews", "#34d399"],
-
-          ["Completed", completedCount, "Completed interviews", "#a78bfa"],
-
-          ["Needs Action", pendingCount, "Pending interviews", "#f59e0b"],
-        ].map(([title, number, subtitle, color]) => (
-          <Box
-            key={title}
-            sx={{
-              p: 2.5,
-              borderRadius: 3,
-              backgroundColor: "#1e293b",
-              border: "1px solid #334155",
-            }}
-          >
-            <Typography
+          [
+            "Upcoming",
+            upcomingCount,
+            "Scheduled / Confirmed",
+            "#60a5fa",
+          ],
+          [
+            "Confirmed",
+            confirmedCount,
+            "Confirmed interviews",
+            "#34d399",
+          ],
+          [
+            "Completed",
+            completedCount,
+            "Completed interviews",
+            "#a78bfa",
+          ],
+          [
+            "Needs Action",
+            pendingCount,
+            "Pending interviews",
+            "#f59e0b",
+          ],
+        ].map(
+          ([
+            title,
+            number,
+            subtitle,
+            color,
+          ]) => (
+            <Box
+              key={title}
               sx={{
-                color: "#94a3b8",
-                fontSize: 14,
-                mb: 1,
+                p: 2.5,
+                borderRadius: 3,
+                backgroundColor:
+                  "#1e293b",
+                border:
+                  "1px solid #334155",
               }}
             >
-              {title}
-            </Typography>
+              <Typography
+                sx={{
+                  color: "#94a3b8",
+                  fontSize: 14,
+                  mb: 1,
+                }}
+              >
+                {title}
+              </Typography>
 
-            <Typography
-              sx={{
-                color: "#f8fafc",
-                fontSize: 30,
-                fontWeight: 700,
-              }}
-            >
-              {number}
-            </Typography>
+              <Typography
+                sx={{
+                  color: "#f8fafc",
+                  fontSize: 30,
+                  fontWeight: 700,
+                }}
+              >
+                {number}
+              </Typography>
 
-            <Typography
-              sx={{
-                color,
-                fontSize: 13,
-                mt: 0.5,
-              }}
-            >
-              {subtitle}
-            </Typography>
-          </Box>
-        ))}
+              <Typography
+                sx={{
+                  color,
+                  fontSize: 13,
+                  mt: 0.5,
+                }}
+              >
+                {subtitle}
+              </Typography>
+            </Box>
+          )
+        )}
       </Box>
 
-      {/* =====================================================
-          SEARCH + FILTERS
-      ===================================================== */}
+      {/* =================================================
+          SEARCH / FILTER
+      ================================================= */}
 
       <Box
         sx={{
@@ -756,7 +876,8 @@ const Interviews = () => {
           p: 2,
           borderRadius: 3,
           backgroundColor: "#172033",
-          border: "1px solid #334155",
+          border:
+            "1px solid #334155",
           display: "flex",
           alignItems: "center",
           gap: 1.5,
@@ -765,7 +886,9 @@ const Interviews = () => {
       >
         <TextField
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
           placeholder="Search candidate, job or interviewer..."
           size="small"
           sx={{
@@ -774,19 +897,23 @@ const Interviews = () => {
 
             "& .MuiOutlinedInput-root": {
               color: "#f8fafc",
-              backgroundColor: "#111827",
+              backgroundColor:
+                "#111827",
               borderRadius: 2,
 
               "& fieldset": {
-                borderColor: "#334155",
+                borderColor:
+                  "#334155",
               },
 
               "&:hover fieldset": {
-                borderColor: "#475569",
+                borderColor:
+                  "#475569",
               },
 
               "&.Mui-focused fieldset": {
-                borderColor: "#6366f1",
+                borderColor:
+                  "#6366f1",
               },
             },
 
@@ -811,70 +938,113 @@ const Interviews = () => {
           select
           size="small"
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) =>
+            setStatusFilter(
+              e.target.value
+            )
+          }
           sx={{
             minWidth: 145,
 
             "& .MuiOutlinedInput-root": {
               color: "#e2e8f0",
-              backgroundColor: "#111827",
+              backgroundColor:
+                "#111827",
               borderRadius: 2,
             },
           }}
         >
-          <MenuItem value="All">All Status</MenuItem>
+          <MenuItem value="All">
+            All Status
+          </MenuItem>
 
-          <MenuItem value="Scheduled">Scheduled</MenuItem>
+          <MenuItem value="Scheduled">
+            Scheduled
+          </MenuItem>
 
-          <MenuItem value="Confirmed">Confirmed</MenuItem>
+          <MenuItem value="Confirmed">
+            Confirmed
+          </MenuItem>
 
-          <MenuItem value="Pending">Pending</MenuItem>
+          <MenuItem value="Pending">
+            Pending
+          </MenuItem>
 
-          <MenuItem value="Completed">Completed</MenuItem>
+          <MenuItem value="Completed">
+            Completed
+          </MenuItem>
+
+          <MenuItem value="Cancelled">
+            Cancelled
+          </MenuItem>
         </TextField>
 
         <TextField
           select
           size="small"
           value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
+          onChange={(e) =>
+            setTypeFilter(
+              e.target.value
+            )
+          }
           sx={{
             minWidth: 165,
 
             "& .MuiOutlinedInput-root": {
               color: "#e2e8f0",
-              backgroundColor: "#111827",
+              backgroundColor:
+                "#111827",
               borderRadius: 2,
             },
           }}
         >
-          <MenuItem value="All">All Types</MenuItem>
+          <MenuItem value="All">
+            All Types
+          </MenuItem>
 
-          <MenuItem value="Technical Interview">Technical</MenuItem>
+          <MenuItem value="Technical Interview">
+            Technical
+          </MenuItem>
 
-          <MenuItem value="HR Interview">HR</MenuItem>
+          <MenuItem value="HR Interview">
+            HR
+          </MenuItem>
 
-          <MenuItem value="Managerial Interview">Managerial</MenuItem>
+          <MenuItem value="Managerial Interview">
+            Managerial
+          </MenuItem>
         </TextField>
 
-        {/* View Toggle */}
+        {/* VIEW TOGGLE */}
 
         <Box
           sx={{
             display: "flex",
             backgroundColor: "#111827",
-            border: "1px solid #334155",
+            border:
+              "1px solid #334155",
             borderRadius: 2,
             overflow: "hidden",
           }}
         >
           <Button
-            startIcon={<ViewListRoundedIcon />}
-            onClick={() => setViewMode("list")}
+            startIcon={
+              <ViewListRoundedIcon />
+            }
+            onClick={() =>
+              setViewMode("list")
+            }
             sx={{
               height: 40,
-              color: viewMode === "list" ? "#fff" : "#94a3b8",
-              backgroundColor: viewMode === "list" ? "#3730a3" : "transparent",
+              color:
+                viewMode === "list"
+                  ? "#fff"
+                  : "#94a3b8",
+              backgroundColor:
+                viewMode === "list"
+                  ? "#3730a3"
+                  : "transparent",
               textTransform: "none",
               borderRadius: 0,
             }}
@@ -883,13 +1053,22 @@ const Interviews = () => {
           </Button>
 
           <Button
-            startIcon={<CalendarMonthRoundedIcon />}
-            onClick={() => setViewMode("calendar")}
+            startIcon={
+              <CalendarMonthRoundedIcon />
+            }
+            onClick={() =>
+              setViewMode("calendar")
+            }
             sx={{
               height: 40,
-              color: viewMode === "calendar" ? "#fff" : "#94a3b8",
+              color:
+                viewMode === "calendar"
+                  ? "#fff"
+                  : "#94a3b8",
               backgroundColor:
-                viewMode === "calendar" ? "#3730a3" : "transparent",
+                viewMode === "calendar"
+                  ? "#3730a3"
+                  : "transparent",
               textTransform: "none",
               borderRadius: 0,
             }}
@@ -899,9 +1078,9 @@ const Interviews = () => {
         </Box>
       </Box>
 
-      {/* =====================================================
+      {/* =================================================
           NEXT INTERVIEW
-      ===================================================== */}
+      ================================================= */}
 
       <Box
         sx={{
@@ -912,13 +1091,15 @@ const Interviews = () => {
           },
           borderRadius: 3,
           backgroundColor: "#1e293b",
-          border: "1px solid #334155",
+          border:
+            "1px solid #334155",
         }}
       >
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent:
+              "space-between",
             alignItems: "center",
             mb: 3,
           }}
@@ -939,7 +1120,9 @@ const Interviews = () => {
                 px: 1.5,
                 py: 0.6,
                 borderRadius: 2,
-                ...getStatusStyle(nextInterview.status),
+                ...getStatusStyle(
+                  nextInterview.status
+                ),
                 fontSize: 13,
                 fontWeight: 600,
               }}
@@ -961,8 +1144,6 @@ const Interviews = () => {
               alignItems: "center",
             }}
           >
-            {/* Candidate */}
-
             <Box
               sx={{
                 display: "flex",
@@ -975,17 +1156,23 @@ const Interviews = () => {
                   width: 52,
                   height: 52,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                  background:
+                    "linear-gradient(135deg,#6366f1,#8b5cf6)",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
+                  justifyContent:
+                    "center",
                   color: "#fff",
                   fontWeight: 700,
                 }}
               >
-                {nextInterview.name
+                {getCandidateName(
+                  nextInterview
+                )
                   .split(" ")
-                  .map((word) => word[0])
+                  .map(
+                    (word) => word[0]
+                  )
                   .slice(0, 2)
                   .join("")
                   .toUpperCase()}
@@ -999,7 +1186,9 @@ const Interviews = () => {
                     fontWeight: 600,
                   }}
                 >
-                  {nextInterview.name}
+                  {getCandidateName(
+                    nextInterview
+                  )}
                 </Typography>
 
                 <Typography
@@ -1008,17 +1197,21 @@ const Interviews = () => {
                     fontSize: 14,
                   }}
                 >
-                  {nextInterview.role}
+                  {getJobTitle(
+                    nextInterview
+                  )}
                 </Typography>
 
                 <Box
                   sx={{
-                    display: "inline-block",
+                    display:
+                      "inline-block",
                     mt: 1,
                     px: 1.2,
                     py: 0.5,
                     borderRadius: 1.5,
-                    backgroundColor: "#312e81",
+                    backgroundColor:
+                      "#312e81",
                     color: "#c4b5fd",
                     fontSize: 12,
                   }}
@@ -1028,8 +1221,6 @@ const Interviews = () => {
               </Box>
             </Box>
 
-            {/* Details */}
-
             <Box>
               <Typography
                 sx={{
@@ -1037,7 +1228,10 @@ const Interviews = () => {
                   fontSize: 14,
                 }}
               >
-                📅 {formatDate(nextInterview.fullDate)}
+                📅{" "}
+                {formatDate(
+                  nextInterview.date
+                )}
               </Typography>
 
               <Typography
@@ -1055,11 +1249,10 @@ const Interviews = () => {
                   fontSize: 14,
                 }}
               >
-                👤 {nextInterview.interviewer}
+                👤{" "}
+                {nextInterview.interviewer}
               </Typography>
             </Box>
-
-            {/* Actions */}
 
             <Box
               sx={{
@@ -1071,17 +1264,21 @@ const Interviews = () => {
               {nextInterview.meetingLink && (
                 <Button
                   variant="contained"
-                  startIcon={<VideoCameraFrontRoundedIcon />}
+                  startIcon={
+                    <VideoCameraFrontRoundedIcon />
+                  }
                   onClick={() =>
                     window.open(
                       nextInterview.meetingLink,
                       "_blank",
-                      "noopener,noreferrer",
+                      "noopener,noreferrer"
                     )
                   }
                   sx={{
-                    background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-                    textTransform: "none",
+                    background:
+                      "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                    textTransform:
+                      "none",
                     boxShadow: "none",
                   }}
                 >
@@ -1091,11 +1288,17 @@ const Interviews = () => {
 
               <Button
                 variant="outlined"
-                onClick={() => handleViewDetails(nextInterview)}
+                onClick={() =>
+                  handleViewDetails(
+                    nextInterview
+                  )
+                }
                 sx={{
                   color: "#cbd5e1",
-                  borderColor: "#475569",
-                  textTransform: "none",
+                  borderColor:
+                    "#475569",
+                  textTransform:
+                    "none",
                 }}
               >
                 View Details
@@ -1114,9 +1317,9 @@ const Interviews = () => {
         )}
       </Box>
 
-      {/* =====================================================
+      {/* =================================================
           LIST VIEW
-      ===================================================== */}
+      ================================================= */}
 
       {viewMode === "list" && (
         <Box
@@ -1128,13 +1331,15 @@ const Interviews = () => {
             },
             borderRadius: 3,
             backgroundColor: "#1e293b",
-            border: "1px solid #334155",
+            border:
+              "1px solid #334155",
           }}
         >
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent:
+                "space-between",
               alignItems: "center",
               mb: 3,
             }}
@@ -1157,7 +1362,8 @@ const Interviews = () => {
                   color: "#94a3b8",
                 }}
               >
-                Your scheduled candidate interviews.
+                Your scheduled candidate
+                interviews.
               </Typography>
             </Box>
 
@@ -1167,11 +1373,13 @@ const Interviews = () => {
                 fontSize: 13,
               }}
             >
-              {filteredInterviews.length} interviews
+              {filteredInterviews.length}{" "}
+              interviews
             </Typography>
           </Box>
 
-          {filteredInterviews.length === 0 ? (
+          {filteredInterviews.length ===
+          0 ? (
             <Box
               sx={{
                 py: 6,
@@ -1187,160 +1395,197 @@ const Interviews = () => {
               </Typography>
             </Box>
           ) : (
-            filteredInterviews.map((interview) => (
-              <Box
-                key={interview.id}
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: {
-                    xs: "1fr",
-                    md: "1.4fr 1.2fr 1.2fr auto",
-                  },
-                  alignItems: "center",
-                  gap: 2,
-                  p: 2,
-                  mb: 2,
-                  borderRadius: 2,
-                  backgroundColor: "#182235",
-                  border: "1px solid #334155",
-                }}
-              >
-                {/* Candidate */}
-
-                <Box>
-                  <Typography
-                    sx={{
-                      color: "#f8fafc",
-                      fontSize: 15,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {interview.name}
-                  </Typography>
-
-                  <Typography
-                    sx={{
-                      color: "#94a3b8",
-                      fontSize: 13,
-                    }}
-                  >
-                    {interview.email}
-                  </Typography>
-
-                  <Typography
-                    sx={{
-                      color: "#a5b4fc",
-                      fontSize: 13,
-                    }}
-                  >
-                    {interview.role}
-                  </Typography>
-                </Box>
-
-                {/* Date */}
-
-                <Box>
-                  <Typography
-                    sx={{
-                      color: "#e2e8f0",
-                      fontSize: 13,
-                    }}
-                  >
-                    📅 {formatDate(interview.fullDate)}
-                  </Typography>
-
-                  <Typography
-                    sx={{
-                      color: "#94a3b8",
-                      fontSize: 13,
-                    }}
-                  >
-                    🕐 {interview.time}
-                  </Typography>
-                </Box>
-
-                {/* Type */}
-
-                <Box>
-                  <Typography
-                    sx={{
-                      color: "#cbd5e1",
-                      fontSize: 13,
-                    }}
-                  >
-                    {interview.type}
-                  </Typography>
-
-                  <Typography
-                    sx={{
-                      color: "#94a3b8",
-                      fontSize: 12,
-                      mt: 0.5,
-                    }}
-                  >
-                    👤 {interview.interviewer}
-                  </Typography>
-                </Box>
-
-                {/* Actions */}
-
+            filteredInterviews.map(
+              (interview) => (
                 <Box
+                  key={
+                    interview._id ||
+                    interview.id
+                  }
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    flexWrap: "wrap",
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      md: "1.4fr 1.2fr 1.2fr auto",
+                    },
+                    alignItems:
+                      "center",
+                    gap: 2,
+                    p: 2,
+                    mb: 2,
+                    borderRadius: 2,
+                    backgroundColor:
+                      "#182235",
+                    border:
+                      "1px solid #334155",
                   }}
                 >
-                  <Box
-                    sx={{
-                      px: 1.2,
-                      py: 0.6,
-                      borderRadius: 2,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      ...getStatusStyle(interview.status),
-                    }}
-                  >
-                    {interview.status}
+                  {/* Candidate */}
+
+                  <Box>
+                    <Typography
+                      sx={{
+                        color: "#f8fafc",
+                        fontSize: 15,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {getCandidateName(
+                        interview
+                      )}
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        color: "#94a3b8",
+                        fontSize: 13,
+                      }}
+                    >
+                      {getCandidateEmail(
+                        interview
+                      )}
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        color: "#a5b4fc",
+                        fontSize: 13,
+                      }}
+                    >
+                      {getJobTitle(
+                        interview
+                      )}
+                    </Typography>
                   </Box>
 
-                  <Button
-                    size="small"
-                    onClick={() => handleViewDetails(interview)}
-                    sx={{
-                      color: "#cbd5e1",
-                      border: "1px solid #475569",
-                      textTransform: "none",
-                    }}
-                  >
-                    View
-                  </Button>
+                  {/* Date */}
 
-                  <Button
-                    size="small"
-                    onClick={() => handleOpenReschedule(interview)}
+                  <Box>
+                    <Typography
+                      sx={{
+                        color: "#e2e8f0",
+                        fontSize: 13,
+                      }}
+                    >
+                      📅{" "}
+                      {formatDate(
+                        interview.date
+                      )}
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        color: "#94a3b8",
+                        fontSize: 13,
+                      }}
+                    >
+                      🕐{" "}
+                      {interview.time}
+                    </Typography>
+                  </Box>
+
+                  {/* Type */}
+
+                  <Box>
+                    <Typography
+                      sx={{
+                        color: "#cbd5e1",
+                        fontSize: 13,
+                      }}
+                    >
+                      {interview.type}
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        color: "#94a3b8",
+                        fontSize: 12,
+                        mt: 0.5,
+                      }}
+                    >
+                      👤{" "}
+                      {interview.interviewer}
+                    </Typography>
+                  </Box>
+
+                  {/* Actions */}
+
+                  <Box
                     sx={{
-                      color: "#fff",
-                      backgroundColor: "#6366f1",
-                      textTransform: "none",
-                      "&:hover": {
-                        backgroundColor: "#4f46e5",
-                      },
+                      display: "flex",
+                      alignItems:
+                        "center",
+                      gap: 1,
+                      flexWrap:
+                        "wrap",
                     }}
                   >
-                    Reschedule
-                  </Button>
+                    <Box
+                      sx={{
+                        px: 1.2,
+                        py: 0.6,
+                        borderRadius: 2,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        ...getStatusStyle(
+                          interview.status
+                        ),
+                      }}
+                    >
+                      {interview.status}
+                    </Box>
+
+                    <Button
+                      size="small"
+                      onClick={() =>
+                        handleViewDetails(
+                          interview
+                        )
+                      }
+                      sx={{
+                        color:
+                          "#cbd5e1",
+                        border:
+                          "1px solid #475569",
+                        textTransform:
+                          "none",
+                      }}
+                    >
+                      View
+                    </Button>
+
+                    <Button
+                      size="small"
+                      onClick={() =>
+                        handleOpenReschedule(
+                          interview
+                        )
+                      }
+                      sx={{
+                        color: "#fff",
+                        backgroundColor:
+                          "#6366f1",
+                        textTransform:
+                          "none",
+                        "&:hover": {
+                          backgroundColor:
+                            "#4f46e5",
+                        },
+                      }}
+                    >
+                      Reschedule
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
-            ))
+              )
+            )
           )}
         </Box>
       )}
 
-      {/* =====================================================
+      {/* =================================================
           CALENDAR VIEW
-      ===================================================== */}
+      ================================================= */}
 
       {viewMode === "calendar" && (
         <Box
@@ -1360,14 +1605,17 @@ const Interviews = () => {
             sx={{
               p: 2.5,
               borderRadius: 3,
-              backgroundColor: "#1e293b",
-              border: "1px solid #334155",
+              backgroundColor:
+                "#1e293b",
+              border:
+                "1px solid #334155",
             }}
           >
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "space-between",
+                justifyContent:
+                  "space-between",
                 alignItems: "center",
                 mb: 2.5,
               }}
@@ -1379,9 +1627,12 @@ const Interviews = () => {
                   fontWeight: 600,
                 }}
               >
-                {currentMonth.toLocaleString("default", {
-                  month: "long",
-                })}{" "}
+                {currentMonth.toLocaleString(
+                  "default",
+                  {
+                    month: "long",
+                  }
+                )}{" "}
                 {year}
               </Typography>
 
@@ -1392,7 +1643,9 @@ const Interviews = () => {
                 }}
               >
                 <Button
-                  onClick={handlePreviousMonth}
+                  onClick={
+                    handlePreviousMonth
+                  }
                   sx={{
                     minWidth: 36,
                     width: 36,
@@ -1404,7 +1657,9 @@ const Interviews = () => {
                 </Button>
 
                 <Button
-                  onClick={handleNextMonth}
+                  onClick={
+                    handleNextMonth
+                  }
                   sx={{
                     minWidth: 36,
                     width: 36,
@@ -1422,11 +1677,20 @@ const Interviews = () => {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "repeat(7, 1fr)",
+                gridTemplateColumns:
+                  "repeat(7, 1fr)",
                 textAlign: "center",
               }}
             >
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+              {[
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun",
+              ].map((day) => (
                 <Typography
                   key={day}
                   sx={{
@@ -1446,16 +1710,22 @@ const Interviews = () => {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: "repeat(7, 1fr)",
+                gridTemplateColumns:
+                  "repeat(7, 1fr)",
                 gap: 0.5,
               }}
             >
               {Array.from(
                 {
-                  length: startingDay + daysInMonth,
+                  length:
+                    startingDay +
+                    daysInMonth,
                 },
                 (_, index) => {
-                  const date = index - startingDay + 1;
+                  const date =
+                    index -
+                    startingDay +
+                    1;
 
                   if (date < 1) {
                     return (
@@ -1468,61 +1738,92 @@ const Interviews = () => {
                     );
                   }
 
-                  const isSelected = selectedDate === date;
+                  const isSelected =
+                    selectedDate ===
+                    date;
 
-                  const interviewExists = hasInterview(date);
+                  const interviewExists =
+                    hasInterview(
+                      date
+                    );
 
                   return (
                     <Box
                       key={index}
-                      onClick={() => handleDateClick(date)}
+                      onClick={() =>
+                        setSelectedDate(
+                          date
+                        )
+                      }
                       sx={{
                         height: 38,
                         display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        position: "relative",
-                        cursor: "pointer",
+                        alignItems:
+                          "center",
+                        justifyContent:
+                          "center",
+                        position:
+                          "relative",
+                        cursor:
+                          "pointer",
                       }}
                     >
                       <Box
                         sx={{
                           width: 32,
                           height: 32,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50%",
-                          backgroundColor: isSelected
-                            ? "#6366f1"
-                            : "transparent",
-                          color: isSelected ? "#fff" : "#e2e8f0",
+                          display:
+                            "flex",
+                          alignItems:
+                            "center",
+                          justifyContent:
+                            "center",
+                          borderRadius:
+                            "50%",
+                          backgroundColor:
+                            isSelected
+                              ? "#6366f1"
+                              : "transparent",
+                          color:
+                            isSelected
+                              ? "#fff"
+                              : "#e2e8f0",
                           fontSize: 13,
-                          fontWeight: isSelected ? 700 : 400,
+                          fontWeight:
+                            isSelected
+                              ? 700
+                              : 400,
 
                           "&:hover": {
-                            backgroundColor: isSelected ? "#6366f1" : "#182235",
+                            backgroundColor:
+                              isSelected
+                                ? "#6366f1"
+                                : "#182235",
                           },
                         }}
                       >
                         {date}
                       </Box>
 
-                      {interviewExists && !isSelected && (
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            bottom: 1,
-                            width: 4,
-                            height: 4,
-                            borderRadius: "50%",
-                            backgroundColor: "#6366f1",
-                          }}
-                        />
-                      )}
+                      {interviewExists &&
+                        !isSelected && (
+                          <Box
+                            sx={{
+                              position:
+                                "absolute",
+                              bottom: 1,
+                              width: 4,
+                              height: 4,
+                              borderRadius:
+                                "50%",
+                              backgroundColor:
+                                "#6366f1",
+                            }}
+                          />
+                        )}
                     </Box>
                   );
-                },
+                }
               )}
             </Box>
           </Box>
@@ -1533,8 +1834,10 @@ const Interviews = () => {
             sx={{
               p: 2.5,
               borderRadius: 3,
-              backgroundColor: "#1e293b",
-              border: "1px solid #334155",
+              backgroundColor:
+                "#1e293b",
+              border:
+                "1px solid #334155",
             }}
           >
             <Typography
@@ -1545,108 +1848,149 @@ const Interviews = () => {
                 mb: 2,
               }}
             >
-              Interviews on {selectedDate}{" "}
-              {currentMonth.toLocaleString("default", {
-                month: "short",
-              })}{" "}
+              Interviews on{" "}
+              {selectedDate}{" "}
+              {currentMonth.toLocaleString(
+                "default",
+                {
+                  month: "short",
+                }
+              )}{" "}
               {year}
             </Typography>
 
-            {selectedInterviews.length === 0 ? (
+            {selectedInterviews.length ===
+            0 ? (
               <Typography
                 sx={{
                   color: "#64748b",
-                  textAlign: "center",
+                  textAlign:
+                    "center",
                   py: 5,
                 }}
               >
-                No interviews scheduled for this date.
+                No interviews scheduled
+                for this date.
               </Typography>
             ) : (
-              selectedInterviews.map((interview) => (
-                <Box
-                  key={interview.id}
-                  sx={{
-                    p: 1.5,
-                    mb: 1.5,
-                    borderRadius: 2,
-                    backgroundColor: "#182235",
-                    border: "1px solid #334155",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleViewDetails(interview)}
-                >
+              selectedInterviews.map(
+                (interview) => (
                   <Box
+                    key={
+                      interview._id ||
+                      interview.id
+                    }
                     sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
+                      p: 1.5,
+                      mb: 1.5,
+                      borderRadius: 2,
+                      backgroundColor:
+                        "#182235",
+                      border:
+                        "1px solid #334155",
+                      cursor:
+                        "pointer",
                     }}
+                    onClick={() =>
+                      handleViewDetails(
+                        interview
+                      )
+                    }
                   >
-                    <Typography
-                      sx={{
-                        color: "#818cf8",
-                        fontSize: 13,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {interview.time}
-                    </Typography>
-
                     <Box
                       sx={{
-                        px: 1,
-                        py: 0.3,
-                        borderRadius: 1,
-                        fontSize: 10,
-                        fontWeight: 600,
-                        ...getStatusStyle(interview.status),
+                        display: "flex",
+                        justifyContent:
+                          "space-between",
+                        alignItems:
+                          "center",
                       }}
                     >
-                      {interview.status}
+                      <Typography
+                        sx={{
+                          color:
+                            "#818cf8",
+                          fontSize: 13,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {
+                          interview.time
+                        }
+                      </Typography>
+
+                      <Box
+                        sx={{
+                          px: 1,
+                          py: 0.3,
+                          borderRadius:
+                            1,
+                          fontSize: 10,
+                          fontWeight: 600,
+                          ...getStatusStyle(
+                            interview.status
+                          ),
+                        }}
+                      >
+                        {
+                          interview.status
+                        }
+                      </Box>
                     </Box>
+
+                    <Typography
+                      sx={{
+                        color:
+                          "#f8fafc",
+                        fontSize: 14,
+                        fontWeight: 600,
+                        mt: 1,
+                      }}
+                    >
+                      {getCandidateName(
+                        interview
+                      )}
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        color:
+                          "#64748b",
+                        fontSize: 12,
+                      }}
+                    >
+                      {getJobTitle(
+                        interview
+                      )}
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        color:
+                          "#64748b",
+                        fontSize: 12,
+                      }}
+                    >
+                      {interview.type}
+                    </Typography>
                   </Box>
-
-                  <Typography
-                    sx={{
-                      color: "#f8fafc",
-                      fontSize: 14,
-                      fontWeight: 600,
-                      mt: 1,
-                    }}
-                  >
-                    {interview.name}
-                  </Typography>
-
-                  <Typography
-                    sx={{
-                      color: "#64748b",
-                      fontSize: 12,
-                    }}
-                  >
-                    {interview.role}
-                  </Typography>
-
-                  <Typography
-                    sx={{
-                      color: "#64748b",
-                      fontSize: 12,
-                    }}
-                  >
-                    {interview.type}
-                  </Typography>
-                </Box>
-              ))
+                )
+              )
             )}
 
             <Button
               fullWidth
-              startIcon={<AddRoundedIcon />}
-              onClick={handleOpenSchedule}
+              startIcon={
+                <AddRoundedIcon />
+              }
+              onClick={
+                handleOpenSchedule
+              }
               sx={{
                 mt: 1,
                 color: "#818cf8",
-                textTransform: "none",
+                textTransform:
+                  "none",
                 fontWeight: 600,
               }}
             >
@@ -1656,19 +2000,22 @@ const Interviews = () => {
         </Box>
       )}
 
-      {/* =====================================================
-          SCHEDULE INTERVIEW DIALOG
-      ===================================================== */}
+      {/* =================================================
+          SCHEDULE DIALOG
+      ================================================= */}
 
       <Dialog
         open={openSchedule}
-        onClose={handleCloseSchedule}
+        onClose={
+          handleCloseSchedule
+        }
         fullWidth
         maxWidth="sm"
         PaperProps={{
           sx: {
             borderRadius: 3,
-            backgroundColor: "#1e293b",
+            backgroundColor:
+              "#1e293b",
             color: "#f8fafc",
             maxHeight: "90vh",
           },
@@ -1690,23 +2037,24 @@ const Interviews = () => {
               mb: 1,
             }}
           >
-            Enter the Candidate ID and Job ID that you used in Postman/MongoDB.
+            Enter the Candidate ID and
+            Job ID.
           </Typography>
-
-          {/* Candidate ID */}
 
           <TextField
             fullWidth
             required
             label="Candidate ID"
             name="candidate"
-            value={formData.candidate}
-            onChange={handleFormChange}
+            value={
+              formData.candidate
+            }
+            onChange={
+              handleFormChange
+            }
             margin="normal"
-            placeholder="6a8158798be1a5ce140c2355"
+            placeholder="Candidate ObjectId"
           />
-
-          {/* Job ID */}
 
           <TextField
             fullWidth
@@ -1714,12 +2062,12 @@ const Interviews = () => {
             label="Job ID"
             name="job"
             value={formData.job}
-            onChange={handleFormChange}
+            onChange={
+              handleFormChange
+            }
             margin="normal"
-            placeholder="6a873283a6f8c70918405caf"
+            placeholder="Job ObjectId"
           />
-
-          {/* Date */}
 
           <TextField
             fullWidth
@@ -1728,7 +2076,9 @@ const Interviews = () => {
             label="Interview Date"
             name="date"
             value={formData.date}
-            onChange={handleFormChange}
+            onChange={
+              handleFormChange
+            }
             margin="normal"
             slotProps={{
               inputLabel: {
@@ -1736,8 +2086,6 @@ const Interviews = () => {
               },
             }}
           />
-
-          {/* Time */}
 
           <TextField
             fullWidth
@@ -1746,7 +2094,9 @@ const Interviews = () => {
             label="Interview Time"
             name="time"
             value={formData.time}
-            onChange={handleFormChange}
+            onChange={
+              handleFormChange
+            }
             margin="normal"
             slotProps={{
               inputLabel: {
@@ -1755,8 +2105,6 @@ const Interviews = () => {
             }}
           />
 
-          {/* Type */}
-
           <TextField
             fullWidth
             required
@@ -1764,39 +2112,49 @@ const Interviews = () => {
             label="Interview Type"
             name="type"
             value={formData.type}
-            onChange={handleFormChange}
+            onChange={
+              handleFormChange
+            }
             margin="normal"
           >
-            <MenuItem value="Technical Interview">Technical Interview</MenuItem>
+            <MenuItem value="Technical Interview">
+              Technical Interview
+            </MenuItem>
 
-            <MenuItem value="HR Interview">HR Interview</MenuItem>
+            <MenuItem value="HR Interview">
+              HR Interview
+            </MenuItem>
 
             <MenuItem value="Managerial Interview">
               Managerial Interview
             </MenuItem>
           </TextField>
 
-          {/* Interviewer */}
-
           <TextField
             fullWidth
             required
             label="Interviewer"
             name="interviewer"
-            value={formData.interviewer}
-            onChange={handleFormChange}
+            value={
+              formData.interviewer
+            }
+            onChange={
+              handleFormChange
+            }
             margin="normal"
             placeholder="John Doe"
           />
-
-          {/* Meeting Link */}
 
           <TextField
             fullWidth
             label="Meeting Link"
             name="meetingLink"
-            value={formData.meetingLink}
-            onChange={handleFormChange}
+            value={
+              formData.meetingLink
+            }
+            onChange={
+              handleFormChange
+            }
             margin="normal"
             placeholder="https://meet.google.com/example"
           />
@@ -1808,10 +2166,12 @@ const Interviews = () => {
           }}
         >
           <Button
-            disabled={submitting}
-            onClick={handleCloseSchedule}
+            onClick={
+              handleCloseSchedule
+            }
             sx={{
-              textTransform: "none",
+              textTransform:
+                "none",
             }}
           >
             Cancel
@@ -1819,42 +2179,55 @@ const Interviews = () => {
 
           <Button
             variant="contained"
-            disabled={submitting}
-            onClick={handleSchedule}
+            disabled={loading}
+            onClick={
+              handleSchedule
+            }
             sx={{
-              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-              textTransform: "none",
+              background:
+                "linear-gradient(135deg,#6366f1,#8b5cf6)",
+              textTransform:
+                "none",
 
               "&:hover": {
-                background: "linear-gradient(135deg,#5859e8,#7c3aed)",
+                background:
+                  "linear-gradient(135deg,#5859e8,#7c3aed)",
               },
             }}
           >
-            {submitting ? "Scheduling..." : "Schedule Interview"}
+            {loading
+              ? "Scheduling..."
+              : "Schedule Interview"}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* =====================================================
+      {/* =================================================
           DETAILS DIALOG
-      ===================================================== */}
+      ================================================= */}
 
       <Dialog
         open={openDetails}
-        onClose={() => setOpenDetails(false)}
+        onClose={() =>
+          setOpenDetails(false)
+        }
         fullWidth
         maxWidth="sm"
       >
         <DialogTitle
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent:
+              "space-between",
             alignItems: "center",
           }}
         >
           Interview Details
+
           <Button
-            onClick={() => setOpenDetails(false)}
+            onClick={() =>
+              setOpenDetails(false)
+            }
             sx={{
               minWidth: 40,
               color: "#64748b",
@@ -1873,7 +2246,9 @@ const Interviews = () => {
                 mb: 1,
               }}
             >
-              {selectedInterview.name}
+              {getCandidateName(
+                selectedInterview
+              )}
             </Typography>
 
             <Typography
@@ -1882,25 +2257,16 @@ const Interviews = () => {
                 mb: 3,
               }}
             >
-              {selectedInterview.role}
+              {getJobTitle(
+                selectedInterview
+              )}
             </Typography>
 
-            <Typography>📅 {formatDate(selectedInterview.fullDate)}</Typography>
-
-            <Typography
-              sx={{
-                mt: 1,
-              }}
-            >
-              🕐 {selectedInterview.time}
-            </Typography>
-
-            <Typography
-              sx={{
-                mt: 1,
-              }}
-            >
-              💼 {selectedInterview.type}
+            <Typography>
+              📅{" "}
+              {formatDate(
+                selectedInterview.date
+              )}
             </Typography>
 
             <Typography
@@ -1908,7 +2274,8 @@ const Interviews = () => {
                 mt: 1,
               }}
             >
-              👤 {selectedInterview.interviewer}
+              🕐{" "}
+              {selectedInterview.time}
             </Typography>
 
             <Typography
@@ -1916,16 +2283,42 @@ const Interviews = () => {
                 mt: 1,
               }}
             >
-              📌 {selectedInterview.status}
+              💼{" "}
+              {selectedInterview.type}
             </Typography>
 
-            {selectedInterview.email && (
+            <Typography
+              sx={{
+                mt: 1,
+              }}
+            >
+              👤{" "}
+              {
+                selectedInterview.interviewer
+              }
+            </Typography>
+
+            <Typography
+              sx={{
+                mt: 1,
+              }}
+            >
+              📌{" "}
+              {selectedInterview.status}
+            </Typography>
+
+            {getCandidateEmail(
+              selectedInterview
+            ) && (
               <Typography
                 sx={{
                   mt: 1,
                 }}
               >
-                📧 {selectedInterview.email}
+                📧{" "}
+                {getCandidateEmail(
+                  selectedInterview
+                )}
               </Typography>
             )}
 
@@ -1933,10 +2326,14 @@ const Interviews = () => {
               <Typography
                 sx={{
                   mt: 1,
-                  wordBreak: "break-all",
+                  wordBreak:
+                    "break-all",
                 }}
               >
-                🔗 {selectedInterview.meetingLink}
+                🔗{" "}
+                {
+                  selectedInterview.meetingLink
+                }
               </Typography>
             )}
           </DialogContent>
@@ -1947,16 +2344,25 @@ const Interviews = () => {
             <>
               <Button
                 color="error"
-                onClick={() => handleDelete(selectedInterview.id)}
+                onClick={() =>
+                  handleDelete(
+                    selectedInterview._id ||
+                      selectedInterview.id
+                  )
+                }
               >
                 Delete
               </Button>
 
               <Button
                 onClick={() => {
-                  setOpenDetails(false);
+                  setOpenDetails(
+                    false
+                  );
 
-                  handleOpenReschedule(selectedInterview);
+                  handleOpenReschedule(
+                    selectedInterview
+                  );
                 }}
               >
                 Reschedule
@@ -1965,12 +2371,14 @@ const Interviews = () => {
               {selectedInterview.meetingLink && (
                 <Button
                   variant="contained"
-                  startIcon={<VideoCameraFrontRoundedIcon />}
+                  startIcon={
+                    <VideoCameraFrontRoundedIcon />
+                  }
                   onClick={() =>
                     window.open(
                       selectedInterview.meetingLink,
                       "_blank",
-                      "noopener,noreferrer",
+                      "noopener,noreferrer"
                     )
                   }
                 >
@@ -1978,23 +2386,33 @@ const Interviews = () => {
                 </Button>
               )}
 
-              <Button onClick={() => setOpenDetails(false)}>Close</Button>
+              <Button
+                onClick={() =>
+                  setOpenDetails(false)
+                }
+              >
+                Close
+              </Button>
             </>
           )}
         </DialogActions>
       </Dialog>
 
-      {/* =====================================================
+      {/* =================================================
           RESCHEDULE DIALOG
-      ===================================================== */}
+      ================================================= */}
 
       <Dialog
         open={openReschedule}
-        onClose={() => setOpenReschedule(false)}
+        onClose={() =>
+          setOpenReschedule(false)
+        }
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>Reschedule Interview</DialogTitle>
+        <DialogTitle>
+          Reschedule Interview
+        </DialogTitle>
 
         <DialogContent>
           <Typography
@@ -2004,8 +2422,8 @@ const Interviews = () => {
               mb: 1,
             }}
           >
-            You can update the interview details here. Backend reschedule API
-            will be connected separately.
+            Update the interview date,
+            time and other details.
           </Typography>
 
           <TextField
@@ -2014,10 +2432,14 @@ const Interviews = () => {
             label="New Date"
             name="date"
             value={formData.date}
-            onChange={handleFormChange}
+            onChange={
+              handleFormChange
+            }
             margin="normal"
-            InputLabelProps={{
-              shrink: true,
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
             }}
           />
 
@@ -2027,10 +2449,14 @@ const Interviews = () => {
             label="New Time"
             name="time"
             value={formData.time}
-            onChange={handleFormChange}
+            onChange={
+              handleFormChange
+            }
             margin="normal"
-            InputLabelProps={{
-              shrink: true,
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
             }}
           />
 
@@ -2040,12 +2466,18 @@ const Interviews = () => {
             label="Interview Type"
             name="type"
             value={formData.type}
-            onChange={handleFormChange}
+            onChange={
+              handleFormChange
+            }
             margin="normal"
           >
-            <MenuItem value="Technical Interview">Technical Interview</MenuItem>
+            <MenuItem value="Technical Interview">
+              Technical Interview
+            </MenuItem>
 
-            <MenuItem value="HR Interview">HR Interview</MenuItem>
+            <MenuItem value="HR Interview">
+              HR Interview
+            </MenuItem>
 
             <MenuItem value="Managerial Interview">
               Managerial Interview
@@ -2056,8 +2488,12 @@ const Interviews = () => {
             fullWidth
             label="Interviewer"
             name="interviewer"
-            value={formData.interviewer}
-            onChange={handleFormChange}
+            value={
+              formData.interviewer
+            }
+            onChange={
+              handleFormChange
+            }
             margin="normal"
           />
 
@@ -2065,22 +2501,35 @@ const Interviews = () => {
             fullWidth
             label="Meeting Link"
             name="meetingLink"
-            value={formData.meetingLink}
-            onChange={handleFormChange}
+            value={
+              formData.meetingLink
+            }
+            onChange={
+              handleFormChange
+            }
             margin="normal"
           />
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={() => setOpenReschedule(false)}>Cancel</Button>
+          <Button
+            onClick={() =>
+              setOpenReschedule(false)
+            }
+          >
+            Cancel
+          </Button>
 
           <Button
             variant="contained"
-            onClick={() => {
-              alert("Reschedule API is not connected yet.");
-            }}
+            disabled={loading}
+            onClick={
+              handleReschedule
+            }
           >
-            Save Changes
+            {loading
+              ? "Saving..."
+              : "Save Changes"}
           </Button>
         </DialogActions>
       </Dialog>

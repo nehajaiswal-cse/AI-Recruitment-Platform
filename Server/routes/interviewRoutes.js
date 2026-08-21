@@ -8,7 +8,9 @@ import {
   getMyInterviews,
   getInterviewById,
   updateInterviewStatus,
-  getRecruiterInterviews
+  getRecruiterInterviews,
+  updateInterview,
+  deleteInterview
 } from "../controllers/interviewController.js";
 
 const router = express.Router();
@@ -42,6 +44,10 @@ router.get(
   roleMiddleware("applicant"),
   getInterviewById
 );
+
+router.put("/:interviewId", updateInterview);
+
+router.delete("/:interviewId", deleteInterview);
 
 router.put(
   "/:id/status",

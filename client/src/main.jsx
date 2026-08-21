@@ -9,6 +9,7 @@ import { ThemeModeProvider } from './context/ThemeModeContext.jsx'
 import AppTheme from './components/common/AppTheme.jsx'
 import { JobProvider } from './context/jobContext.jsx';
 import { CandidateProvider } from './context/CandidateContext.jsx';
+import { InterviewProvider } from "./context/InterviewContext.jsx"
 
 ReactDOM.createRoot(
   document.getElementById('root')
@@ -17,13 +18,16 @@ ReactDOM.createRoot(
     <AuthContextProvider>
       <JobProvider>
         <CandidateProvider>
-          <BrowserRouter>
-          <ThemeModeProvider>
-            <AppTheme>
-              <App />
-            </AppTheme>
+          <InterviewProvider>
+            <BrowserRouter>
+              <ThemeModeProvider>
+               <AppTheme>
+                <App />
+              </AppTheme>
           </ThemeModeProvider>
           </BrowserRouter>
+          </InterviewProvider>
+          
         </CandidateProvider>
     </JobProvider>
 
