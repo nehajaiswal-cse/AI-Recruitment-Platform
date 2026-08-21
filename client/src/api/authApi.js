@@ -1,4 +1,3 @@
-// import api from "./api";
 import api from "./api";
 
 export const loginUser = async (formData) => {
@@ -66,7 +65,6 @@ export const getprofile = async () => {
 };
 
 
-
 // export const loginUser = async (formData) => {
 //   try {
 //     const response = await api.post("/auth/login", formData);
@@ -122,6 +120,7 @@ export const getprofile = async () => {
 //     );
 //   }
 // };
+
 export const updateProfile = async (profileData) => {
   try {
     const response = await api.put("/profile", profileData);
@@ -131,8 +130,9 @@ export const updateProfile = async (profileData) => {
 
     throw new Error(
       error.response?.data?.message ||
-      error.response?.data?.error ||
-      "Failed to update profile."
+        error.response?.data?.error ||
+        "Failed to update profile."
     );
   }
-};
+
+}
