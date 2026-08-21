@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -22,61 +22,39 @@ import SmartToyRoundedIcon from "@mui/icons-material/SmartToyRounded";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import LightbulbRoundedIcon from "@mui/icons-material/LightbulbRounded";
 
+import useInterview from "../../../hooks/useInterview";
+
 const Interviews = () => {
   const navigate = useNavigate();
 
-  const [interviews, setInterviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const {
+    loading,
+    error,
+
+    upcomingInterviews,
+    pastInterviews,
+    nextInterview,
+
+    upcomingCount,
+    completedCount,
+    confirmedCount,
+    thisWeekCount,
+  } = useInterview();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
 
   // =====================================================
-  // FETCH APPLICANT INTERVIEWS
+  // DIALOG
   // =====================================================
 
-  useEffect(() => {
-    const fetchInterviews = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          setError("Authentication token not found. Please login again.");
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch(
-          "http://localhost:5000/api/interviews/my",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch interviews");
-        }
-
-        setInterviews(data.interviews || []);
-      } catch (err) {
-        console.error("Fetch interviews error:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInterviews();
-  }, []);
+  const openDialog = (title) => {
+    setDialogTitle(title);
+    setDialogOpen(true);
+  };
 
   // =====================================================
-  // FORMAT DATE
+  // DATE FORMAT
   // =====================================================
 
   const formatDate = (date) => {
@@ -90,7 +68,7 @@ const Interviews = () => {
   };
 
   // =====================================================
-  // GET DAY
+  // DAY
   // =====================================================
 
   const getDay = (date) => {
@@ -102,7 +80,7 @@ const Interviews = () => {
   };
 
   // =====================================================
-  // GET INITIALS
+  // INITIALS
   // =====================================================
 
   const getInitials = (name = "") => {
@@ -115,95 +93,6 @@ const Interviews = () => {
     }
 
     return name.slice(0, 2).toUpperCase();
-  };
-
-  // =====================================================
-  // UPCOMING INTERVIEWS
-  // =====================================================
-
-  const upcomingInterviews = useMemo(() => {
-    const now = new Date();
-
-    return interviews
-      .filter((interview) => {
-        const interviewDate = new Date(interview.date);
-
-        return (
-          interviewDate >= now &&
-          interview.status !== "Completed" &&
-          interview.status !== "Cancelled"
-        );
-      })
-      .sort(
-        (a, b) =>
-          new Date(a.date) - new Date(b.date)
-      );
-  }, [interviews]);
-
-  // =====================================================
-  // PAST INTERVIEWS
-  // =====================================================
-
-  const pastInterviews = useMemo(() => {
-    const now = new Date();
-
-    return interviews.filter((interview) => {
-      const interviewDate = new Date(interview.date);
-
-      return (
-        interviewDate < now ||
-        interview.status === "Completed" ||
-        interview.status === "Cancelled"
-      );
-    });
-  }, [interviews]);
-
-  // =====================================================
-  // STATS
-  // =====================================================
-
-  const upcomingCount = upcomingInterviews.length;
-
-  const completedCount = interviews.filter(
-    (interview) => interview.status === "Completed"
-  ).length;
-
-  const shortlistedCount = interviews.filter(
-    (interview) => interview.status === "Confirmed"
-  ).length;
-
-  // =====================================================
-  // THIS WEEK
-  // =====================================================
-
-  const thisWeekCount = useMemo(() => {
-    const now = new Date();
-
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(
-      now.getDate() - now.getDay()
-    );
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(
-      startOfWeek.getDate() + 7
-    );
-
-    return interviews.filter((interview) => {
-      const date = new Date(interview.date);
-
-      return date >= startOfWeek && date < endOfWeek;
-    }).length;
-  }, [interviews]);
-
-  // =====================================================
-  // DIALOG
-  // =====================================================
-
-  const openDialog = (title) => {
-    setDialogTitle(title);
-    setDialogOpen(true);
   };
 
   // =====================================================
@@ -251,10 +140,34 @@ const Interviews = () => {
   };
 
   // =====================================================
-  // NEXT INTERVIEW
+  // LOADING
   // =====================================================
 
-  const nextInterview = upcomingInterviews[0];
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "#07111f",
+          color: "#f8fafc",
+          p: { xs: 2, sm: 3, md: 4 },
+        }}
+      >
+        <Typography
+          sx={{
+            color: "#94a3b8",
+            fontSize: 15,
+          }}
+        >
+          Loading interviews...
+        </Typography>
+      </Box>
+    );
+  }
+
+  // =====================================================
+  // PAGE
+  // =====================================================
 
   return (
     <Box
@@ -339,25 +252,10 @@ const Interviews = () => {
       </Box>
 
       {/* =====================================================
-          LOADING
-      ===================================================== */}
-
-      {loading && (
-        <Typography
-          sx={{
-            color: "#94a3b8",
-            mb: 3,
-          }}
-        >
-          Loading interviews...
-        </Typography>
-      )}
-
-      {/* =====================================================
           ERROR
       ===================================================== */}
 
-      {!loading && error && (
+      {error && (
         <Box
           sx={{
             p: 2,
@@ -367,7 +265,11 @@ const Interviews = () => {
             border: "1px solid #7f1d1d",
           }}
         >
-          <Typography sx={{ color: "#f87171" }}>
+          <Typography
+            sx={{
+              color: "#f87171",
+            }}
+          >
             {error}
           </Typography>
         </Box>
@@ -377,67 +279,65 @@ const Interviews = () => {
           STATS
       ===================================================== */}
 
-      {!loading && (
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "1fr 1fr",
-              lg: "repeat(4, 1fr)",
-            },
-            gap: 2,
-            mb: 3,
-          }}
-        >
-          <StatCard
-            icon={<CalendarMonthRoundedIcon />}
-            title="Upcoming"
-            value={upcomingCount}
-            subtitle="Interviews scheduled"
-            iconBg="#2e1065"
-            iconColor="#a78bfa"
-            lineColor="#8b5cf6"
-          />
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "1fr 1fr",
+            lg: "repeat(4, 1fr)",
+          },
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        <StatCard
+          icon={<CalendarMonthRoundedIcon />}
+          title="Upcoming"
+          value={upcomingCount}
+          subtitle="Interviews scheduled"
+          iconBg="#2e1065"
+          iconColor="#a78bfa"
+          lineColor="#8b5cf6"
+        />
 
-          <StatCard
-            icon={<AccessTimeRoundedIcon />}
-            title="This Week"
-            value={thisWeekCount}
-            subtitle="Interviews this week"
-            iconBg="#082f49"
-            iconColor="#38bdf8"
-            lineColor="#3b82f6"
-          />
+        <StatCard
+          icon={<AccessTimeRoundedIcon />}
+          title="This Week"
+          value={thisWeekCount}
+          subtitle="Interviews this week"
+          iconBg="#082f49"
+          iconColor="#38bdf8"
+          lineColor="#3b82f6"
+        />
 
-          <StatCard
-            icon={<CheckCircleRoundedIcon />}
-            title="Completed"
-            value={completedCount}
-            subtitle="Interviews completed"
-            iconBg="#052e1b"
-            iconColor="#4ade80"
-            lineColor="#22c55e"
-            green
-          />
+        <StatCard
+          icon={<CheckCircleRoundedIcon />}
+          title="Completed"
+          value={completedCount}
+          subtitle="Interviews completed"
+          iconBg="#052e1b"
+          iconColor="#4ade80"
+          lineColor="#22c55e"
+          green
+        />
 
-          <StatCard
-            icon={<StarRoundedIcon />}
-            title="Confirmed"
-            value={shortlistedCount}
-            subtitle="Confirmed interviews"
-            iconBg="#422006"
-            iconColor="#fbbf24"
-            lineColor="#f59e0b"
-          />
-        </Box>
-      )}
+        <StatCard
+          icon={<StarRoundedIcon />}
+          title="Confirmed"
+          value={confirmedCount}
+          subtitle="Confirmed interviews"
+          iconBg="#422006"
+          iconColor="#fbbf24"
+          lineColor="#f59e0b"
+        />
+      </Box>
 
       {/* =====================================================
           NEXT INTERVIEW
       ===================================================== */}
 
-      {!loading && nextInterview && (
+      {nextInterview && (
         <Box
           sx={{
             position: "relative",
@@ -472,6 +372,8 @@ const Interviews = () => {
               zIndex: 1,
             }}
           >
+            {/* TOP */}
+
             <Box
               sx={{
                 display: "flex",
@@ -514,7 +416,8 @@ const Interviews = () => {
                     fontWeight: 700,
                   }}
                 >
-                  {nextInterview.job?.title || "Interview"}
+                  {nextInterview.job?.title ||
+                    "Interview"}
                 </Typography>
 
                 <Box
@@ -530,7 +433,11 @@ const Interviews = () => {
                     sx={{ fontSize: 18 }}
                   />
 
-                  <Typography sx={{ fontSize: 14 }}>
+                  <Typography
+                    sx={{
+                      fontSize: 14,
+                    }}
+                  >
                     {nextInterview.recruiter?.name ||
                       "Recruiter"}
                   </Typography>
@@ -559,6 +466,8 @@ const Interviews = () => {
               </Box>
             </Box>
 
+            {/* DETAILS */}
+
             <Box
               sx={{
                 display: "grid",
@@ -575,21 +484,32 @@ const Interviews = () => {
               <InterviewDetail
                 icon={<CalendarMonthRoundedIcon />}
                 label="Date"
-                value={formatDate(nextInterview.date)}
-                sub={getDay(nextInterview.date)}
+                value={formatDate(
+                  nextInterview.date
+                )}
+                sub={getDay(
+                  nextInterview.date
+                )}
               />
 
               <InterviewDetail
                 icon={<AccessTimeRoundedIcon />}
                 label="Time"
-                value={nextInterview.time}
-                sub={nextInterview.duration || ""}
+                value={nextInterview.time || "N/A"}
+                sub={
+                  nextInterview.duration || ""
+                }
               />
 
               <InterviewDetail
-                icon={<VideoCameraFrontRoundedIcon />}
+                icon={
+                  <VideoCameraFrontRoundedIcon />
+                }
                 label="Interview Type"
-                value={nextInterview.type}
+                value={
+                  nextInterview.type ||
+                  "Online"
+                }
                 sub={
                   nextInterview.meetingLink
                     ? "Google Meet"
@@ -597,6 +517,8 @@ const Interviews = () => {
                 }
               />
             </Box>
+
+            {/* ACTIONS */}
 
             <Box
               sx={{
@@ -608,13 +530,18 @@ const Interviews = () => {
             >
               <Button
                 onClick={() => {
-                  if (nextInterview.meetingLink) {
+                  if (
+                    nextInterview.meetingLink
+                  ) {
                     window.open(
                       nextInterview.meetingLink,
-                      "_blank"
+                      "_blank",
+                      "noopener,noreferrer"
                     );
                   } else {
-                    openDialog("Meeting link not available");
+                    openDialog(
+                      "Meeting link not available"
+                    );
                   }
                 }}
                 startIcon={
@@ -667,41 +594,40 @@ const Interviews = () => {
       )}
 
       {/* =====================================================
-          NO NEXT INTERVIEW
+          NO UPCOMING INTERVIEW
       ===================================================== */}
 
-      {!loading &&
-        !nextInterview &&
-        !error && (
-          <Box
+      {!nextInterview && !error && (
+        <Box
+          sx={{
+            p: 3,
+            mb: 3,
+            borderRadius: 3,
+            bgcolor: "#0e1a2b",
+            border: "1px solid #24334a",
+          }}
+        >
+          <Typography
             sx={{
-              p: 3,
-              mb: 3,
-              borderRadius: 3,
-              bgcolor: "#0e1a2b",
-              border: "1px solid #24334a",
+              fontSize: 18,
+              fontWeight: 700,
             }}
           >
-            <Typography
-              sx={{
-                fontSize: 18,
-                fontWeight: 700,
-              }}
-            >
-              No upcoming interviews
-            </Typography>
+            No upcoming interviews
+          </Typography>
 
-            <Typography
-              sx={{
-                mt: 0.5,
-                color: "#94a3b8",
-                fontSize: 13,
-              }}
-            >
-              You don't have any upcoming interviews scheduled.
-            </Typography>
-          </Box>
-        )}
+          <Typography
+            sx={{
+              mt: 0.5,
+              color: "#94a3b8",
+              fontSize: 13,
+            }}
+          >
+            You don't have any upcoming interviews
+            scheduled.
+          </Typography>
+        </Box>
+      )}
 
       {/* =====================================================
           AI INTERVIEW COACH
@@ -770,16 +696,21 @@ const Interviews = () => {
                 fontSize: 13,
               }}
             >
-              Practice before your real interview with an AI interviewer.
+              Practice before your real interview
+              with an AI interviewer.
             </Typography>
           </Box>
         </Box>
 
         <Button
           onClick={() =>
-            navigate("/applicant/interviews/coach")
+            navigate(
+              "/applicant/interviews/coach"
+            )
           }
-          endIcon={<ArrowForwardRoundedIcon />}
+          endIcon={
+            <ArrowForwardRoundedIcon />
+          }
           sx={{
             bgcolor: "#6366f1",
             color: "#fff",
@@ -799,29 +730,25 @@ const Interviews = () => {
       </Box>
 
       {/* =====================================================
-          UPCOMING INTERVIEWS
+          UPCOMING
       ===================================================== */}
 
-      {!loading && (
-        <InterviewList
-          title="Upcoming Interviews"
-          subtitle="Your scheduled interviews."
-          interviews={upcomingInterviews}
-          upcoming
-        />
-      )}
+      <InterviewList
+        title="Upcoming Interviews"
+        subtitle="Your scheduled interviews."
+        interviews={upcomingInterviews}
+        upcoming
+      />
 
       {/* =====================================================
-          PAST INTERVIEWS
+          PAST
       ===================================================== */}
 
-      {!loading && (
-        <InterviewList
-          title="Past Interviews"
-          subtitle="Your completed interview history."
-          interviews={pastInterviews}
-        />
-      )}
+      <InterviewList
+        title="Past Interviews"
+        subtitle="Your completed interview history."
+        interviews={pastInterviews}
+      />
 
       {/* =====================================================
           INTERVIEW INSIGHTS
@@ -865,107 +792,24 @@ const Interviews = () => {
             color="#f59e0b"
           />
 
-          <Box
-            sx={{
-              p: 2.5,
-              borderRadius: 3,
-              bgcolor: "#0e1a2b",
-              border: "1px solid #24334a",
-            }}
-          >
-            <Typography
-              sx={{
-                color: "#94a3b8",
-                fontSize: 13,
-                mb: 2,
-              }}
-            >
-              Strong Areas
-            </Typography>
-
-            {[
+          <InsightListCard
+            title="Strong Areas"
+            items={[
               "Data Structures",
               "Problem Solving",
               "Communication",
-            ].map((item) => (
-              <Box
-                key={item}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  mb: 1.2,
-                }}
-              >
-                <CheckCircleRoundedIcon
-                  sx={{
-                    fontSize: 17,
-                    color: "#22c55e",
-                  }}
-                />
+            ]}
+            success
+          />
 
-                <Typography sx={{ fontSize: 13 }}>
-                  {item}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-
-          <Box
-            sx={{
-              p: 2.5,
-              borderRadius: 3,
-              bgcolor: "#0e1a2b",
-              border: "1px solid #24334a",
-            }}
-          >
-            <Typography
-              sx={{
-                color: "#94a3b8",
-                fontSize: 13,
-                mb: 2,
-              }}
-            >
-              Areas to Improve
-            </Typography>
-
-            {[
+          <InsightListCard
+            title="Areas to Improve"
+            items={[
               "System Design",
               "Behavioral Answers",
               "Confidence",
-            ].map((item) => (
-              <Box
-                key={item}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  mb: 1.2,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 17,
-                    height: 17,
-                    borderRadius: "50%",
-                    bgcolor: "#422006",
-                    color: "#f59e0b",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 11,
-                    fontWeight: 700,
-                  }}
-                >
-                  !
-                </Box>
-
-                <Typography sx={{ fontSize: 13 }}>
-                  {item}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
+            ]}
+          />
         </Box>
       </Box>
 
@@ -1035,17 +879,22 @@ const Interviews = () => {
                 fontSize: 13,
               }}
             >
-              Consistent practice is the key to success. Use AI Interview Coach
-              to improve your skills.
+              Consistent practice is the key to
+              success. Use AI Interview Coach to
+              improve your skills.
             </Typography>
           </Box>
         </Box>
 
         <Button
           onClick={() =>
-            navigate("/applicant/interviews/coach")
+            navigate(
+              "/applicant/interviews/coach"
+            )
           }
-          endIcon={<ArrowForwardRoundedIcon />}
+          endIcon={
+            <ArrowForwardRoundedIcon />
+          }
           variant="outlined"
           sx={{
             textTransform: "none",
@@ -1099,7 +948,8 @@ const Interviews = () => {
               fontSize: 14,
             }}
           >
-            This feature is ready for backend integration.
+            The meeting link is not available
+            for this interview yet.
           </Typography>
         </DialogContent>
 
@@ -1189,7 +1039,9 @@ const StatCard = ({
 
       <Typography
         sx={{
-          color: green ? "#4ade80" : "#94a3b8",
+          color: green
+            ? "#4ade80"
+            : "#94a3b8",
           fontSize: 12,
         }}
       >
@@ -1206,7 +1058,11 @@ const StatCard = ({
           opacity: 0.9,
         }}
       >
-        <svg width="70" height="28" viewBox="0 0 70 28">
+        <svg
+          width="70"
+          height="28"
+          viewBox="0 0 70 28"
+        >
           <polyline
             points="2,22 12,20 20,21 30,14 39,17 49,7 58,12 68,3"
             fill="none"
@@ -1291,6 +1147,83 @@ const InterviewList = ({
 }) => {
   const navigate = useNavigate();
 
+  const formatDateStatic = (date) => {
+    if (!date) return "N/A";
+
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
+
+  const getDayStatic = (date) => {
+    if (!date) return "";
+
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        weekday: "long",
+      }
+    );
+  };
+
+  const getInitialsStatic = (name = "") => {
+    const words = name.trim().split(" ");
+
+    if (words.length >= 2) {
+      return (
+        words[0][0] +
+        words[words.length - 1][0]
+      ).toUpperCase();
+    }
+
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const getStatusStyleStatic = (status) => {
+    switch (status) {
+      case "Confirmed":
+        return {
+          bgcolor: "#052e1b",
+          color: "#4ade80",
+        };
+
+      case "Scheduled":
+        return {
+          bgcolor: "#172554",
+          color: "#60a5fa",
+        };
+
+      case "Pending":
+        return {
+          bgcolor: "#422006",
+          color: "#fbbf24",
+        };
+
+      case "Completed":
+        return {
+          bgcolor: "#052e1b",
+          color: "#4ade80",
+        };
+
+      case "Cancelled":
+        return {
+          bgcolor: "#3f1111",
+          color: "#f87171",
+        };
+
+      default:
+        return {
+          bgcolor: "#1e293b",
+          color: "#cbd5e1",
+        };
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -1301,6 +1234,8 @@ const InterviewList = ({
         overflow: "hidden",
       }}
     >
+      {/* HEADER */}
+
       <Box
         sx={{
           p: 2.5,
@@ -1331,12 +1266,15 @@ const InterviewList = ({
         </Box>
       </Box>
 
+      {/* EMPTY */}
+
       {interviews.length === 0 ? (
         <Box
           sx={{
             px: 2.5,
             py: 3,
-            borderTop: "1px solid #1e2b40",
+            borderTop:
+              "1px solid #1e2b40",
           }}
         >
           <Typography
@@ -1351,10 +1289,12 @@ const InterviewList = ({
       ) : (
         interviews.map((interview, index) => {
           const jobTitle =
-            interview.job?.title || "Interview";
+            interview.job?.title ||
+            "Interview";
 
           const company =
-            interview.recruiter?.name || "Recruiter";
+            interview.recruiter?.name ||
+            "Recruiter";
 
           return (
             <Box
@@ -1369,14 +1309,16 @@ const InterviewList = ({
                 gap: 2,
                 px: 2.5,
                 py: 2,
-                borderTop: "1px solid #1e2b40",
+                borderTop:
+                  "1px solid #1e2b40",
 
                 "&:hover": {
                   bgcolor: "#111f33",
                 },
               }}
             >
-              {/* Company */}
+              {/* JOB / COMPANY */}
+
               <Box
                 sx={{
                   display: "flex",
@@ -1393,14 +1335,14 @@ const InterviewList = ({
                       index % 3 === 0
                         ? "#312e81"
                         : index % 3 === 1
-                          ? "#172554"
-                          : "#422006",
+                        ? "#172554"
+                        : "#422006",
                     color:
                       index % 3 === 0
                         ? "#c4b5fd"
                         : index % 3 === 1
-                          ? "#60a5fa"
-                          : "#fbbf24",
+                        ? "#60a5fa"
+                        : "#fbbf24",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -1433,14 +1375,17 @@ const InterviewList = ({
                 </Box>
               </Box>
 
-              {/* Date */}
+              {/* DATE */}
+
               <Box>
                 <Typography
                   sx={{
                     fontSize: 13,
                   }}
                 >
-                  {formatDateStatic(interview.date)}
+                  {formatDateStatic(
+                    interview.date
+                  )}
                 </Typography>
 
                 <Typography
@@ -1450,18 +1395,21 @@ const InterviewList = ({
                     mt: 0.3,
                   }}
                 >
-                  {getDayStatic(interview.date)}
+                  {getDayStatic(
+                    interview.date
+                  )}
                 </Typography>
               </Box>
 
-              {/* Time */}
+              {/* TIME */}
+
               <Box>
                 <Typography
                   sx={{
                     fontSize: 13,
                   }}
                 >
-                  {interview.time}
+                  {interview.time || "N/A"}
                 </Typography>
 
                 <Typography
@@ -1471,11 +1419,13 @@ const InterviewList = ({
                     mt: 0.3,
                   }}
                 >
-                  {interview.type}
+                  {interview.type ||
+                    "Online"}
                 </Typography>
               </Box>
 
-              {/* Action */}
+              {/* ACTION */}
+
               <Box
                 sx={{
                   display: "flex",
@@ -1485,6 +1435,7 @@ const InterviewList = ({
                     xs: "flex-start",
                     md: "flex-end",
                   },
+                  flexWrap: "wrap",
                 }}
               >
                 <Box
@@ -1499,7 +1450,8 @@ const InterviewList = ({
                     ),
                   }}
                 >
-                  {interview.status}
+                  {interview.status ||
+                    "Scheduled"}
                 </Box>
 
                 <Button
@@ -1535,87 +1487,6 @@ const InterviewList = ({
       )}
     </Box>
   );
-};
-
-/* =========================================================
-   STATIC HELPERS
-========================================================= */
-
-const formatDateStatic = (date) => {
-  if (!date) return "N/A";
-
-  return new Date(date).toLocaleDateString(
-    "en-IN",
-    {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }
-  );
-};
-
-const getDayStatic = (date) => {
-  if (!date) return "";
-
-  return new Date(date).toLocaleDateString(
-    "en-IN",
-    {
-      weekday: "long",
-    }
-  );
-};
-
-const getInitialsStatic = (name = "") => {
-  const words = name.trim().split(" ");
-
-  if (words.length >= 2) {
-    return (
-      words[0][0] +
-      words[words.length - 1][0]
-    ).toUpperCase();
-  }
-
-  return name.slice(0, 2).toUpperCase();
-};
-
-const getStatusStyleStatic = (status) => {
-  switch (status) {
-    case "Confirmed":
-      return {
-        bgcolor: "#052e1b",
-        color: "#4ade80",
-      };
-
-    case "Scheduled":
-      return {
-        bgcolor: "#172554",
-        color: "#60a5fa",
-      };
-
-    case "Pending":
-      return {
-        bgcolor: "#422006",
-        color: "#fbbf24",
-      };
-
-    case "Completed":
-      return {
-        bgcolor: "#052e1b",
-        color: "#4ade80",
-      };
-
-    case "Cancelled":
-      return {
-        bgcolor: "#3f1111",
-        color: "#f87171",
-      };
-
-    default:
-      return {
-        bgcolor: "#1e293b",
-        color: "#cbd5e1",
-      };
-  }
 };
 
 /* =========================================================
@@ -1683,6 +1554,83 @@ const InsightCard = ({
       >
         {subtitle}
       </Typography>
+    </Box>
+  );
+};
+
+/* =========================================================
+   INSIGHT LIST CARD
+========================================================= */
+
+const InsightListCard = ({
+  title,
+  items,
+  success = false,
+}) => {
+  return (
+    <Box
+      sx={{
+        p: 2.5,
+        borderRadius: 3,
+        bgcolor: "#0e1a2b",
+        border: "1px solid #24334a",
+      }}
+    >
+      <Typography
+        sx={{
+          color: "#94a3b8",
+          fontSize: 13,
+          mb: 2,
+        }}
+      >
+        {title}
+      </Typography>
+
+      {items.map((item) => (
+        <Box
+          key={item}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            mb: 1.2,
+          }}
+        >
+          {success ? (
+            <CheckCircleRoundedIcon
+              sx={{
+                fontSize: 17,
+                color: "#22c55e",
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: 17,
+                height: 17,
+                borderRadius: "50%",
+                bgcolor: "#422006",
+                color: "#f59e0b",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 11,
+                fontWeight: 700,
+              }}
+            >
+              !
+            </Box>
+          )}
+
+          <Typography
+            sx={{
+              fontSize: 13,
+            }}
+          >
+            {item}
+          </Typography>
+        </Box>
+      ))}
     </Box>
   );
 };

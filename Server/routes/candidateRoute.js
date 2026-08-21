@@ -6,19 +6,14 @@ import {
   getCandidateById,
   updateCandidate,
   updateCandidateStatus,
-  deleteCandidate,
-  createManualCandidate
+  deleteCandidate
 } from "../controllers/candidateController.js";
 
 import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post(
-  "/manual",
-  authMiddleware,
-  createManualCandidate
-);
+
 
 // Create candidate from application
 router.post("/", authMiddleware, createCandidate);
