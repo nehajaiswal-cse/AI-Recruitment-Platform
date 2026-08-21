@@ -45,6 +45,8 @@ import FindJobs from "./pages/applicant/jobs/FindJobs.jsx"
 import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx"
 import Apply from "./pages/applicant/jobs/apply.jsx"
 
+import Analytics from "./pages/recruiter/Analytics.jsx"
+
 
 
 export default function App() {
@@ -134,6 +136,8 @@ export default function App() {
 
           <Route path="/recruiter/jobs/:id"element={<ViewJob />}/>
           <Route path="*" element={<NotFound />} />
+
+          <Route path="/recruiter/analytics" element={<Analytics />} />
        
 
      
