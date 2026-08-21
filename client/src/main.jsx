@@ -19,29 +19,21 @@ ReactDOM.createRoot(
     <AuthContextProvider>
       <JobProvider>
         <CandidateProvider>
-          <InterviewProvider>
-            <BrowserRouter>
-              <ThemeModeProvider>
-               <AppTheme>
-                <App />
-              </AppTheme>
-          </ThemeModeProvider>
-          </BrowserRouter>
-          </InterviewProvider>
+          <ApplicationProvider>
+            <InterviewProvider>
+             <BrowserRouter>
+               <ThemeModeProvider>
+                 <AppTheme>
+                   <App />
+                 </AppTheme>
+               </ThemeModeProvider>
+             </BrowserRouter>
+            </InterviewProvider>
+          </ApplicationProvider>
+         
           
         </CandidateProvider>
-    </JobProvider>
-        <ApplicationProvider>
-          <BrowserRouter>
-            <ThemeModeProvider>
-              <AppTheme>
-                <App />
-              </AppTheme>
-            </ThemeModeProvider>
-          </BrowserRouter>
-        </ApplicationProvider>
       </JobProvider>
-
     </AuthContextProvider>
   </React.StrictMode>
 )
