@@ -1,29 +1,46 @@
+
 export const COLORS = {
-  navy: "#0F1F35",
-  navyDark: "#091729",
-  navyCard: "#142A45",
-  navyCardLight: "#1B344F",
+  // Brand colors — remain the same in both themes
   blue: "#3287F5",
   blueDark: "#2374DD",
   teal: "#67C8BC",
   tealDark: "#4FB5AA",
+  white: "#FFFFFF",
+
+  // These are kept for places where you still need static colors
+  navy: "#0F1F35",
+  navyDark: "#091729",
+  navyCard: "#142A45",
+  navyCardLight: "#1B344F",
+
   light: "#F5F8FB",
   lightBlue: "#EEF4F8",
   lightSection: "#EAF2F7",
   section: "#C9D9E6",
-  white: "#FFFFFF",
+
   textDark: "#10233D",
   text: "#304A61",
   muted: "#687D91",
   mutedLight: "#9FB2C7",
+
   border: "rgba(130,166,195,0.18)",
   track: "#2A435F",
-  cardGradient: "linear-gradient(145deg, #142A45 0%, #10233D 100%)",
-  stepGradient: "linear-gradient(145deg, #142A45 0%, #10223A 100%)",
+
+  // Kept for backward compatibility
+  cardGradient:
+    "linear-gradient(145deg, #142A45 0%, #10233D 100%)",
+
+  stepGradient:
+    "linear-gradient(145deg, #142A45 0%, #10223A 100%)",
 };
 
+
+// ======================================================
+// SECTION
+// ======================================================
+
 export const sectionSx = {
-  bgcolor: COLORS.section,
+  bgcolor: "background.default",
   py: 11,
 };
 
@@ -32,26 +49,38 @@ export const centeredHeaderSx = {
   mb: 7,
 };
 
+
+// ======================================================
+// BUTTONS
+// ======================================================
+
 export const primaryButtonSx = {
   bgcolor: COLORS.blue,
   color: COLORS.white,
   fontWeight: 700,
   borderRadius: "11px",
+
   "&:hover": {
     bgcolor: COLORS.blueDark,
   },
 };
 
 export const outlineButtonSx = {
-  color: COLORS.white,
-  borderColor: "rgba(132,168,199,0.42)",
+  color: "text.primary",
+  borderColor: "divider",
   fontWeight: 700,
   borderRadius: "11px",
+
   "&:hover": {
-    borderColor: "#7AA3CC",
-    bgcolor: "rgba(255,255,255,0.04)",
+    borderColor: COLORS.blue,
+    bgcolor: "action.hover",
   },
 };
+
+
+// ======================================================
+// COMMON
+// ======================================================
 
 export const flexCenter = {
   display: "flex",
@@ -59,12 +88,25 @@ export const flexCenter = {
   justifyContent: "center",
 };
 
+
+// ======================================================
+// CARDS
+// ======================================================
+
 export const darkCardBase = {
   position: "relative",
   overflow: "hidden",
-  background: COLORS.cardGradient,
-  border: "1px solid rgba(112,167,194,0.22)",
-  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+
+  // IMPORTANT:
+  // These now follow MUI theme
+  bgcolor: "background.paper",
+  color: "text.primary",
+
+  border: "1px solid",
+  borderColor: "divider",
+
+  transition:
+    "transform 0.3s ease, box-shadow 0.3s ease",
 };
 
 export const darkCardHover = {
@@ -72,6 +114,11 @@ export const darkCardHover = {
     transform: "translateY(-6px)",
   },
 };
+
+
+// ======================================================
+// ICON BOXES
+// ======================================================
 
 export const tealIconBox = {
   bgcolor: "rgba(103,200,188,0.12)",
@@ -85,10 +132,20 @@ export const blueIconBox = {
   ...flexCenter,
 };
 
+
+// ======================================================
+// SECTION CONTAINER
+// ======================================================
+
 export const sectionContainerSx = {
   position: "relative",
   zIndex: 1,
 };
+
+
+// ======================================================
+// SECTION LABEL
+// ======================================================
 
 export const sectionLabelSx = {
   color: COLORS.teal,

@@ -13,11 +13,14 @@ import {
   FiCpu,
 } from "react-icons/fi";
 
+import { Box, Typography, useTheme } from "@mui/material";
+
 import useAuth from "../../hooks/UseAuth";
 
 const LoginForm = ({ role = "applicant" }) => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const theme = useTheme();
 
   const isRecruiter = role === "recruiter";
 
@@ -97,146 +100,483 @@ const LoginForm = ({ role = "applicant" }) => {
   };
 
   return (
-    <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: "1200px",
+        mx: "auto",
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "1fr",
+          lg: "1fr 1fr",
+        },
+        gap: {
+          xs: 3,
+          lg: 6,
+        },
+        alignItems: "center",
+        px: {
+          xs: 2,
+          sm: 3,
+        },
+      }}
+    >
+      {/* =====================================================
+          LEFT SIDE
+      ====================================================== */}
+      <Box
+        sx={{
+          display: {
+            xs: "none",
+            lg: "block",
+          },
+          pr: 3,
+        }}
+      >
+        {/* AI PLATFORM BADGE */}
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 1,
+            px: 1.5,
+            py: 0.8,
+            borderRadius: 10,
+            bgcolor:
+              theme.palette.mode === "dark"
+                ? "rgba(59,130,246,0.10)"
+                : "rgba(59,130,246,0.08)",
+            border: "1px solid",
+            borderColor:
+              theme.palette.mode === "dark"
+                ? "rgba(59,130,246,0.30)"
+                : "rgba(59,130,246,0.25)",
+            color: theme.palette.primary.main,
+            fontSize: 14,
+            fontWeight: 500,
+          }}
+        >
+          <FiCpu
+            style={{
+              fontSize: "18px",
+            }}
+          />
 
-      {/* LEFT SIDE */}
-      <div className="lg:col-span-6 space-y-6 hidden lg:block pr-6">
+          <Typography
+            component="span"
+            sx={{
+              fontSize: 14,
+              fontWeight: 500,
+              color: theme.palette.primary.main,
+            }}
+          >
+            AI Recruitment Platform
+          </Typography>
+        </Box>
 
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-800 border border-gray-600 text-amber-300 text-sm font-medium">
-          <FiCpu className="text-base text-blue-400" />
-          AI Recruitment Platform
-        </div>
+        {/* TITLE */}
+        <Typography
+          component="h1"
+          sx={{
+            mt: 4,
+            fontSize: {
+              lg: "48px",
+              xl: "56px",
+            },
+            fontWeight: 800,
+            lineHeight: 1.1,
+            letterSpacing: "-1.5px",
+            color: "text.primary",
+          }}
+        >
+          Welcome back to
+        </Typography>
 
-        <h1 className="text-4xl xl:text-5xl font-extrabold tracking-tight leading-tight text-white">
-          Welcome back to{" "}
-          <br />
+        <Typography
+          component="div"
+          sx={{
+            fontSize: {
+              lg: "48px",
+              xl: "56px",
+            },
+            fontWeight: 800,
+            lineHeight: 1.1,
+            letterSpacing: "-1.5px",
+            background:
+              "linear-gradient(135deg, #3b82f6, #9333ea)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          Talvyn
+        </Typography>
 
-          <span className="bg-linear-to-br from-blue-400 via-purple-400 to-amber-300 bg-clip-text text-transparent">
-            Talvyn
-          </span>
-        </h1>
-
-        <p className="text-gray-300 text-lg leading-relaxed">
+        {/* DESCRIPTION */}
+        <Typography
+          sx={{
+            mt: 3,
+            maxWidth: 600,
+            fontSize: 18,
+            lineHeight: 1.7,
+            color: "text.secondary",
+          }}
+        >
           {isRecruiter
             ? "Manage candidates, create job openings, and use AI-powered candidate matching."
             : "Discover opportunities, improve your resume, and find jobs matched to your skills."}
-        </p>
+        </Typography>
 
-        {/* Feature 1 */}
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800 border border-gray-600 shadow-md">
-
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center shrink-0">
+        {/* =====================================================
+            FEATURE 1
+        ====================================================== */}
+        <Box
+          sx={{
+            mt: 4,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            p: 2,
+            borderRadius: 3,
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 8px 24px rgba(0,0,0,0.20)"
+                : "0 8px 24px rgba(15,23,42,0.08)",
+          }}
+        >
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              minWidth: 48,
+              borderRadius: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background:
+                "linear-gradient(135deg, #3b82f6, #9333ea)",
+              color: "#fff",
+            }}
+          >
             {isRecruiter ? (
-              <FiUserCheck className="text-xl" />
+              <FiUserCheck size={22} />
             ) : (
-              <FiBriefcase className="text-xl" />
+              <FiBriefcase size={22} />
             )}
-          </div>
+          </Box>
 
-          <div>
-            <h3 className="font-semibold text-white">
+          <Box>
+            <Typography
+              sx={{
+                fontSize: 17,
+                fontWeight: 600,
+                color: "text.primary",
+              }}
+            >
               {isRecruiter
                 ? "Smart Candidate Screening"
                 : "AI-Powered Job Matching"}
-            </h3>
+            </Typography>
 
-            <p className="text-sm text-gray-300">
+            <Typography
+              sx={{
+                mt: 0.3,
+                fontSize: 14,
+                color: "text.secondary",
+              }}
+            >
               {isRecruiter
                 ? "Analyze and rank candidates using AI"
                 : "Find opportunities based on your skills"}
-            </p>
-          </div>
-        </div>
+            </Typography>
+          </Box>
+        </Box>
 
-        {/* Feature 2 */}
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-800 border border-gray-600 shadow-md">
-
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center shrink-0">
+        {/* =====================================================
+            FEATURE 2
+        ====================================================== */}
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            p: 2,
+            borderRadius: 3,
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 8px 24px rgba(0,0,0,0.20)"
+                : "0 8px 24px rgba(15,23,42,0.08)",
+          }}
+        >
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              minWidth: 48,
+              borderRadius: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background:
+                "linear-gradient(135deg, #3b82f6, #9333ea)",
+              color: "#fff",
+            }}
+          >
             {isRecruiter ? (
-              <FiBriefcase className="text-xl" />
+              <FiBriefcase size={22} />
             ) : (
-              <FiUserCheck className="text-xl" />
+              <FiUserCheck size={22} />
             )}
-          </div>
+          </Box>
 
-          <div>
-            <h3 className="font-semibold text-white">
+          <Box>
+            <Typography
+              sx={{
+                fontSize: 17,
+                fontWeight: 600,
+                color: "text.primary",
+              }}
+            >
               {isRecruiter
                 ? "Recruitment Management"
                 : "Career Management"}
-            </h3>
+            </Typography>
 
-            <p className="text-sm text-gray-300">
+            <Typography
+              sx={{
+                mt: 0.3,
+                fontSize: 14,
+                color: "text.secondary",
+              }}
+            >
               {isRecruiter
                 ? "Manage jobs and application pipelines"
                 : "Track applications and improve your profile"}
-            </p>
-          </div>
-        </div>
-      </div>
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
 
-      {/* RIGHT SIDE */}
-      <div className="lg:col-span-6">
+      {/* =====================================================
+          RIGHT SIDE - LOGIN CARD
+      ====================================================== */}
+      <Box>
+        <Box
+          sx={{
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 3,
+            p: {
+              xs: 3,
+              sm: 4,
+            },
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 20px 50px rgba(0,0,0,0.30)"
+                : "0 20px 50px rgba(15,23,42,0.10)",
+          }}
+        >
+          {/* ROLE BADGE */}
+          <Box
+            sx={{
+              display: "inline-flex",
+              px: 1.5,
+              py: 0.6,
+              borderRadius: 10,
+              bgcolor:
+                theme.palette.mode === "dark"
+                  ? "rgba(59,130,246,0.12)"
+                  : "rgba(59,130,246,0.08)",
+              border: "1px solid",
+              borderColor:
+                theme.palette.mode === "dark"
+                  ? "rgba(59,130,246,0.35)"
+                  : "rgba(59,130,246,0.25)",
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: "primary.main",
+              }}
+            >
+              {isRecruiter ? "Recruiter" : "Applicant"}
+            </Typography>
+          </Box>
 
-        <div className="bg-gray-800 border-2 border-gray-600 rounded-2xl p-6 sm:p-8 shadow-2xl text-white">
-
-          <div className="mb-6">
-
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-300 border border-blue-500/30">
-                {isRecruiter ? "Recruiter" : "Applicant"}
-              </span>
-            </div>
-
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+          {/* HEADER */}
+          <Box sx={{ mt: 2 }}>
+            <Typography
+              component="h2"
+              sx={{
+                fontSize: {
+                  xs: 28,
+                  sm: 32,
+                },
+                fontWeight: 700,
+                color: "text.primary",
+              }}
+            >
               Sign In
-            </h2>
+            </Typography>
 
-            <p className="text-gray-300 text-sm mt-1">
+            <Typography
+              sx={{
+                mt: 0.5,
+                fontSize: 14,
+                color: "text.secondary",
+              }}
+            >
               {isRecruiter
                 ? "Sign in to manage your recruitment workspace."
                 : "Sign in to access your applicant dashboard."}
-            </p>
-          </div>
+            </Typography>
+          </Box>
 
-          {/* ERROR */}
+          {/* =====================================================
+              ERROR
+          ====================================================== */}
           {error && (
-            <div className="mb-5 p-4 rounded-xl bg-red-900/40 border border-red-500/50 text-red-200 text-sm flex items-start gap-3">
-              <FiAlertCircle className="text-lg shrink-0 mt-0.5 text-red-400" />
-              <span>{error}</span>
-            </div>
-          )}
+            <Box
+              sx={{
+                mt: 3,
+                p: 2,
+                borderRadius: 2,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 1.5,
+                bgcolor:
+                  theme.palette.mode === "dark"
+                    ? "rgba(239,68,68,0.12)"
+                    : "rgba(239,68,68,0.08)",
+                border: "1px solid",
+                borderColor:
+                  theme.palette.mode === "dark"
+                    ? "rgba(239,68,68,0.35)"
+                    : "rgba(239,68,68,0.25)",
+              }}
+            >
+              <FiAlertCircle
+                size={20}
+                style={{
+                  color: theme.palette.error.main,
+                  flexShrink: 0,
+                  marginTop: 2,
+                }}
+              />
 
-          {/* SUCCESS */}
-          {success && (
-            <div className="mb-5 p-4 rounded-xl bg-emerald-900/40 border border-emerald-500/50 text-emerald-200 text-sm flex items-start gap-3">
-              <FiCheckCircle className="text-lg shrink-0 mt-0.5 text-emerald-400" />
-              <span>{success}</span>
-            </div>
-          )}
-
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-5"
-            noValidate
-          >
-
-            {/* EMAIL */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2"
+              <Typography
+                sx={{
+                  fontSize: 14,
+                  color: theme.palette.error.main,
+                }}
               >
-                Email Address
-              </label>
+                {error}
+              </Typography>
+            </Box>
+          )}
 
-              <div className="relative">
+          {/* =====================================================
+              SUCCESS
+          ====================================================== */}
+          {success && (
+            <Box
+              sx={{
+                mt: 3,
+                p: 2,
+                borderRadius: 2,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 1.5,
+                bgcolor:
+                  theme.palette.mode === "dark"
+                    ? "rgba(16,185,129,0.12)"
+                    : "rgba(16,185,129,0.08)",
+                border: "1px solid",
+                borderColor:
+                  theme.palette.mode === "dark"
+                    ? "rgba(16,185,129,0.35)"
+                    : "rgba(16,185,129,0.25)",
+              }}
+            >
+              <FiCheckCircle
+                size={20}
+                style={{
+                  color: theme.palette.success.main,
+                  flexShrink: 0,
+                  marginTop: 2,
+                }}
+              />
 
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                  <FiMail className="text-lg" />
-                </div>
+              <Typography
+                sx={{
+                  fontSize: 14,
+                  color: theme.palette.success.main,
+                }}
+              >
+                {success}
+              </Typography>
+            </Box>
+          )}
 
-                <input
+          {/* =====================================================
+              FORM
+          ====================================================== */}
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{
+              mt: 3,
+            }}
+          >
+            {/* EMAIL */}
+            <Box sx={{ mb: 2.5 }}>
+              <Typography
+                component="label"
+                htmlFor="email"
+                sx={{
+                  display: "block",
+                  mb: 1,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  letterSpacing: "1px",
+                  color: "text.secondary",
+                }}
+              >
+                EMAIL ADDRESS
+              </Typography>
+
+              <Box
+                sx={{
+                  position: "relative",
+                }}
+              >
+                <Box
+                  sx={{
+                    position: "absolute",
+                    left: 14,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "text.secondary",
+                    zIndex: 1,
+                    display: "flex",
+                  }}
+                >
+                  <FiMail size={19} />
+                </Box>
+
+                <Box
+                  component="input"
                   id="email"
                   name="email"
                   type="email"
@@ -248,41 +588,97 @@ const LoginForm = ({ role = "applicant" }) => {
                       ? "hr@company.com"
                       : "you@example.com"
                   }
-                  className="w-full pl-11 pr-4 py-3 bg-gray-900 border border-gray-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 rounded-xl text-white placeholder-gray-400 transition outline-none"
-                />
+                  sx={{
+                    width: "100%",
+                    boxSizing: "border-box",
+                    height: 64,
+                    pl: 6,
+                    pr: 2,
+                    borderRadius: 2,
+                    outline: "none",
+                    fontSize: 16,
+                    fontFamily: "inherit",
+                    color: "text.primary",
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? "#182235"
+                        : "#f1f5f9",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    transition: "all 0.2s ease",
 
-              </div>
-            </div>
+                    "&::placeholder": {
+                      color: "text.secondary",
+                      opacity: 1,
+                    },
+
+                    "&:focus": {
+                      borderColor: "primary.main",
+                      boxShadow: `0 0 0 3px ${theme.palette.primary.main}20`,
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
 
             {/* PASSWORD */}
-            <div>
-
-              <div className="flex items-center justify-between mb-2">
-
-                <label
+            <Box sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 1,
+                }}
+              >
+                <Typography
+                  component="label"
                   htmlFor="password"
-                  className="block text-xs font-semibold uppercase tracking-wider text-gray-300"
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    letterSpacing: "1px",
+                    color: "text.secondary",
+                  }}
                 >
-                  Password
-                </label>
+                  PASSWORD
+                </Typography>
 
                 <Link
                   to="#"
                   onClick={(e) => e.preventDefault()}
-                  className="text-xs font-medium text-amber-300 hover:text-amber-200"
+                  style={{
+                    color: theme.palette.warning.main,
+                    textDecoration: "none",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                  }}
                 >
                   Forgot password?
                 </Link>
+              </Box>
 
-              </div>
+              <Box
+                sx={{
+                  position: "relative",
+                }}
+              >
+                <Box
+                  sx={{
+                    position: "absolute",
+                    left: 14,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "text.secondary",
+                    zIndex: 1,
+                    display: "flex",
+                  }}
+                >
+                  <FiLock size={19} />
+                </Box>
 
-              <div className="relative">
-
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                  <FiLock className="text-lg" />
-                </div>
-
-                <input
+                <Box
+                  component="input"
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
@@ -290,48 +686,171 @@ const LoginForm = ({ role = "applicant" }) => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-11 py-3 bg-gray-900 border border-gray-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 rounded-xl text-white placeholder-gray-400 transition outline-none"
+                  sx={{
+                    width: "100%",
+                    boxSizing: "border-box",
+                    height: 64,
+                    pl: 6,
+                    pr: 6,
+                    borderRadius: 2,
+                    outline: "none",
+                    fontSize: 16,
+                    fontFamily: "inherit",
+                    color: "text.primary",
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? "#182235"
+                        : "#f1f5f9",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    transition: "all 0.2s ease",
+
+                    "&::placeholder": {
+                      color: "text.secondary",
+                      opacity: 1,
+                    },
+
+                    "&:focus": {
+                      borderColor: "primary.main",
+                      boxShadow: `0 0 0 3px ${theme.palette.primary.main}20`,
+                    },
+                  }}
                 />
 
-                <button
+                {/* SHOW / HIDE PASSWORD */}
+                <Box
+                  component="button"
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-amber-300"
+                  onClick={() =>
+                    setShowPassword((prev) => !prev)
+                  }
+                  sx={{
+                    position: "absolute",
+                    right: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    border: 0,
+                    bgcolor: "transparent",
+                    color: "text.secondary",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 0.5,
+
+                    "&:hover": {
+                      color: "primary.main",
+                    },
+                  }}
                 >
                   {showPassword ? (
-                    <FiEyeOff className="text-lg" />
+                    <FiEyeOff size={20} />
                   ) : (
-                    <FiEye className="text-lg" />
+                    <FiEye size={20} />
                   )}
-                </button>
+                </Box>
+              </Box>
+            </Box>
 
-              </div>
-            </div>
-
-            {/* SUBMIT */}
-            <button
+            {/* =====================================================
+                SUBMIT BUTTON
+            ====================================================== */}
+            <Box
+              component="button"
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+              sx={{
+                width: "100%",
+                height: 64,
+                border: 0,
+                borderRadius: 2,
+                background:
+                  "linear-gradient(90deg, #3b82f6, #9333ea)",
+                color: "#fff",
+                fontSize: 17,
+                fontWeight: 600,
+                fontFamily: "inherit",
+                cursor: loading ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+                opacity: loading ? 0.55 : 1,
+                transition: "all 0.2s ease",
+                boxShadow:
+                  "0 8px 20px rgba(59,130,246,0.20)",
 
+                "&:hover": {
+                  opacity: loading ? 0.55 : 0.92,
+                  transform: loading
+                    ? "none"
+                    : "translateY(-1px)",
+                  boxShadow:
+                    "0 10px 24px rgba(59,130,246,0.28)",
+                },
+
+                "&:disabled": {
+                  cursor: "not-allowed",
+                },
+              }}
+            >
               {loading ? (
-                <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <Box
+                  sx={{
+                    width: 20,
+                    height: 20,
+                    border: "2px solid rgba(255,255,255,0.3)",
+                    borderTopColor: "#fff",
+                    borderRadius: "50%",
+                    animation: "loginSpin 0.8s linear infinite",
+
+                    "@keyframes loginSpin": {
+                      from: {
+                        transform: "rotate(0deg)",
+                      },
+                      to: {
+                        transform: "rotate(360deg)",
+                      },
+                    },
+                  }}
+                />
               ) : (
                 <>
-                  <span>Sign In</span>
-                  <FiArrowRight className="text-lg" />
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: "#fff",
+                      fontSize: 17,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Sign In
+                  </Typography>
+
+                  <FiArrowRight size={20} />
                 </>
               )}
+            </Box>
+          </Box>
 
-            </button>
-
-          </form>
-
-          {/* REGISTER */}
-          <div className="mt-6 text-center text-sm text-gray-300">
-
-            Don't have an account?{" "}
+          {/* =====================================================
+              REGISTER
+          ====================================================== */}
+          <Box
+            sx={{
+              mt: 3,
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              component="span"
+              sx={{
+                fontSize: 14,
+                color: "text.secondary",
+              }}
+            >
+              Don't have an account?{" "}
+            </Typography>
 
             <Link
               to={
@@ -339,18 +858,27 @@ const LoginForm = ({ role = "applicant" }) => {
                   ? "/recruiter/register"
                   : "/applicant/register"
               }
-              className="font-semibold text-amber-300 hover:text-amber-200 underline underline-offset-4"
+              style={{
+                color: theme.palette.warning.main,
+                fontSize: "14px",
+                fontWeight: 600,
+                textDecoration: "underline",
+                textUnderlineOffset: "4px",
+              }}
             >
               Create account
             </Link>
-
-          </div>
-
-        </div>
-
-      </div>
-    </div>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
 export default LoginForm;
+
+
+
+
+
+
