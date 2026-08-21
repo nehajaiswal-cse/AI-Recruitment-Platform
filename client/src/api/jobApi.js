@@ -1,5 +1,12 @@
 import api from "./api";
 
+// Get all jobs for applicant - Find Jobs
+export const getAllJobs = async () => {
+  const response = await api.get("/jobs");
+
+  return response.data;
+};
+
 // Get all jobs created by logged-in recruiter
 export const getMyJobs = async () => {
   const response = await api.get("/jobs/my-jobs");

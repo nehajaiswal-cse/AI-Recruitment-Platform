@@ -1,5 +1,27 @@
 import "./index.css";
 import { Routes, Route } from "react-router-dom";
+//import React from 'react'
+
+import './index.css';
+import {Routes, Route} from 'react-router-dom';
+import ADashboard from './pages/applicant/Dashboard';
+import RDashboard from './pages/recruiter/Dashboard';
+import NotFound from './pages/NotFound';
+import Home from './pages/Home';
+import ApplicantRegister from './pages/applicant/ApplicantRegister';
+import ApplicantLogin from './pages/applicant/ApplicantLogin';
+import RecruiterLogin from './pages/recruiter/RecruiterLogin';
+import RecruiterRegister from './pages/recruiter/RecruiterRegister';
+import ProtectedRoute from './components/dashboard/ProtectedRoute.jsx';
+import ApplicantProfile from './pages/applicant/Profile';
+import RecruiterProfile from './pages/recruiter/Profile';
+import Jobs from "./pages/recruiter/jobs/Jobs.jsx"
+import CreateJob from "./pages/recruiter/jobs/createJob.jsx"
+import EditJob from "./pages/recruiter/jobs/editJob.jsx"
+import ViewJob from "./pages/recruiter/jobs/ViewJob.jsx"
+import FindJobs from "./pages/applicant/jobs/FindJobs.jsx"
+import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx"
+import Apply from "./pages/applicant/jobs/apply.jsx"
 
 // Dashboards
 import ADashboard from "./pages/applicant/Dashboard";
@@ -105,6 +127,17 @@ export default function App() {
             path="/recruiter/candidates"
             element={<Candidates />}
           />
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant/jobs" element={<FindJobs />} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant/jobs/:jobId" element={<ApplicantviewJob />} />
+        </Route>  
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant/jobs/:jobId/apply" element={<Apply />} />
+        </Route>
+
+      </Routes>
 
           <Route path="/recruiter/jobs" element={<Jobs />} />
 
