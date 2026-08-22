@@ -65,27 +65,6 @@ export const getprofile = async () => {
 };
 
 
-// export const loginUser = async (formData) => {
-//   try {
-//     const response = await api.post("/auth/login", formData);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Login error:", error);
-
-//     throw new Error(
-//       error.response?.data?.message ||
-//       error.response?.data?.error ||
-//       "Login failed. Please try again."
-//     );
-//   }
-// };
-
-// export const registerUser = async (formData) => {
-//   try {
-//     const response = await api.post("/auth/register", formData);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Registration error:", error);
 
 //     throw new Error(
 //       error.response?.data?.message ||

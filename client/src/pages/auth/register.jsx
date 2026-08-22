@@ -1,5 +1,21 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+import {
+  Alert,
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  FormControlLabel,
+  IconButton,
+  InputAdornment,
+  Paper,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
+
 import {
   FiUser,
   FiMail,
@@ -7,8 +23,6 @@ import {
   FiEye,
   FiEyeOff,
   FiArrowRight,
-  FiAlertCircle,
-  FiCheckCircle,
   FiBriefcase,
   FiUserCheck,
   FiCheck,
@@ -16,8 +30,12 @@ import {
 
 import useAuth from "../../hooks/UseAuth";
 
+import { brandGradient } from "../../theme";
+
 const RegisterForm = ({ role = "applicant" }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
+
   const { register } = useAuth();
 
   const isRecruiter = role === "recruiter";
@@ -119,308 +137,571 @@ const RegisterForm = ({ role = "applicant" }) => {
     }
   };
 
+  const inputSx = {
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: theme.palette.background.surface,
+
+      "& fieldset": {
+        borderColor: theme.palette.divider,
+      },
+
+      "&:hover fieldset": {
+        borderColor: theme.palette.primary.main,
+      },
+
+      "&.Mui-focused fieldset": {
+        borderColor: theme.palette.primary.main,
+        borderWidth: 2,
+      },
+    },
+
+    "& .MuiInputBase-input": {
+      color: theme.palette.text.primary,
+    },
+
+    "& .MuiInputBase-input::placeholder": {
+      color: theme.palette.text.secondary,
+      opacity: 1,
+    },
+
+    "& .MuiInputAdornment-root": {
+      color: theme.palette.text.secondary,
+    },
+  };
+
   return (
-    <div className="w-full max-w-2xl">
-
-      <div className="bg-gray-800 border-2 border-gray-600 rounded-2xl p-6 sm:p-8 shadow-2xl text-white">
-
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 800,
+      }}
+    >
+      <Paper
+        elevation={6}
+        sx={{
+          p: { xs: 3, sm: 4 },
+          borderRadius: 3,
+          backgroundColor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
+          color: theme.palette.text.primary,
+        }}
+      >
         {/* HEADER */}
-        <div className="text-center mb-8">
-
-          <div className="flex justify-center mb-3">
-
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-300 border border-blue-500/30">
+        <Box
+          sx={{
+            textAlign: "center",
+            mb: 4,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              mb: 1.5,
+            }}
+          >
+            <Box
+              sx={{
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 5,
+                backgroundColor: "rgba(59, 130, 246, 0.1)",
+                color: "#60a5fa",
+                border: "1px solid rgba(59, 130, 246, 0.3)",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+              }}
+            >
               {isRecruiter
                 ? "Recruiter Account"
                 : "Applicant Account"}
-            </span>
+            </Box>
+          </Box>
 
-          </div>
-
-          <h2 className="text-3xl font-extrabold text-white">
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              color: theme.palette.text.primary,
+              fontSize: {
+                xs: "1.8rem",
+                sm: "2.125rem",
+              },
+            }}
+          >
             Create Your Account
-          </h2>
+          </Typography>
 
-          <p className="text-gray-300 text-sm mt-1">
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 0.5,
+              color: theme.palette.text.secondary,
+            }}
+          >
             {isRecruiter
               ? "Create your recruiter workspace and start finding great candidates."
               : "Create your applicant account and discover opportunities."}
-          </p>
-
-        </div>
+          </Typography>
+        </Box>
 
         {/* ROLE INFORMATION */}
-        <div className="mb-6 p-4 rounded-xl bg-gray-900 border border-gray-600 flex items-center gap-4">
-
-          <div className="p-3 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
-
+        <Box
+          sx={{
+            mb: 3,
+            p: 2,
+            borderRadius: 3,
+            backgroundColor:
+              theme.palette.background.surface,
+            border: `1px solid ${theme.palette.divider}`,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Box
+            sx={{
+              p: 1.5,
+              borderRadius: 2,
+              background: brandGradient,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
             {isRecruiter ? (
-              <FiBriefcase className="text-xl text-white" />
+              <FiBriefcase
+                style={{
+                  fontSize: "20px",
+                  color: "#fff",
+                }}
+              />
             ) : (
-              <FiUserCheck className="text-xl text-white" />
+              <FiUserCheck
+                style={{
+                  fontSize: "20px",
+                  color: "#fff",
+                }}
+              />
             )}
+          </Box>
 
-          </div>
-
-          <div>
-
-            <h3 className="font-semibold text-white">
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 600,
+                color: theme.palette.text.primary,
+              }}
+            >
               {isRecruiter
                 ? "Recruiter / Employer"
                 : "Job Applicant"}
-            </h3>
+            </Typography>
 
-            <p className="text-xs text-gray-400 mt-1">
+            <Typography
+              variant="caption"
+              sx={{
+                color: theme.palette.text.secondary,
+                display: "block",
+                mt: 0.5,
+              }}
+            >
               {isRecruiter
                 ? "Post jobs and find candidates using AI."
                 : "Apply for jobs and get AI-powered career insights."}
-            </p>
+            </Typography>
+          </Box>
 
-          </div>
-
-          <div className="ml-auto w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center">
-            <FiCheck />
-          </div>
-
-        </div>
+          <Box
+            sx={{
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              backgroundColor:
+                theme.palette.success.main,
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <FiCheck size={16} />
+          </Box>
+        </Box>
 
         {/* ERROR */}
         {error && (
-          <div className="mb-5 p-4 rounded-xl bg-red-900/40 border border-red-500/50 text-red-200 text-sm flex items-start gap-3">
-
-            <FiAlertCircle className="text-lg shrink-0 mt-0.5 text-red-400" />
-
-            <span>{error}</span>
-
-          </div>
+          <Alert
+            severity="error"
+            sx={{
+              mb: 2.5,
+              borderRadius: 2,
+            }}
+          >
+            {error}
+          </Alert>
         )}
 
         {/* SUCCESS */}
         {success && (
-          <div className="mb-5 p-4 rounded-xl bg-emerald-900/40 border border-emerald-500/50 text-emerald-200 text-sm flex items-start gap-3">
-
-            <FiCheckCircle className="text-lg shrink-0 mt-0.5 text-emerald-400" />
-
-            <span>{success}</span>
-
-          </div>
+          <Alert
+            severity="success"
+            sx={{
+              mb: 2.5,
+              borderRadius: 2,
+            }}
+          >
+            {success}
+          </Alert>
         )}
 
-        <form
+        {/* FORM */}
+        <Box
+          component="form"
           onSubmit={handleSubmit}
-          className="space-y-4"
           noValidate
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
         >
-
           {/* NAME */}
-          <div>
-
-            <label
+          <Box>
+            <Typography
+              component="label"
               htmlFor="name"
-              className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-1.5"
+              sx={{
+                display: "block",
+                mb: 0.75,
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: theme.palette.text.secondary,
+              }}
             >
               Full Name
-            </label>
+            </Typography>
 
-            <div className="relative">
-
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                <FiUser className="text-lg" />
-              </div>
-
-              <input
-                id="name"
-                name="name"
-                type="text"
-                autoComplete="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder={
-                  isRecruiter
-                    ? "Recruiter Name"
-                    : "Alex Morgan"
-                }
-                className="w-full pl-11 pr-4 py-3 bg-gray-900 border border-gray-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 rounded-xl text-white placeholder-gray-400 transition outline-none"
-              />
-
-            </div>
-
-          </div>
+            <TextField
+              fullWidth
+              id="name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder={
+                isRecruiter
+                  ? "Recruiter Name"
+                  : "Alex Morgan"
+              }
+              sx={inputSx}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FiUser />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
 
           {/* EMAIL */}
-          <div>
-
-            <label
+          <Box>
+            <Typography
+              component="label"
               htmlFor="email"
-              className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-1.5"
+              sx={{
+                display: "block",
+                mb: 0.75,
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: theme.palette.text.secondary,
+              }}
             >
               Email Address
-            </label>
+            </Typography>
 
-            <div className="relative">
-
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                <FiMail className="text-lg" />
-              </div>
-
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder={
-                  isRecruiter
-                    ? "hr@company.com"
-                    : "you@example.com"
-                }
-                className="w-full pl-11 pr-4 py-3 bg-gray-900 border border-gray-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 rounded-xl text-white placeholder-gray-400 transition outline-none"
-              />
-
-            </div>
-
-          </div>
+            <TextField
+              fullWidth
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder={
+                isRecruiter
+                  ? "hr@company.com"
+                  : "you@example.com"
+              }
+              sx={inputSx}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FiMail />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
 
           {/* PASSWORDS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "1fr 1fr",
+              },
+              gap: 2,
+            }}
+          >
             {/* PASSWORD */}
-            <div>
-
-              <label
+            <Box>
+              <Typography
+                component="label"
                 htmlFor="password"
-                className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-1.5"
+                sx={{
+                  display: "block",
+                  mb: 0.75,
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: theme.palette.text.secondary,
+                }}
               >
                 Password
-              </label>
+              </Typography>
 
-              <div className="relative">
+              <TextField
+                fullWidth
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                sx={inputSx}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FiLock />
+                    </InputAdornment>
+                  ),
 
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                  <FiLock className="text-lg" />
-                </div>
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        type="button"
+                        onClick={() =>
+                          setShowPassword(
+                            (prev) => !prev
+                          )
+                        }
+                        edge="end"
+                        sx={{
+                          color:
+                            theme.palette.text.secondary,
 
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full pl-11 pr-11 py-3 bg-gray-900 border border-gray-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 rounded-xl text-white placeholder-gray-400 transition outline-none"
-                />
+                          "&:hover": {
+                            color:
+                              theme.palette.primary.main,
+                          },
+                        }}
+                      >
+                        {showPassword ? (
+                          <FiEyeOff />
+                        ) : (
+                          <FiEye />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowPassword((prev) => !prev)
-                  }
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-amber-300"
-                >
-                  {showPassword ? (
-                    <FiEyeOff />
-                  ) : (
-                    <FiEye />
-                  )}
-                </button>
-
-              </div>
-
-            </div>
-
-            {/* CONFIRM */}
-            <div>
-
-              <label
+            {/* CONFIRM PASSWORD */}
+            <Box>
+              <Typography
+                component="label"
                 htmlFor="confirmPassword"
-                className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-1.5"
+                sx={{
+                  display: "block",
+                  mb: 0.75,
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: theme.palette.text.secondary,
+                }}
               >
                 Confirm Password
-              </label>
+              </Typography>
 
-              <div className="relative">
+              <TextField
+                fullWidth
+                id="confirmPassword"
+                name="confirmPassword"
+                type={
+                  showConfirmPassword
+                    ? "text"
+                    : "password"
+                }
+                autoComplete="new-password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="••••••••"
+                sx={inputSx}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FiLock />
+                    </InputAdornment>
+                  ),
 
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                  <FiLock className="text-lg" />
-                </div>
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(
+                            (prev) => !prev
+                          )
+                        }
+                        edge="end"
+                        sx={{
+                          color:
+                            theme.palette.text.secondary,
 
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={
-                    showConfirmPassword
-                      ? "text"
-                      : "password"
-                  }
-                  autoComplete="new-password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full pl-11 pr-11 py-3 bg-gray-900 border border-gray-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 rounded-xl text-white placeholder-gray-400 transition outline-none"
-                />
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowConfirmPassword((prev) => !prev)
-                  }
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-amber-300"
-                >
-                  {showConfirmPassword ? (
-                    <FiEyeOff />
-                  ) : (
-                    <FiEye />
-                  )}
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
+                          "&:hover": {
+                            color:
+                              theme.palette.primary.main,
+                          },
+                        }}
+                      >
+                        {showConfirmPassword ? (
+                          <FiEyeOff />
+                        ) : (
+                          <FiEye />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+          </Box>
 
           {/* TERMS */}
-          <div className="flex items-center gap-3 pt-2">
+          <FormControlLabel
+            sx={{
+              mt: 0.5,
+              alignItems: "flex-start",
+              "& .MuiFormControlLabel-label": {
+                mt: 0.5,
+              },
+            }}
+            control={
+              <Checkbox
+                id="agreeTerms"
+                checked={agreeTerms}
+                onChange={(e) =>
+                  setAgreeTerms(e.target.checked)
+                }
+                sx={{
+                  color: theme.palette.text.secondary,
 
-            <input
-              id="agreeTerms"
-              type="checkbox"
-              checked={agreeTerms}
-              onChange={(e) =>
-                setAgreeTerms(e.target.checked)
-              }
-              className="w-4 h-4 accent-amber-400 cursor-pointer"
-            />
-
-            <label
-              htmlFor="agreeTerms"
-              className="text-xs text-gray-300 cursor-pointer"
-            >
-              I agree to the{" "}
-              <span className="text-amber-300">
-                Terms of Service
-              </span>{" "}
-              and{" "}
-              <span className="text-amber-300">
-                Privacy Policy
-              </span>
-            </label>
-
-          </div>
+                  "&.Mui-checked": {
+                    color: theme.palette.warning.main,
+                  },
+                }}
+              />
+            }
+            label={
+              <Typography
+                variant="caption"
+                sx={{
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                I agree to the{" "}
+                <Box
+                  component="span"
+                  sx={{
+                    color: theme.palette.warning.light,
+                  }}
+                >
+                  Terms of Service
+                </Box>{" "}
+                and{" "}
+                <Box
+                  component="span"
+                  sx={{
+                    color: theme.palette.warning.light,
+                  }}
+                >
+                  Privacy Policy
+                </Box>
+              </Typography>
+            }
+          />
 
           {/* SUBMIT */}
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
-          >
+            fullWidth
+            variant="contained"
+            sx={{
+              mt: 1,
+              py: 1.5,
+              borderRadius: 2,
+              background: brandGradient,
+              color: "#fff",
+              fontWeight: 600,
+              fontSize: "0.95rem",
+              boxShadow: 3,
 
+              "&:hover": {
+                background: brandGradient,
+                opacity: 0.9,
+                boxShadow: 5,
+              },
+
+              "&.Mui-disabled": {
+                background: brandGradient,
+                color: "#fff",
+                opacity: 0.5,
+              },
+            }}
+          >
             {loading ? (
-              <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <CircularProgress
+                size={22}
+                sx={{
+                  color: "#fff",
+                }}
+              />
             ) : (
-              <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 1,
+                }}
+              >
                 <span>
                   Create{" "}
                   {isRecruiter
@@ -430,33 +711,54 @@ const RegisterForm = ({ role = "applicant" }) => {
                 </span>
 
                 <FiArrowRight />
-              </>
+              </Box>
             )}
-
-          </button>
-
-        </form>
+          </Button>
+        </Box>
 
         {/* LOGIN LINK */}
-        <div className="mt-6 text-center text-sm text-gray-300 pt-4 border-t border-gray-600">
+        <Box
+          sx={{
+            mt: 3,
+            pt: 2,
+            textAlign: "center",
+            borderTop: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography
+            component="span"
+            variant="body2"
+            sx={{
+              color: theme.palette.text.secondary,
+            }}
+          >
+            Already have an account?{" "}
+          </Typography>
 
-          Already have an account?{" "}
-
-          <Link
+          <Box
+            component={Link}
             to={
               isRecruiter
                 ? "/recruiter/login"
                 : "/applicant/login"
             }
-            className="font-semibold text-amber-300 hover:text-amber-200 underline underline-offset-4"
+            sx={{
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              color: theme.palette.warning.light,
+              textDecoration: "underline",
+              textUnderlineOffset: "4px",
+
+              "&:hover": {
+                color: theme.palette.warning.main,
+              },
+            }}
           >
             Sign in
-          </Link>
-
-        </div>
-
-      </div>
-    </div>
+          </Box>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
