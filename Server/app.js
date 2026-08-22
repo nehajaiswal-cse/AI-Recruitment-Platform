@@ -4,6 +4,7 @@ import authRoutes from "./routes/authRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 import Candidate from "./routes/candidateRoute.js";
 import interview from "./routes/interviewRoutes.js"
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use("/api", protectedRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
+app.use("/api/analytics", analyticsRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/candidates",Candidate)
 app.use("/api/interviews",interview)

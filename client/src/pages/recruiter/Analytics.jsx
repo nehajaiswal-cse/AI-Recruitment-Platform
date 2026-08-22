@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { getRecruiterAnalytics } from '../../api/analyticsApi';
 import {
   Box,
 
@@ -14,15 +16,33 @@ import AIMatchDistribution from '../../components/analytics/AIMatchDistribution'
 import JobPerformance from '../../components/analytics/JobPerformance';
 
 import {
-  summaryStats,
-  applicationTrend,
+  //summaryStats,
+  //applicationTrend,
   candidatePipeline,
   aiMatchDistribution,
   jobPerformance,
 } from '../../data/analyticsData';
 
 function Analytics() {
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await getRecruiterAnalytics();
+        setAnalytics(response.data);
+      } catch (error) {
+        console.error(
+          'ANALYTICS API ERROR:',
+          error.response?.data || error.message
+        );
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
   return (
+
     <Box
       sx={{
         minHeight: '100vh',
@@ -60,73 +80,118 @@ function Analytics() {
             minWidth: 0,
             bgcolor: 'background.default',
             color: 'text.primary',
-            p:5,
-            
-            
+            p: 5,
+
+
           }}
-          
-           
+
+
         >
-        
 
-            {/* Page Header */}
-            <Box sx={{ mb: 4 }}>
-              <Typography
-                variant="h4"
-                sx={{
-                  fontWeight: 700,
-                  mb: 0.5,
-                }}
-              >
-                Analytics
-              </Typography>
 
-              <Typography
-                variant="body1"
-                color="text.secondary"
-              >
-                Track recruitment performance and hiring outcomes
-              </Typography>
-            </Box>
-
-            {/* Summary Cards */}
-            <Box sx={{ mb: 4 }}>
-              <StatCards stats={summaryStats} />
-            </Box>
-
-            {/* Application Overview + AI Matching */}
-            <Box
+          {/* Page Header */}
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="h4"
               sx={{
-                display: 'grid',
-                gridTemplateColumns: {
-                  xs: '1fr',
-                  lg: '2fr 1fr',
-                },
-                gap: 3,
-                mb: 3,
+                fontWeight: 700,
+                mb: 0.5,
               }}
             >
-              <ApplicationOverview
-                data={applicationTrend}
-              />
+              Analytics
+            </Typography>
 
-              <AIMatchDistribution
-                data={aiMatchDistribution}
-              />
-            </Box>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+            >
+              Track recruitment performance and hiring outcomes
+            </Typography>
+          </Box>
 
-            {/* Candidate Pipeline */}
-            <Box sx={{ mb: 3 }}>
-              <CandidatePipeline
-                data={candidatePipeline}
-              />
-            </Box>
-
-            {/* Job Performance */}
-            <JobPerformance
-              data={jobPerformance}
+          {/* Summary Cards */}
+          <Box sx={{ mb: 4 }}>
+            <StatCards
+              stats={
+                analytics
+                  ? [
+                    {
+                      id: 1,
+                      label: 'Total Jobs',
+                      value: analytics.totalJobs,
+                      color: '#7c3aed',
+                      icon: 'work',
+                    },
+                    {
+                      id: 2,
+                      label: 'Applications',
+                      value: analytics.totalApplications,
+                      color: '#2563eb',
+                      icon: 'assignment',
+                    },
+                    {
+                      id: 3,
+                      label: 'Shortlisted',
+                      value: analytics.shortlisted,
+                      color: '#f59e0b',
+                      icon: 'playlist_add_check',
+                    },
+                    {
+                      id: 4,
+                      label: 'Hired',
+                      value: analytics.hired,
+                      color: '#16a34a',
+                      icon: 'workspace_premium',
+                    },
+                    {
+                      id: 5,
+                      label: 'Rejected',
+                      value: analytics.rejected,
+                      color: '#dc2626',
+                      icon: 'groups',
+                    },
+                  ]
+                  : []
+              }
             />
-         
+          </Box>
+
+          {/* Application Overview + AI Matching */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                lg: '2fr 1fr',
+              },
+              gap: 3,
+              mb: 3,
+            }}
+          >
+            {/* <ApplicationOverview
+              data={applicationTrend}
+            /> */}
+            <ApplicationOverview
+              data={analytics?.applicationTrend || []}
+            />
+
+            <AIMatchDistribution
+              data={aiMatchDistribution}
+            />
+          </Box>
+
+          {/* Candidate Pipeline */}
+          <Box sx={{ mb: 3 }}>
+            <CandidatePipeline
+              data={candidatePipeline}
+            />
+          </Box>
+
+          {/* Job Performance */}
+          <JobPerformance
+            data={jobPerformance}
+          />
+
         </Box>
       </Box>
     </Box>
