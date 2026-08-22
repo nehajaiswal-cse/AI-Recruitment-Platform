@@ -2,7 +2,7 @@
 import "./index.css";
 import { Routes, Route } from "react-router-dom";
 
-import { ApplicationProvider } from "./context/ApplicationProvider";
+//import { ApplicationProvider } from "./context/ApplicationProvider";
 
 import ADashboard from "./pages/applicant/Dashboard";
 import ApplicantRegister from "./pages/applicant/ApplicantRegister";
@@ -30,7 +30,7 @@ import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
-    <ApplicationProvider>
+    //<ApplicationProvider>
       <div>
         <Routes>
 
@@ -143,7 +143,7 @@ export default function App() {
 
         </Routes>
       </div>
-    </ApplicationProvider>
+    //</ApplicationProvider>
   );
 }
 
