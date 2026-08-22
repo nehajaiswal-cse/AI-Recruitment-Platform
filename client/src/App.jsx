@@ -58,6 +58,7 @@ export default function App() {
             element={<RecruiterLogin />}
           />
 
+    
 
           {/* ================= APPLICANT ROUTES ================= */}
 
