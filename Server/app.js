@@ -4,12 +4,9 @@ import authRoutes from "./routes/authRoutes.js";
 import protectedRoutes from "./routes/protectedRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
-<<<<<<< HEAD
 import analyticsRoutes from "./routes/analyticsRoutes.js";
-=======
 import Candidate from "./routes/candidateRoute.js";
 import interview from "./routes/interviewRoutes.js"
->>>>>>> b8c5bf8ad30541bff2b542a2187e5b59206c0951
 
 const app = express();
 
