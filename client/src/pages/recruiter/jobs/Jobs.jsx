@@ -44,7 +44,7 @@ const Jobs = () => {
     loading,
     error,
     fetchMyJobs,
-    deleteJob,
+    removeJob,
   } = useJob();
 
   const [search, setSearch] = useState("");
@@ -110,7 +110,7 @@ const Jobs = () => {
     if (!selectedJob?._id) return;
 
     try {
-      await deleteJob(selectedJob._id);
+      await removeJob(selectedJob._id);
       handleMenuClose();
       await fetchMyJobs();
     } catch (err) {
