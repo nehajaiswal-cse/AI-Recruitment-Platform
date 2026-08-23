@@ -14,6 +14,7 @@ import RecruiterLogin from "./pages/recruiter/RecruiterLogin";
 import RecruiterRegister from "./pages/recruiter/RecruiterRegister";
 import RecruiterProfile from "./pages/recruiter/Profile";
 import Analytics from "./pages/recruiter/Analytics";
+import Candidates from "./pages/recruiter/Candidates";
 
 import Jobs from "./pages/recruiter/jobs/Jobs.jsx";
 import CreateJob from "./pages/recruiter/jobs/createJob.jsx";
@@ -106,7 +107,11 @@ export default function App() {
               path="/recruiter/analytics"
               element={<Analytics />}
             />
-
+            <Route 
+              path="/recruiter/candidates" 
+              element={<Candidates />} 
+            />
+            
             <Route
               path="/recruiter/jobs"
               element={<Jobs />}

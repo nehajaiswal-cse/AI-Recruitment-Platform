@@ -1,6 +1,5 @@
 import Application from "../models/applications.js";
 import Job from "../models/job.js";
-import Candidate from "../models/candidate.js";
 
 const applyForJob = async (req, res) => {
   try {
@@ -41,17 +40,9 @@ const applyForJob = async (req, res) => {
       coverLetter
     });
 
-    const candidate = await Candidate.create({
-      applicationId: application._id,
-      applicantId: req.user.id,
-      jobId: job._id,
-      recruiterId: job.recruiterId,
-      status: "applied"
-    });
-
     res.status(201).json({
       message: "Application submitted successfully",
-      application,candidate
+      application
     });
 
   } catch (error) {

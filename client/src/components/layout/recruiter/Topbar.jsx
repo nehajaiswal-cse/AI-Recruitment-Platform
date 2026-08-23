@@ -30,6 +30,13 @@ export default function RTopbar() {
       md: 2,
     },
 
+    pb: 2,
+
+    bgcolor: 'background.surface',
+    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+    position: 'relative',
+    zIndex: 1,
+
     mb: 3,
   }}
 >
@@ -69,8 +76,3 @@ export default function RTopbar() {
     </Box>
   )
 }
-
-
-
-
-

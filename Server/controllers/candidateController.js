@@ -1,4 +1,4 @@
-import Candidate from "../models/Candidate.js";
+import Candidate from "../models/candidate.js";
 import Application from "../models/applications.js";
 import Job from "../models/job.js";
 
@@ -166,7 +166,7 @@ export const getCandidateById = async (req, res) => {
 
     const candidate = await Candidate.findOne({
       _id: id,
-      recruiterId: req.user._id
+      recruiterId: req.user.id
     })
       .populate("applicantId", "name email phone")
       .populate("jobId", "title company description")
@@ -217,7 +217,7 @@ export const updateCandidate = async (req, res) => {
 
     const candidate = await Candidate.findOne({
       _id: id,
-      recruiterId: req.user._id
+      recruiterId: req.user.id
     });
 
     if (!candidate) {
@@ -306,7 +306,7 @@ export const updateCandidateStatus = async (req, res) => {
 
     const candidate = await Candidate.findOne({
       _id: id,
-      recruiterId: req.user._id
+      recruiterId:req.user.id
     });
 
     if (!candidate) {
@@ -349,7 +349,7 @@ export const deleteCandidate = async (req, res) => {
 
     const candidate = await Candidate.findOne({
       _id: id,
-      recruiterId: req.user._id
+      recruiterId: req.user.id
     });
 
     if (!candidate) {

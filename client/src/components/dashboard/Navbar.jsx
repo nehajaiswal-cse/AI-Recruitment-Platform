@@ -162,6 +162,7 @@ const Navbar = ({
               key={link.path}
               component={NavLink}
               to={link.path}
+              end
               sx={{
                 color: 'text.secondary',
 
@@ -315,6 +316,7 @@ const Navbar = ({
               key={link.path}
               component={NavLink}
               to={link.path}
+              end
               onClick={handleMenuClose}
               sx={{
                 py: 1.25,

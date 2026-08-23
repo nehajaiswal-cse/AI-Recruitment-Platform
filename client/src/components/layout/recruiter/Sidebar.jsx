@@ -1,62 +1,37 @@
+import { useNavigate, useLocation } from "react-router-dom";
 
 import Sidebar from "../../dashboard/Sidebar.jsx";
 
-import {
-  LuLayoutDashboard,
-  LuBriefcaseBusiness,
-  LuUsers,
-  LuChartNoAxesCombined,
-  LuVideo,
-  LuBuilding2,
-  LuSettings,
-} from "react-icons/lu";
+// Maps this Sidebar component's internal ids -> actual routes
+const ID_TO_PATH = {
+  dashboard: "/recruiter",
+  jobs: "/recruiter/jobs",
+  candidates: "/recruiter/candidates",
+  analytics: "/recruiter/analytics",
+  interviews: "/recruiter/interviews",
+  company: "/recruiter/company",
+  settings: "/recruiter/settings",
+};
 
-const recruiterSidebarItems = [
-  {
-    label: "Dashboard",
-    path: "/recruiter/dashboard",
-    icon: LuLayoutDashboard,
-  },
-  {
-    label: "Manage Jobs",
-    path: "/recruiter/jobs",
-    icon: LuBriefcaseBusiness,
-  },
-  {
-    label: "Candidates",
-    path: "/recruiter/candidates",
-    icon: LuUsers,
-  },
-  {
-    label: "Analytics",
-    path: "/recruiter/analytics",
-    icon: LuChartNoAxesCombined,
-  },
-  {
-    label: "Interviews",
-    path: "/recruiter/interviews",
-    icon: LuVideo,
-  },
-  {
-    label: "Company",
-    path: "/recruiter/company",
-    icon: LuBuilding2,
-  },
-  {
-    label: "Settings",
-    path: "/recruiter/settings",
-    icon: LuSettings,
-  },
-];
+// Reverse map: route path -> id (used to highlight the active item)
+const PATH_TO_ID = Object.fromEntries(
+  Object.entries(ID_TO_PATH).map(([id, path]) => [path, id])
+);
 
 const RSidebar = () => {
-  return (
-    <>
-      <Sidebar items={recruiterSidebarItems} />
+  const navigate = useNavigate();
+  const location = useLocation();
 
-      {/* Your content */}
-    </>
-  );
+  const activeId = PATH_TO_ID[location.pathname] || "dashboard";
+
+  const handleNavigate = (id) => {
+    const path = ID_TO_PATH[id];
+    if (path) {
+      navigate(path);
+    }
+  };
+
+  return <Sidebar active={activeId} onNavigate={handleNavigate} />;
 };
 
 export default RSidebar;
