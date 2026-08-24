@@ -8,6 +8,8 @@ import ADashboard from "./pages/applicant/Dashboard";
 import ApplicantRegister from "./pages/applicant/ApplicantRegister";
 import ApplicantLogin from "./pages/applicant/ApplicantLogin";
 import ApplicantProfile from "./pages/applicant/Profile";
+import FindJobs from  "./pages/applicant/jobs/FindJobs.jsx"
+import Apply from "./pages/applicant/jobs/Apply.jsx"
 
 import RDashboard from "./pages/recruiter/Dashboard";
 import RecruiterLogin from "./pages/recruiter/RecruiterLogin";
@@ -20,8 +22,7 @@ import CreateJob from "./pages/recruiter/jobs/createJob.jsx";
 import EditJob from "./pages/recruiter/jobs/editJob.jsx";
 import ViewJob from "./pages/recruiter/jobs/ViewJob.jsx";
 
-import Application from "./pages/applicant/Applications.jsx";
-import ApplicationDetails from "./pages/applicant/applications/ApplicationDetails.jsx";
+
 
 import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
 
@@ -57,7 +58,8 @@ export default function App() {
             path="/recruiter/login"
             element={<RecruiterLogin />}
           />
-
+  
+         
     
 
           {/* ================= APPLICANT ROUTES ================= */}
@@ -75,16 +77,18 @@ export default function App() {
               element={<ApplicantProfile />}
             />
 
+            
             <Route
-              path="/applicant/applications"
-              element={<Application />}
-            />
+            path="/applicant/jobs"
+            element={<FindJobs></FindJobs>}
+              />
 
             <Route
-              path="/applicant/applications/:id"
-              element={<ApplicationDetails />}
-            />
+            path = "/applicant/jobs/:jobId/apply"
+            element={<Apply></Apply>}
+            />  
           </Route>
+
 
 
           {/* ================= RECRUITER ROUTES ================= */}
