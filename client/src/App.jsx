@@ -23,8 +23,6 @@ import CreateJob from "./pages/recruiter/jobs/createJob.jsx";
 import EditJob from "./pages/recruiter/jobs/editJob.jsx";
 import ViewJob from "./pages/recruiter/jobs/ViewJob.jsx";
 
-import Application from "./pages/applicant/Applications.jsx";
-import ApplicationDetails from "./pages/applicant/applications/ApplicationDetails.jsx";
 
 import FindJobs from "./pages/applicant/jobs/FindJobs";
 import Interviews from "./pages/applicant/Interview/Interviews";
@@ -84,15 +82,8 @@ export default function App() {
               element={<ApplicantProfile />}
             />
 
-            <Route
-              path="/applicant/applications"
-              element={<Application />}
-            />
+            
 
-            <Route
-              path="/applicant/applications/:id"
-              element={<ApplicationDetails />}
-            />
 
             <Route path="/applicant/jobs" element={<FindJobs />} />
             <Route path="/applicant/interviews" element={<Interviews />} />
