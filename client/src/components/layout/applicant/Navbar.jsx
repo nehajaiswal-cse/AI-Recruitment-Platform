@@ -13,7 +13,7 @@ const applicantLinks = [
   },
   {
     label: "Saved Jobs",
-    path: "/applicant/candidates",
+    path: "/applicant/saved-jobs",
   },
   {
     label: "Applications",

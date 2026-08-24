@@ -25,6 +25,8 @@ import CreateJob from "./pages/recruiter/jobs/createJob.jsx";
 import EditJob from "./pages/recruiter/jobs/editJob.jsx";
 import ViewJob from "./pages/recruiter/jobs/ViewJob.jsx";
 
+import Settings from "./pages/applicant/Settings";
+// import Resume from "./pages/applicant/Resume";
 
 
 import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
@@ -80,7 +82,16 @@ export default function App() {
               element={<ApplicantProfile />}
             />
 
+            <Route
+              path="/applicant/settings"
+              element={<Settings />}
+            />  
             
+            {/* <Route
+              path="/applicant/resume"
+              element={<Resume />}
+            />
+             */}
             <Route
             path="/applicant/jobs"
             element={<FindJobs></FindJobs>}

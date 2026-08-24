@@ -25,6 +25,9 @@ import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import { useNavigate } from "react-router-dom";
 import  useJobs  from "../../../hooks/useJob";
 
+import ANavbar from "../../../components/layout/applicant/Navbar";
+import ASidebar from "../../../components/layout/applicant/Sidebar";
+
 const FindJobs = () => {
   const navigate = useNavigate();
 
@@ -88,361 +91,403 @@ const FindJobs = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography
-          variant="h4"
-          fontWeight={700}
-          sx={{ mb: 1 }}
-        >
-          Find Jobs
-        </Typography>
-
-        <Typography color="text.secondary">
-          Discover opportunities that match your skills and career goals.
-        </Typography>
-      </Box>
-
-      {/* Search & Filters */}
-      <Card
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        color: "text.primary",
+      }}
+    >
+      {/* Navbar */}
+      <Box
+        component="header"
         sx={{
-          mb: 4,
-          borderRadius: 3,
-          boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
         }}
       >
-        <CardContent>
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                md: "2fr 1.3fr 1fr",
-              },
-              gap: 2,
-            }}
-          >
-            <TextField
-              fullWidth
-              placeholder="Search jobs, skills or company..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchRoundedIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
+        <ANavbar />
+      </Box>
 
-            <TextField
-              fullWidth
-              placeholder="Location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LocationOnOutlinedIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              select
-              fullWidth
-              label="Job Type"
-              value={jobType}
-              onChange={(e) => setJobType(e.target.value)}
-            >
-              <MenuItem value="">All Types</MenuItem>
-              <MenuItem value="Full Time">Full Time</MenuItem>
-              <MenuItem value="Part Time">Part Time</MenuItem>
-              <MenuItem value="Internship">Internship</MenuItem>
-              <MenuItem value="Contract">Contract</MenuItem>
-              <MenuItem value="Remote">Remote</MenuItem>
-            </TextField>
-          </Box>
-        </CardContent>
-      </Card>
-
-      {/* Result Count */}
+      {/* Sidebar + Main */}
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
+          minWidth: 0,
         }}
       >
-        <Typography fontWeight={600}>
-          {filteredJobs.length} Jobs Found
-        </Typography>
+        {/* Sidebar */}
+        <ASidebar />
 
-        {(search || location || jobType) && (
-          <Button
-            variant="text"
-            onClick={() => {
-              setSearch("");
-              setLocation("");
-              setJobType("");
-            }}
-          >
-            Clear Filters
-          </Button>
-        )}
-      </Box>
-
-      {/* Loading */}
-      {loading && (
+        {/* Main */}
         <Box
+          component="main"
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            py: 8,
+            flex: 1,
+            minWidth: 0,
+            bgcolor: "background.default",
+            color: "text.primary",
           }}
         >
-          <CircularProgress />
-        </Box>
-      )}
-
-      {/* Error */}
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Jobs */}
-      {!loading && filteredJobs.length > 0 && (
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              md: "repeat(2, 1fr)",
-            },
-            gap: 3,
-          }}
-        >
-          {filteredJobs.map((job) => {
-            const isSaved = savedJobs.includes(job._id);
-
-            return (
-              <Card
-                key={job._id}
-                sx={{
-                  borderRadius: 3,
-                  transition: "0.2s",
-                  "&:hover": {
-                    transform: "translateY(-3px)",
-                    boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-                  },
-                }}
+          <Box sx={{ p: { xs: 2, md: 4 } }}>
+            {/* Header */}
+            <Box sx={{ mb: 4 }}>
+              <Typography
+                variant="h4"
+                fontWeight={700}
+                sx={{ mb: 1 }}
               >
-                <CardContent sx={{ p: 3 }}>
-                  {/* Top */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <Box>
-                      <Typography
-                        variant="h6"
-                        fontWeight={700}
-                        sx={{ mb: 0.5 }}
-                      >
-                        {job.title}
-                      </Typography>
+                Find Jobs
+              </Typography>
 
-                      <Typography
-                        color="text.secondary"
-                        fontWeight={500}
-                      >
-                        {job.company || "Company"}
-                      </Typography>
-                    </Box>
+              <Typography color="text.secondary">
+                Discover opportunities that match your skills and career goals.
+              </Typography>
+            </Box>
 
-                    <IconButton
-                      onClick={() => handleSaveJob(job._id)}
-                      color={isSaved ? "primary" : "default"}
-                    >
-                      {isSaved ? (
-                        <BookmarkRoundedIcon />
-                      ) : (
-                        <BookmarkBorderRoundedIcon />
-                      )}
-                    </IconButton>
-                  </Box>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  {/* Job Info */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 2,
-                      mb: 2,
-                    }}
-                  >
-                    {job.location && (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 0.5,
-                        }}
-                      >
-                        <LocationOnOutlinedIcon
-                          fontSize="small"
-                        />
-                        <Typography variant="body2">
-                          {job.location}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {job.jobType && (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 0.5,
-                        }}
-                      >
-                        <WorkOutlineRoundedIcon
-                          fontSize="small"
-                        />
-                        <Typography variant="body2">
-                          {job.jobType}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {job.experience && (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 0.5,
-                        }}
-                      >
-                        <AccessTimeRoundedIcon
-                          fontSize="small"
-                        />
-                        <Typography variant="body2">
-                          {job.experience}
-                        </Typography>
-                      </Box>
-                    )}
-                  </Box>
-
-                  {/* Skills */}
-                  {job.skills?.length > 0 && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 1,
-                        mb: 3,
-                      }}
-                    >
-                      {job.skills.slice(0, 5).map((skill, index) => (
-                        <Chip
-                          key={index}
-                          label={skill}
-                          size="small"
-                          variant="outlined"
-                        />
-                      ))}
-                    </Box>
-                  )}
-
-                  {/* Description */}
-                  {job.description && (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{
-                        mb: 3,
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {job.description}
-                    </Typography>
-                  )}
-
-                  {/* Buttons */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      gap: 1.5,
-                    }}
-                  >
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      onClick={() => handleViewJob(job._id)}
-                    >
-                      View Details
-                    </Button>
-
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      onClick={() => handleApply(job._id)}
-                    >
-                      Apply Now
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </Box>
-      )}
-
-      {/* No Jobs */}
-      {!loading && filteredJobs.length === 0 && (
-        <Card
-          sx={{
-            borderRadius: 3,
-            textAlign: "center",
-            py: 8,
-          }}
-        >
-          <CardContent>
-            <SearchRoundedIcon
+            {/* Search & Filters */}
+            <Card
               sx={{
-                fontSize: 50,
-                color: "text.secondary",
+                mb: 4,
+                borderRadius: 3,
+                boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              }}
+            >
+              <CardContent>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      md: "2fr 1.3fr 1fr",
+                    },
+                    gap: 2,
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    placeholder="Search jobs, skills or company..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchRoundedIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+
+                  <TextField
+                    fullWidth
+                    placeholder="Location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LocationOnOutlinedIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+
+                  <TextField
+                    select
+                    fullWidth
+                    label="Job Type"
+                    value={jobType}
+                    onChange={(e) => setJobType(e.target.value)}
+                  >
+                    <MenuItem value="">All Types</MenuItem>
+                    <MenuItem value="Full Time">Full Time</MenuItem>
+                    <MenuItem value="Part Time">Part Time</MenuItem>
+                    <MenuItem value="Internship">Internship</MenuItem>
+                    <MenuItem value="Contract">Contract</MenuItem>
+                    <MenuItem value="Remote">Remote</MenuItem>
+                  </TextField>
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* Result Count */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                 mb: 2,
               }}
-            />
-
-            <Typography variant="h6" fontWeight={600}>
-              No jobs found
-            </Typography>
-
-            <Typography
-              color="text.secondary"
-              sx={{ mt: 1 }}
             >
-              Try changing your search or filters.
-            </Typography>
-          </CardContent>
-        </Card>
-      )}
+              <Typography fontWeight={600}>
+                {filteredJobs.length} Jobs Found
+              </Typography>
+
+              {(search || location || jobType) && (
+                <Button
+                  variant="text"
+                  onClick={() => {
+                    setSearch("");
+                    setLocation("");
+                    setJobType("");
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              )}
+            </Box>
+
+            {/* Loading */}
+            {loading && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  py: 8,
+                }}
+              >
+                <CircularProgress />
+              </Box>
+            )}
+
+            {/* Error */}
+            {error && (
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {error}
+              </Alert>
+            )}
+
+            {/* Jobs */}
+            {!loading && filteredJobs.length > 0 && (
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    md: "repeat(2, 1fr)",
+                  },
+                  gap: 3,
+                }}
+              >
+                {filteredJobs.map((job) => {
+                  const isSaved = savedJobs.includes(job._id);
+
+                  return (
+                    <Card
+                      key={job._id}
+                      sx={{
+                        borderRadius: 3,
+                        transition: "0.2s",
+                        "&:hover": {
+                          transform: "translateY(-3px)",
+                          boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
+                        },
+                      }}
+                    >
+                      <CardContent sx={{ p: 3 }}>
+                        {/* Top */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <Box>
+                            <Typography
+                              variant="h6"
+                              fontWeight={700}
+                              sx={{ mb: 0.5 }}
+                            >
+                              {job.title}
+                            </Typography>
+
+                            <Typography
+                              color="text.secondary"
+                              fontWeight={500}
+                            >
+                              {job.company || "Company"}
+                            </Typography>
+                          </Box>
+
+                          <IconButton
+                            onClick={() => handleSaveJob(job._id)}
+                            color={isSaved ? "primary" : "default"}
+                          >
+                            {isSaved ? (
+                              <BookmarkRoundedIcon />
+                            ) : (
+                              <BookmarkBorderRoundedIcon />
+                            )}
+                          </IconButton>
+                        </Box>
+
+                        <Divider sx={{ my: 2 }} />
+
+                        {/* Job Info */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 2,
+                            mb: 2,
+                          }}
+                        >
+                          {job.location && (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 0.5,
+                              }}
+                            >
+                              <LocationOnOutlinedIcon
+                                fontSize="small"
+                              />
+                              <Typography variant="body2">
+                                {job.location}
+                              </Typography>
+                            </Box>
+                          )}
+
+                          {job.jobType && (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 0.5,
+                              }}
+                            >
+                              <WorkOutlineRoundedIcon
+                                fontSize="small"
+                              />
+                              <Typography variant="body2">
+                                {job.jobType}
+                              </Typography>
+                            </Box>
+                          )}
+
+                          {job.experience && (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 0.5,
+                              }}
+                            >
+                              <AccessTimeRoundedIcon
+                                fontSize="small"
+                              />
+                              <Typography variant="body2">
+                                {job.experience}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+
+                        {/* Skills */}
+                        {job.skills?.length > 0 && (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              gap: 1,
+                              mb: 3,
+                            }}
+                          >
+                            {job.skills.slice(0, 5).map((skill, index) => (
+                              <Chip
+                                key={index}
+                                label={skill}
+                                size="small"
+                                variant="outlined"
+                              />
+                            ))}
+                          </Box>
+                        )}
+
+                        {/* Description */}
+                        {job.description && (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              mb: 3,
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {job.description}
+                          </Typography>
+                        )}
+
+                        {/* Buttons */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: 1.5,
+                          }}
+                        >
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            onClick={() => handleViewJob(job._id)}
+                          >
+                            View Details
+                          </Button>
+
+                          <Button
+                            fullWidth
+                            variant="contained"
+                            onClick={() => handleApply(job._id)}
+                          >
+                            Apply Now
+                          </Button>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </Box>
+            )}
+
+            {/* No Jobs */}
+            {!loading && filteredJobs.length === 0 && (
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  textAlign: "center",
+                  py: 8,
+                }}
+              >
+                <CardContent>
+                  <SearchRoundedIcon
+                    sx={{
+                      fontSize: 50,
+                      color: "text.secondary",
+                      mb: 2,
+                    }}
+                  />
+
+                  <Typography variant="h6" fontWeight={600}>
+                    No jobs found
+                  </Typography>
+
+                  <Typography
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
+                    Try changing your search or filters.
+                  </Typography>
+                </CardContent>
+              </Card>
+            )}
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 };

@@ -1,41 +1,29 @@
+import { useNavigate, useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
 import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
-import WorkOutlineRoundedIcon from '@mui/icons-material/WorkOutlineRounded'
-import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined'
-import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded'
-import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined'
-import ApartmentRoundedIcon from '@mui/icons-material/ApartmentRounded'
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
-
-const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: DashboardRoundedIcon },
-  { id: 'jobs', label: 'Manage Jobs', icon: WorkOutlineRoundedIcon },
-  { id: 'candidates', label: 'Candidates', icon: GroupOutlinedIcon },
-  { id: 'analytics', label: 'Analytics', icon: InsightsRoundedIcon },
-  { id: 'interviews', label: 'Interviews', icon: VideocamOutlinedIcon },
-  { id: 'company', label: 'Company', icon: ApartmentRoundedIcon },
-  { id: 'settings', label: 'Settings', icon: SettingsOutlinedIcon },
-]
 
 const SIDEBAR_WIDTH = 216
 
-export default function Sidebar({ active = 'dashboard', onNavigate, mobileOpen = false, onMobileClose }) {
+export default function Sidebar({ items = [], mobileOpen = false, onMobileClose }) {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const navList = (onItemClick) => (
     <List sx={{ px: 1.5, py: 1 }}>
-      {NAV_ITEMS.map((item) => {
+      {items.map((item) => {
         const Icon = item.icon
-        const isActive = active === item.id
+        const isActive = location.pathname === item.path
+
         return (
           <ListItemButton
-            key={item.id}
+            key={item.path}
             selected={isActive}
             onClick={() => {
-              onNavigate?.(item.id)
+              navigate(item.path)
               onItemClick?.()
             }}
             sx={{
@@ -50,7 +38,7 @@ export default function Sidebar({ active = 'dashboard', onNavigate, mobileOpen =
             }}
           >
             <ListItemIcon sx={{ minWidth: 36, color: isActive ? 'primary.main' : 'text.secondary' }}>
-              <Icon fontSize="small" />
+              {Icon && <Icon size={18} />}
             </ListItemIcon>
             <ListItemText
               primary={item.label}
@@ -64,7 +52,6 @@ export default function Sidebar({ active = 'dashboard', onNavigate, mobileOpen =
 
   return (
     <>
-      {/* Desktop: permanent, always visible */}
       <Box
         component="nav"
         sx={{
@@ -82,7 +69,6 @@ export default function Sidebar({ active = 'dashboard', onNavigate, mobileOpen =
         {navList()}
       </Box>
 
-      {/* Mobile / tablet: temporary drawer toggled from the navbar menu icon */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
@@ -105,9 +91,3 @@ export default function Sidebar({ active = 'dashboard', onNavigate, mobileOpen =
 }
 
 export { SIDEBAR_WIDTH }
-
-
-
-
-
-
