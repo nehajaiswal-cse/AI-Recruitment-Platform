@@ -1,13 +1,25 @@
 import Application from "../models/applications.js";
 import Job from "../models/job.js";
+import Candidate from "../models/candidate.js";
+
+import {
+  S3Client,
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
 
 const applyForJob = async (req, res) => {
   try {
     const { jobId, coverLetter } = req.body;
 
+    if (!req.user?.id) {
+      return res.status(401).json({
+        message: "User not authenticated",
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({
-        message: "Resume file is required"
+        message: "Resume file is required",
       });
     }
 
@@ -15,63 +27,106 @@ const applyForJob = async (req, res) => {
 
     if (!job) {
       return res.status(404).json({
-        message: "Job not found"
+        message: "Job not found",
       });
     }
 
     const existingApplication = await Application.findOne({
       jobId,
-      applicantId: req.user.id
+      applicantId: req.user.id,
     });
 
     if (existingApplication) {
       return res.status(400).json({
-        message: "You have already applied for this job"
+        message: "You have already applied for this job",
       });
     }
 
+    // Create S3 client
+    const s3Client = new S3Client({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+    });
+
+    // Upload resume to S3
+    const fileName = `resumes/${Date.now()}-${req.file.originalname}`;
+
+    const uploadCommand = new PutObjectCommand({
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: fileName,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+    });
+
+    await s3Client.send(uploadCommand);
+
+    // S3 file URL
+    const fileUrl =
+      `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
+    // Create application
     const application = await Application.create({
       jobId,
       applicantId: req.user.id,
       resume: {
         fileName: req.file.originalname,
-        fileUrl: `/uploads/${req.file.filename}`
+        fileUrl,
       },
-      coverLetter
+      coverLetter,
     });
 
-    res.status(201).json({
+    // Create candidate automatically
+    const candidate = await Candidate.create({
+      applicationId: application._id,
+      applicantId: req.user.id,
+      jobId: job._id,
+      recruiterId: job.recruiterId,
+      status: "applied",
+    });
+
+    return res.status(201).json({
       message: "Application submitted successfully",
-      application
+      application,
+      candidate,
     });
 
   } catch (error) {
-    res.status(500).json({
+    console.error("Apply job error:", error);
+
+    return res.status(500).json({
       message: "Failed to submit application",
-      error: error.message
+      error: error.message,
     });
   }
 };
+
 
 const getMyApplications = async (req, res) => {
   try {
     const applications = await Application.find({
-      applicantId: req.user.id
-    }).populate("jobId", "title company location employmentType");
+      applicantId: req.user.id,
+    }).populate(
+      "jobId",
+      "title company location employmentType"
+    );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Applications fetched successfully",
       count: applications.length,
-      applications
+      applications,
     });
 
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Failed to fetch applications",
-      error: error.message
+      error: error.message,
     });
   }
 };
+
 
 const getJobApplications = async (req, res) => {
   try {
@@ -80,35 +135,36 @@ const getJobApplications = async (req, res) => {
     // Check that job belongs to logged-in recruiter
     const job = await Job.findOne({
       _id: jobId,
-      recruiterId: req.user.id
+      recruiterId: req.user.id,
     });
 
     if (!job) {
       return res.status(404).json({
-        message: "Job not found or you are not authorized"
+        message: "Job not found or you are not authorized",
       });
     }
 
     const applications = await Application.find({
-      jobId: jobId
+      jobId,
     }).populate(
       "applicantId",
       "name email phone profile"
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Job applications fetched successfully",
       count: applications.length,
-      applications
+      applications,
     });
 
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Failed to fetch job applications",
-      error: error.message
+      error: error.message,
     });
   }
 };
+
 
 const updateApplicationStatus = async (req, res) => {
   try {
@@ -118,12 +174,12 @@ const updateApplicationStatus = async (req, res) => {
       "applied",
       "shortlisted",
       "rejected",
-      "hired"
+      "hired",
     ];
 
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
-        message: "Invalid application status"
+        message: "Invalid application status",
       });
     }
 
@@ -133,17 +189,18 @@ const updateApplicationStatus = async (req, res) => {
 
     if (!application) {
       return res.status(404).json({
-        message: "Application not found"
+        message: "Application not found",
       });
     }
 
-    // Check that this job belongs to logged-in recruiter
+    // Check recruiter authorization
     if (
       application.jobId.recruiterId.toString() !==
       req.user.id.toString()
     ) {
       return res.status(403).json({
-        message: "You are not authorized to update this application"
+        message:
+          "You are not authorized to update this application",
       });
     }
 
@@ -151,17 +208,22 @@ const updateApplicationStatus = async (req, res) => {
 
     await application.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Application status updated successfully",
-      application
+      application,
     });
 
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Failed to update application status",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-export { applyForJob, getMyApplications, getJobApplications , updateApplicationStatus};
+export {
+  applyForJob,
+  getMyApplications,
+  getJobApplications,
+  updateApplicationStatus,
+};

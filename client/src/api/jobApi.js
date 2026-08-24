@@ -16,11 +16,26 @@ export const getMyJobs = async () => {
 
 // Get single job
 export const getJobById = async (jobId) => {
-  const response = await api.get(`/jobs/${jobId}`);
+  try {
+    if (!jobId) {
+      throw new Error("Job ID is required.");
+    }
 
-  return response.data;
+    const response = await api.get(`/jobs/${jobId}`);
+
+    return response.data;
+  } catch (err) {
+    console.error("Get job by ID error:", err);
+
+    const message =
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.message ||
+      "Failed to fetch job.";
+
+    throw new Error(message);
+  }
 };
-
 // Create job
 export const createJob = async (jobData) => {
   const response = await api.post("/jobs", jobData);

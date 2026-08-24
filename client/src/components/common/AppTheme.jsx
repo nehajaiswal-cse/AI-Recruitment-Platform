@@ -1,6 +1,6 @@
 import { ThemeProvider, CssBaseline } from '@mui/material'
 
-import { useThemeMode } from '../../context/useThemeMode.js'
+import { useThemeMode } from '../../hooks/useThemeMode.js'
 import { getTheme } from '../../theme.js'
 
 const AppTheme = ({ children }) => {
