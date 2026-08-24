@@ -54,8 +54,13 @@ const ADashboard = () => {
             minWidth: 0,
             bgcolor: 'background.default',
             color: 'text.primary',
+            pt:5
           }}
         >
+
+           {/* Greeting */}
+     <Greeting role="applicant" sx={{ml:4}} />
+          
           <Topbar />
 
           <Box
@@ -68,8 +73,7 @@ const ADashboard = () => {
             }}
           >
            
-             {/* Greeting */}
-     <Greeting/>
+            
 
      <StatsRow/>
 

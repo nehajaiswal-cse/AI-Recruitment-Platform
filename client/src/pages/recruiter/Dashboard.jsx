@@ -9,6 +9,7 @@ import ApplicationTrend from '../../components/sections/recruiter/ApplicationTre
 import HiringPipelines from '../../components/sections/recruiter/HiringPipelines'
 import RecentApplications from '../../components/sections/recruiter/RecentApplication'
 import UpcomingInterviews from '../../components/sections/recruiter/UpcomingInterviews'
+import Greeting from '../../components/layout/recruiter/WelcomeHeader';
 
 const RDashboard = () => {
   return (
@@ -49,8 +50,11 @@ const RDashboard = () => {
             minWidth: 0,
             bgcolor: 'background.default',
             color: 'text.primary',
+            pt:5
           }}
         >
+               {/* Greeting */}
+     <Greeting role="recruiter" sx={{ml:4}} />
           <Topbar />
 
           <Box
@@ -63,7 +67,7 @@ const RDashboard = () => {
             }}
           >
             {/* Welcome */}
-            <Box sx={{ mb: 3 }}>
+            {/* <Box sx={{ mb: 3 }}>
               <Box
                 component="h1"
                 sx={{
@@ -89,7 +93,9 @@ const RDashboard = () => {
               >
                 Welcome to your dashboard
               </Box>
-            </Box>
+            </Box> */}
+
+       
 
             {/* Dashboard sections */}
             <Box
