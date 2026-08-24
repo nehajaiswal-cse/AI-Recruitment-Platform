@@ -9,11 +9,14 @@ import ApplicantRegister from "./pages/applicant/ApplicantRegister";
 import ApplicantLogin from "./pages/applicant/ApplicantLogin";
 import ApplicantProfile from "./pages/applicant/Profile";
 
+
 import RDashboard from "./pages/recruiter/Dashboard";
 import RecruiterLogin from "./pages/recruiter/RecruiterLogin";
 import RecruiterRegister from "./pages/recruiter/RecruiterRegister";
 import RecruiterProfile from "./pages/recruiter/Profile";
 import Analytics from "./pages/recruiter/Analytics";
+import Candidates from "./pages/recruiter/Candidates"
+import Interview from "./pages/recruiter/Interviews"
 
 import Jobs from "./pages/recruiter/jobs/Jobs.jsx";
 import CreateJob from "./pages/recruiter/jobs/createJob.jsx";
@@ -22,6 +25,12 @@ import ViewJob from "./pages/recruiter/jobs/ViewJob.jsx";
 
 import Application from "./pages/applicant/Applications.jsx";
 import ApplicationDetails from "./pages/applicant/applications/ApplicationDetails.jsx";
+
+import FindJobs from "./pages/applicant/jobs/FindJobs";
+import Interviews from "./pages/applicant/Interview/Interviews";
+
+import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx"
+import Apply from "./pages/applicant/jobs/apply.jsx"
 
 import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
 
@@ -84,7 +93,20 @@ export default function App() {
               path="/applicant/applications/:id"
               element={<ApplicationDetails />}
             />
+
+            <Route path="/applicant/jobs" element={<FindJobs />} />
+            <Route path="/applicant/interviews" element={<Interviews />} />
           </Route>
+
+           <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant/jobs" element={<FindJobs />} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant/jobs/:jobId" element={<ApplicantviewJob />} />
+        </Route>  
+        <Route element={<ProtectedRoute allowedRole="applicant" />}>
+        <Route path="/applicant/jobs/:jobId/apply" element={<Apply />} />
+        </Route>
 
 
           {/* ================= RECRUITER ROUTES ================= */}
@@ -105,6 +127,14 @@ export default function App() {
             <Route
               path="/recruiter/analytics"
               element={<Analytics />}
+            />
+            <Route
+              path="/recruiter/candidates"
+              element={<Candidates />}
+            />
+            <Route
+              path="/recruiter/interviews"
+              element={<Interview/>}
             />
 
             <Route
