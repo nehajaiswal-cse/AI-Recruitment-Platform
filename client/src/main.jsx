@@ -10,8 +10,8 @@ import AppTheme from './components/common/AppTheme.jsx'
 import { JobProvider } from './context/jobContext.jsx';
 import { CandidateProvider } from './context/CandidateContext.jsx';
 import { InterviewProvider } from "./context/InterviewContext.jsx"
-import { ApplicationProvider } from './context/ApplicationContext.jsx'; 
-
+//import { ApplicationProvider } from './context/ApplicationContext.jsx'; 
+import { ApplicationProvider } from "./context/ApplicationContext.jsx";
 
 ReactDOM.createRoot(
   document.getElementById('root')
