@@ -61,7 +61,7 @@ const applyForJob = async (req, res) => {
       ContentType: req.file.mimetype,
     });
 
-    const s3Response = await s3Client.send(uploadCommand);
+    await s3Client.send(uploadCommand);
 
     // S3 file URL
     const fileUrl =
@@ -78,7 +78,7 @@ const applyForJob = async (req, res) => {
       coverLetter,
     });
 
-    // Create candidate
+    // Create candidate automatically
     const candidate = await Candidate.create({
       applicationId: application._id,
       applicantId: req.user.id,
@@ -220,7 +220,6 @@ const updateApplicationStatus = async (req, res) => {
     });
   }
 };
-
 
 export {
   applyForJob,
