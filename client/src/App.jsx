@@ -10,7 +10,7 @@ import ApplicantLogin from "./pages/applicant/ApplicantLogin";
 import ApplicantProfile from "./pages/applicant/Profile";
 import FindJobs from  "./pages/applicant/jobs/FindJobs.jsx"
 import Apply from "./pages/applicant/jobs/Apply.jsx"
-
+import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx"
 
 import RDashboard from "./pages/recruiter/Dashboard";
 import RecruiterLogin from "./pages/recruiter/RecruiterLogin";
