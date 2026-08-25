@@ -8,6 +8,8 @@ import analyticsRoutes from "./routes/analyticsRoutes.js";
 import Candidate from "./routes/candidateRoute.js";
 import interview from "./routes/interviewRoutes.js";
 import interviewRoutes from "./routes/interviewRoutes.js";
+import resumeRoutes from "./routes/resumeRoutes.js";
+import atsRoutes from "./routes/atsRoutes.js";
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/candidates",Candidate)
 app.use("/api/interviews",interview)
 app.use("/api/interviews", interviewRoutes);
+app.use("/api/resumes", resumeRoutes);
+app.use("/api/ats", atsRoutes);
 
 app.get("/", (req, res) => {
   res.json({

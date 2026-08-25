@@ -1,10 +1,8 @@
 import dotenv from "dotenv";
-import app from "./app.js";
-import connectDB from "./config/db.js";
-
-
 dotenv.config();
-import "dotenv/config";
+
+const { default: app } = await import("./app.js");
+const { default: connectDB } = await import("./config/db.js");
 
 console.log("AWS_BUCKET:", process.env.AWS_S3_BUCKET_NAME);
 console.log("AWS_REGION:", process.env.AWS_REGION);
