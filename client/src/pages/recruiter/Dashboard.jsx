@@ -50,11 +50,11 @@ const RDashboard = () => {
             minWidth: 0,
             bgcolor: 'background.default',
             color: 'text.primary',
-            pt:5
+            pt: 5
           }}
         >
-               {/* Greeting */}
-     <Greeting role="recruiter" sx={{ml:4}} />
+          {/* Greeting */}
+          <Greeting role="recruiter" sx={{ ml: 4 }} />
           <Topbar />
 
           <Box
@@ -66,36 +66,9 @@ const RDashboard = () => {
               },
             }}
           >
-            {/* Welcome */}
-            {/* <Box sx={{ mb: 3 }}>
-              <Box
-                component="h1"
-                sx={{
-                  m: 0,
-                  fontSize: {
-                    xs: '1.5rem',
-                    sm: '1.875rem',
-                  },
-                  fontWeight: 700,
-                  color: 'text.primary',
-                }}
-              >
-                👋 Hi Recruiter
-              </Box>
+          
 
-              <Box
-                component="p"
-                sx={{
-                  mt: 1,
-                  mb: 0,
-                  color: 'text.secondary',
-                }}
-              >
-                Welcome to your dashboard
-              </Box>
-            </Box> */}
 
-       
 
             {/* Dashboard sections */}
             <Box
