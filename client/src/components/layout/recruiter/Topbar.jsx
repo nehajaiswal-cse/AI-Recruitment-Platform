@@ -196,6 +196,7 @@ export default function RTopbar() {
           md: 2,
         },
 
+<<<<<<< HEAD
         mb: 3,
       }}
     >
@@ -348,6 +349,35 @@ export default function RTopbar() {
           </Paper>
         )}
       </Box>
+=======
+    pb: 2,
+
+    bgcolor: 'background.surface',
+    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+    position: 'relative',
+    zIndex: 1,
+
+    mb: 3,
+  }}
+>
+      <TextField
+        placeholder="Search Candidates"
+        fullWidth
+        size="small"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+            </InputAdornment>
+          ),
+          sx: {
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            height: 44,
+          },
+        }}
+      />
+>>>>>>> 963d43269c71a3c7330c18f44fa3b77d31e72fd1
 
       <Button
         variant="contained"

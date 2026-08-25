@@ -1,60 +1,80 @@
-import { useEffect, useState } from 'react';
-import { getRecruiterAnalytics } from '../../api/analyticsApi';
-import {
-  Box,
+import { useEffect, useState } from "react";
+import { getRecruiterAnalytics } from "../../api/analyticsApi";
 
-  Typography,
-} from '@mui/material';
+import { Box, Typography, CircularProgress } from "@mui/material";
 
-import RNavbar from '../../components/layout/recruiter/Navbar';
-import RSidebar from '../../components/layout/recruiter/Sidebar';
+import RNavbar from "../../components/layout/recruiter/Navbar";
+import RSidebar from "../../components/layout/recruiter/Sidebar";
 
-import StatCards from '../../components/analytics/StatCard';
-import ApplicationOverview from '../../components/analytics/ApplicationOverview';
-import CandidatePipeline from '../../components/analytics/CandidatePipeline';
-import AIMatchDistribution from '../../components/analytics/AIMatchDistribution';
-import JobPerformance from '../../components/analytics/JobPerformance';
+import StatCards from "../../components/analytics/StatCard";
+import ApplicationOverview from "../../components/analytics/ApplicationOverview";
+import CandidatePipeline from "../../components/analytics/CandidatePipeline";
+import AIMatchDistribution from "../../components/analytics/AIMatchDistribution";
+import JobPerformance from "../../components/analytics/JobPerformance";
 
-import {
-  //summaryStats,
-  //applicationTrend,
-  candidatePipeline,
-  aiMatchDistribution,
-  jobPerformance,
-} from '../../data/analyticsData';
+import { aiMatchDistribution } from "../../data/analyticsData";
 
 function Analytics() {
   const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
+        setLoading(true);
+        setError("");
+
         const response = await getRecruiterAnalytics();
+
         setAnalytics(response.data);
       } catch (error) {
         console.error(
-          'ANALYTICS API ERROR:',
+          "ANALYTICS API ERROR:",
           error.response?.data || error.message
         );
+
+        setError(
+          error.response?.data?.message ||
+            "Failed to load recruiter analytics"
+        );
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchAnalytics();
   }, []);
-  return (
 
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "background.default",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
     <Box
       sx={{
-        minHeight: '100vh',
-        bgcolor: 'background.default',
-        color: 'text.primary',
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        color: "text.primary",
       }}
     >
       {/* Navbar */}
       <Box
         component="header"
         sx={{
-          position: 'sticky',
+          position: "sticky",
           top: 0,
           zIndex: 50,
         }}
@@ -65,7 +85,7 @@ function Analytics() {
       {/* Sidebar + Main */}
       <Box
         sx={{
-          display: 'flex',
+          display: "flex",
           minWidth: 0,
         }}
       >
@@ -78,17 +98,11 @@ function Analytics() {
           sx={{
             flex: 1,
             minWidth: 0,
-            bgcolor: 'background.default',
-            color: 'text.primary',
+            bgcolor: "background.default",
+            color: "text.primary",
             p: 5,
-
-
           }}
-
-
         >
-
-
           {/* Page Header */}
           <Box sx={{ mb: 4 }}>
             <Typography
@@ -109,48 +123,70 @@ function Analytics() {
             </Typography>
           </Box>
 
+          {/* Error */}
+          {error && (
+            <Box
+              sx={{
+                mb: 3,
+                p: 2,
+                borderRadius: 2,
+                backgroundColor: "#450a0a",
+                color: "#fca5a5",
+              }}
+            >
+              {error}
+            </Box>
+          )}
+
           {/* Summary Cards */}
           <Box sx={{ mb: 4 }}>
             <StatCards
               stats={
                 analytics
                   ? [
-                    {
-                      id: 1,
-                      label: 'Total Jobs',
-                      value: analytics.totalJobs,
-                      color: '#7c3aed',
-                      icon: 'work',
-                    },
-                    {
-                      id: 2,
-                      label: 'Applications',
-                      value: analytics.totalApplications,
-                      color: '#2563eb',
-                      icon: 'assignment',
-                    },
-                    {
-                      id: 3,
-                      label: 'Shortlisted',
-                      value: analytics.shortlisted,
-                      color: '#f59e0b',
-                      icon: 'playlist_add_check',
-                    },
-                    {
-                      id: 4,
-                      label: 'Hired',
-                      value: analytics.hired,
-                      color: '#16a34a',
-                      icon: 'workspace_premium',
-                    },
-                    {
-                      id: 5,
-                      label: 'Rejected',
-                      value: analytics.rejected,
-                      color: '#dc2626',
-                      icon: 'groups',
-                    },
-                  ]
+                      {
+                        id: 1,
+                        label: "Total Jobs",
+                        value: analytics.totalJobs,
+                        color: "#7c3aed",
+                        icon: "work",
+                      },
+                      {
+                        id: 2,
+                        label: "Applications",
+                        value: analytics.totalApplications,
+                        color: "#2563eb",
+                        icon: "assignment",
+                      },
+                      {
+                        id: 3,
+                        label: "Shortlisted",
+                        value: analytics.shortlisted,
+                        color: "#f59e0b",
+                        icon: "playlist_add_check",
+                      },
+                      {
+                        id: 4,
+                        label: "Interviews",
+                        value: analytics.totalInterviews,
+                        color: "#7c3aed",
+                        icon: "groups",
+                      },
+                      {
+                        id: 5,
+                        label: "Hired",
+                        value: analytics.hired,
+                        color: "#16a34a",
+                        icon: "workspace_premium",
+                      },
+                      {
+                        id: 6,
+                        label: "Rejected",
+                        value: analytics.rejected,
+                        color: "#dc2626",
+                        icon: "cancel",
+                      },
+                    ]
                   : []
               }
             />
@@ -159,22 +195,20 @@ function Analytics() {
           {/* Application Overview + AI Matching */}
           <Box
             sx={{
-              display: 'grid',
+              display: "grid",
               gridTemplateColumns: {
-                xs: '1fr',
-                lg: '2fr 1fr',
+                xs: "1fr",
+                lg: "2fr 1fr",
               },
               gap: 3,
               mb: 3,
             }}
           >
-            {/* <ApplicationOverview
-              data={applicationTrend}
-            /> */}
             <ApplicationOverview
               data={analytics?.applicationTrend || []}
             />
 
+            {/* AI data is still dummy */}
             <AIMatchDistribution
               data={aiMatchDistribution}
             />
@@ -183,15 +217,14 @@ function Analytics() {
           {/* Candidate Pipeline */}
           <Box sx={{ mb: 3 }}>
             <CandidatePipeline
-              data={candidatePipeline}
+              data={analytics?.candidatePipeline || []}
             />
           </Box>
 
           {/* Job Performance */}
           <JobPerformance
-            data={jobPerformance}
+            data={analytics?.jobPerformance || []}
           />
-
         </Box>
       </Box>
     </Box>
@@ -199,7 +232,3 @@ function Analytics() {
 }
 
 export default Analytics;
-
-
-
-

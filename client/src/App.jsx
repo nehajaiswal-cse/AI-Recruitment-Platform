@@ -8,11 +8,17 @@ import ADashboard from "./pages/applicant/Dashboard";
 import ApplicantRegister from "./pages/applicant/ApplicantRegister";
 import ApplicantLogin from "./pages/applicant/ApplicantLogin";
 import ApplicantProfile from "./pages/applicant/Profile";
+<<<<<<< HEAD
 import SavedJob from "./pages/applicant/SavedJob.jsx";
 import FindJobs from  "./pages/applicant/jobs/FindJobs.jsx";
 import Apply from "./pages/applicant/jobs/Apply.jsx";
 import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx";
 
+=======
+import FindJobs from  "./pages/applicant/jobs/FindJobs.jsx"
+import Apply from "./pages/applicant/jobs/Apply.jsx"
+import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx"
+>>>>>>> 963d43269c71a3c7330c18f44fa3b77d31e72fd1
 
 import RDashboard from "./pages/recruiter/Dashboard";
 import RecruiterLogin from "./pages/recruiter/RecruiterLogin";
