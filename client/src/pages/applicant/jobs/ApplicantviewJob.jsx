@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+//import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -24,6 +25,7 @@ import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 
 import  useJob  from "../../../hooks/useJob";
+import useSavedJobs from "../../../hooks/useSavedJobs";
 
 const ApplicantViewJob = () => {
   const { jobId } = useParams();
@@ -36,8 +38,9 @@ const ApplicantViewJob = () => {
     fetchJobById,
   } = useJob();
 
-  const [saved, setSaved] = useState(false);
-
+  //const [saved, setSaved] = useState(false);
+  const { isJobSaved, toggleSaveJob } = useSavedJobs();
+   const saved = isJobSaved(jobId);
   // ==========================================
   // FETCH JOB
   // ==========================================
@@ -53,8 +56,9 @@ const ApplicantViewJob = () => {
   // ==========================================
 
   const handleSaveJob = () => {
-    setSaved((previous) => !previous);
-
+    toggleSaveJob(jobId);
+    //setSaved((previous) => !previous);
+    
     // Later connect this with backend:
     // saveJob(jobId)
     // removeSavedJob(jobId)
