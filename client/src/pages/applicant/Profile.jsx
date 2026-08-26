@@ -32,45 +32,45 @@ const initialProfile = {
 
 const fieldSx = {
   "& .MuiInputLabel-root": {
-    color: "#94a3b8",
+    color: "text.secondary",
   },
 
   "& .MuiInputLabel-root.Mui-disabled": {
-    color: "#94a3b8",
+    color: "text.secondary",
   },
 
   "& .MuiOutlinedInput-root": {
-    color: "#f8fafc",
-    backgroundColor: "#182235",
+    color: "text.primary",
+    backgroundColor: "background.default",
 
     "& fieldset": {
-      borderColor: "#475569",
+      borderColor: "divider",
     },
 
     "&:hover fieldset": {
-      borderColor: "#64748b",
+      borderColor: "text.secondary",
     },
 
     "&.Mui-focused fieldset": {
-      borderColor: "#82a9ff",
+      borderColor: "primary.main",
     },
   },
 
   // Normal text
   "& .MuiInputBase-input": {
-    color: "#f8fafc",
+    color: "text.primary",
   },
 
   // Disabled text
   "& .MuiInputBase-input.Mui-disabled": {
-    WebkitTextFillColor: "#e2e8f0",
-    color: "#e2e8f0",
+    WebkitTextFillColor: "currentColor",
+    color: "text.primary",
     opacity: 1,
   },
 
   // Disabled input border
   "& .MuiOutlinedInput-root.Mui-disabled fieldset": {
-    borderColor: "#475569",
+    borderColor: "divider",
   },
 };
 
@@ -173,7 +173,7 @@ const Profile = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#111827",
+        bgcolor: "background.default",
       }}
     >
       <Navbar />
@@ -202,7 +202,7 @@ const Profile = () => {
                   md: "32px",
                 },
                 fontWeight: 700,
-                color: "#f8fafc",
+                color: "text.primary",
                 letterSpacing: "-0.5px",
               }}
             >
@@ -213,7 +213,7 @@ const Profile = () => {
               sx={{
                 mt: 0.5,
                 fontSize: "14px",
-                color: "#94a3b8",
+                color: "text.secondary",
               }}
             >
               Keep your information up to date for employers.
@@ -230,8 +230,9 @@ const Profile = () => {
               },
               mb: 3,
               borderRadius: 3,
-              backgroundColor: "#1c2535",
-              border: "1px solid #334155",
+              backgroundColor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
             }}
           >
             <Stack
@@ -250,8 +251,8 @@ const Profile = () => {
                 sx={{
                   width: 66,
                   height: 66,
-                  backgroundColor: "#294b86",
-                  color: "#dbeafe",
+                  backgroundColor: "primary.main",
+                  color: "primary.contrastText",
                   fontSize: "23px",
                   fontWeight: 700,
                 }}
@@ -265,7 +266,7 @@ const Profile = () => {
                   sx={{
                     fontSize: "21px",
                     fontWeight: 600,
-                    color: "#f8fafc",
+                    color: "text.primary",
                   }}
                 >
                   {profile.name}
@@ -275,7 +276,7 @@ const Profile = () => {
                   sx={{
                     mt: 0.3,
                     fontSize: "14px",
-                    color: "#aeb9ca",
+                    color: "text.secondary",
                   }}
                 >
                   {profile.email}
@@ -285,7 +286,7 @@ const Profile = () => {
                   sx={{
                     mt: 0.4,
                     fontSize: "14px",
-                    color: "#aeb9ca",
+                    color: "text.secondary",
                   }}
                 >
                   Applicant account
@@ -296,8 +297,8 @@ const Profile = () => {
               <Chip
                 label="Applicant"
                 sx={{
-                  backgroundColor: "#124e35",
-                  color: "#65e6a0",
+                  backgroundColor: "rgba(16, 185, 129, 0.15)",
+                  color: "success.main",
                   fontWeight: 600,
                   borderRadius: 2,
                   height: 32,
@@ -318,8 +319,9 @@ const Profile = () => {
                 md: 3,
               },
               borderRadius: 3,
-              backgroundColor: "#1c2535",
-              border: "1px solid #334155",
+              backgroundColor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
             }}
           >
             {/* Section Header */}
@@ -327,7 +329,7 @@ const Profile = () => {
               sx={{
                 fontSize: "19px",
                 fontWeight: 600,
-                color: "#f8fafc",
+                color: "text.primary",
                 mb: 3,
               }}
             >
@@ -448,15 +450,15 @@ const Profile = () => {
                     startIcon={<CloseOutlinedIcon />}
                     onClick={handleCancel}
                     sx={{
-                      color: "#e2e8f0",
-                      borderColor: "#64748b",
+                      color: "text.primary",
+                      borderColor: "divider",
                       textTransform: "none",
                       borderRadius: 1.5,
                       px: 2.5,
 
                       "&:hover": {
-                        borderColor: "#94a3b8",
-                        backgroundColor: "rgba(148,163,184,0.08)",
+                        borderColor: "text.secondary",
+                        backgroundColor: "action.hover",
                       },
                     }}
                   >
@@ -468,15 +470,15 @@ const Profile = () => {
                     startIcon={<SaveOutlinedIcon />}
                     onClick={handleSave}
                     sx={{
-                      backgroundColor: "#82a9ff",
-                      color: "#0f172a",
+                      backgroundColor: "primary.main",
+                      color: "primary.contrastText",
                       fontWeight: 700,
                       textTransform: "none",
                       borderRadius: 1.5,
                       px: 2.5,
 
                       "&:hover": {
-                        backgroundColor: "#9bbaff",
+                        backgroundColor: "primary.dark",
                       },
                     }}
                   >
