@@ -7,6 +7,8 @@ import {
   Button,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogContent,
   IconButton,
   LinearProgress,
   MenuItem,
@@ -33,6 +35,14 @@ import ANavbar from "../../components/layout/applicant/Navbar";
 import ASidebar from "../../components/layout/applicant/Sidebar";
 import useResume from "../../hooks/useResume";
 import { getResumeUrl } from "../../api/resumeApi";
+
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
+import TrackChangesRoundedIcon from "@mui/icons-material/TrackChangesRounded";
+import ChecklistRoundedIcon from "@mui/icons-material/ChecklistRounded";
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
 const FILE_COLORS = {
   PDF: "#ef4444",
@@ -103,6 +113,7 @@ const Resume = () => {
 
   const [jobDescription, setJobDescription] = useState("");
   const [selectedResumeId, setSelectedResumeId] = useState("");
+  const [guidelinesOpen, setGuidelinesOpen] = useState(false);
 
   const [atsResult, setAtsResult] = useState(null);
   const [atsLoading, setAtsLoading] = useState(false);
@@ -930,12 +941,419 @@ const Resume = () => {
                 <Button
                   variant="outlined"
                   fullWidth
-                  sx={{ width: { xs: "100%", sm: "auto" } }}
+                  onClick={() => setGuidelinesOpen(true)}
+                  sx={{
+                    width: { xs: "100%", sm: "auto" },
+                  }}
                 >
                   View guidelines
                 </Button>
               </Stack>
             </Paper>
+
+            <Dialog
+              open={guidelinesOpen}
+              onClose={() => setGuidelinesOpen(false)}
+              maxWidth="md"
+              fullWidth
+              PaperProps={{
+                sx: {
+                  borderRadius: 3,
+                  bgcolor: "background.paper",
+                  backgroundImage: "none",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  maxHeight: "85vh",
+                },
+              }}
+            >
+              <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
+                {/* Header */}
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="flex-start"
+                  spacing={2}
+                  sx={{ mb: 3 }}
+                >
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Box
+                      sx={{
+                        width: 52,
+                        height: 52,
+                        borderRadius: 2,
+                        bgcolor: "rgba(59,130,246,0.15)",
+                        color: "primary.main",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <ShieldOutlinedIcon sx={{ fontSize: 28 }} />
+                    </Box>
+
+                    <Box>
+                      <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
+                        ATS Resume Guidelines
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          fontSize: 13,
+                          color: "text.secondary",
+                          mt: 0.5,
+                        }}
+                      >
+                        Follow these best practices to improve your ATS score.
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  <IconButton
+                    onClick={() => setGuidelinesOpen(false)}
+                    sx={{ color: "text.secondary" }}
+                  >
+                    <CloseRoundedIcon />
+                  </IconButton>
+                </Stack>
+
+                {/* Guidelines */}
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                      xs: "1fr",
+                      sm: "1fr 1fr",
+                    },
+                    gap: 2,
+                  }}
+                >
+                  {/* 1 */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2.5,
+                      bgcolor: "background.default",
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      spacing={1.2}
+                      alignItems="center"
+                      sx={{ mb: 1.5 }}
+                    >
+                      <SearchRoundedIcon sx={{ color: "primary.main" }} />
+
+                      <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                        Use Relevant Keywords
+                      </Typography>
+                    </Stack>
+
+                    <Typography
+                      sx={{
+                        fontSize: 12,
+                        color: "text.secondary",
+                        lineHeight: 1.7,
+                      }}
+                    >
+                      Include important keywords from the job description.
+                      Mention relevant skills, tools and technologies naturally.
+                    </Typography>
+                  </Paper>
+
+                  {/* 2 */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2.5,
+                      bgcolor: "background.default",
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      spacing={1.2}
+                      alignItems="center"
+                      sx={{ mb: 1.5 }}
+                    >
+                      <DescriptionOutlinedIcon sx={{ color: "success.main" }} />
+
+                      <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                        Keep Formatting Simple
+                      </Typography>
+                    </Stack>
+
+                    <Typography
+                      sx={{
+                        fontSize: 12,
+                        color: "text.secondary",
+                        lineHeight: 1.7,
+                      }}
+                    >
+                      Use standard headings and a clean layout. Avoid excessive
+                      graphics, tables and unnecessary design elements.
+                    </Typography>
+                  </Paper>
+
+                  {/* 3 */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2.5,
+                      bgcolor: "background.default",
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      spacing={1.2}
+                      alignItems="center"
+                      sx={{ mb: 1.5 }}
+                    >
+                      <TrendingUpRoundedIcon sx={{ color: "#8b5cf6" }} />
+
+                      <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                        Quantify Achievements
+                      </Typography>
+                    </Stack>
+
+                    <Typography
+                      sx={{
+                        fontSize: 12,
+                        color: "text.secondary",
+                        lineHeight: 1.7,
+                      }}
+                    >
+                      Show measurable results whenever possible. Numbers help
+                      recruiters understand the actual impact of your work.
+                    </Typography>
+
+                    <Box
+                      sx={{
+                        mt: 1.5,
+                        p: 1.2,
+                        borderRadius: 1.5,
+                        bgcolor: "rgba(16,185,129,0.08)",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: 11, color: "success.main" }}>
+                        Example: Built 15+ REST APIs and reduced response time
+                        by 30%.
+                      </Typography>
+                    </Box>
+                  </Paper>
+
+                  {/* 4 */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2.5,
+                      bgcolor: "background.default",
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      spacing={1.2}
+                      alignItems="center"
+                      sx={{ mb: 1.5 }}
+                    >
+                      <TrackChangesRoundedIcon sx={{ color: "warning.main" }} />
+
+                      <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                        Match Job Description
+                      </Typography>
+                    </Stack>
+
+                    <Typography
+                      sx={{
+                        fontSize: 12,
+                        color: "text.secondary",
+                        lineHeight: 1.7,
+                      }}
+                    >
+                      Customize your resume for every job. Highlight the skills
+                      and experience that are most relevant to the position.
+                    </Typography>
+                  </Paper>
+
+                  {/* 5 */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2.5,
+                      bgcolor: "background.default",
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      spacing={1.2}
+                      alignItems="center"
+                      sx={{ mb: 1.5 }}
+                    >
+                      <ChecklistRoundedIcon sx={{ color: "#c084fc" }} />
+
+                      <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                        Use ATS-Friendly Sections
+                      </Typography>
+                    </Stack>
+
+                    <Stack spacing={0.7}>
+                      {[
+                        "Personal Information",
+                        "Professional Summary",
+                        "Skills",
+                        "Experience",
+                        "Projects",
+                        "Education",
+                        "Certifications",
+                      ].map((item) => (
+                        <Stack
+                          key={item}
+                          direction="row"
+                          spacing={0.8}
+                          alignItems="center"
+                        >
+                          <CheckCircleRoundedIcon
+                            sx={{
+                              fontSize: 15,
+                              color: "success.main",
+                            }}
+                          />
+
+                          <Typography
+                            sx={{
+                              fontSize: 11.5,
+                              color: "text.secondary",
+                            }}
+                          >
+                            {item}
+                          </Typography>
+                        </Stack>
+                      ))}
+                    </Stack>
+                  </Paper>
+
+                  {/* 6 */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2.5,
+                      bgcolor: "background.default",
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      spacing={1.2}
+                      alignItems="center"
+                      sx={{ mb: 1.5 }}
+                    >
+                      <WarningAmberRoundedIcon sx={{ color: "error.main" }} />
+
+                      <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                        Avoid Common Mistakes
+                      </Typography>
+                    </Stack>
+
+                    <Stack spacing={0.8}>
+                      {[
+                        "Spelling and grammatical errors",
+                        "Unnecessary personal information",
+                        "Huge paragraphs",
+                        "Fake or inflated skills",
+                        "Too many colors or design elements",
+                        "Irrelevant experience",
+                      ].map((item) => (
+                        <Stack
+                          key={item}
+                          direction="row"
+                          spacing={0.8}
+                          alignItems="center"
+                        >
+                          <Typography
+                            sx={{
+                              color: "error.main",
+                              fontWeight: 700,
+                              fontSize: 13,
+                            }}
+                          >
+                            ×
+                          </Typography>
+
+                          <Typography
+                            sx={{
+                              fontSize: 11.5,
+                              color: "text.secondary",
+                            }}
+                          >
+                            {item}
+                          </Typography>
+                        </Stack>
+                      ))}
+                    </Stack>
+                  </Paper>
+                </Box>
+
+                {/* Quick tip */}
+                <Box
+                  sx={{
+                    mt: 2,
+                    p: 1.8,
+                    borderRadius: 2,
+                    bgcolor: "rgba(59,130,246,0.10)",
+                    border: "1px solid",
+                    borderColor: "rgba(59,130,246,0.25)",
+                  }}
+                >
+                  <Stack direction="row" spacing={1.2} alignItems="center">
+                    <LightbulbOutlinedIcon sx={{ color: "warning.main" }} />
+
+                    <Box>
+                      <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                        Quick Tip
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          fontSize: 11.5,
+                          color: "text.secondary",
+                          mt: 0.3,
+                        }}
+                      >
+                        Keep your resume relevant, readable and tailored to the
+                        job description.
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Box>
+
+                {/* Footer */}
+                <Stack direction="row" justifyContent="flex-end" sx={{ mt: 2 }}>
+                  <Button
+                    variant="contained"
+                    endIcon={<ArrowForwardRoundedIcon />}
+                    onClick={() => setGuidelinesOpen(false)}
+                  >
+                    Got it
+                  </Button>
+                </Stack>
+              </DialogContent>
+            </Dialog>
           </Box>
         </Box>
       </Box>
