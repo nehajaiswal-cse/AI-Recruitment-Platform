@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTheme } from "@mui/material/styles";
 
 import {
   Box,
@@ -23,7 +24,11 @@ import VideoCameraFrontRoundedIcon from "@mui/icons-material/VideoCameraFrontRou
 
 import { useInterviewContext } from "../../context/InterviewContext";
 
+import RNavbar from '../../components/layout/recruiter/Navbar';
+import RSidebar from '../../components/layout/recruiter/Sidebar';
+
 const Interviews = () => {
+  const theme = useTheme();
   // ===================================================
   // INTERVIEW CONTEXT
   // ===================================================
@@ -595,41 +600,43 @@ const Interviews = () => {
   // ===================================================
 
   const getStatusStyle = (status) => {
+    const isDark = theme.palette.mode === "dark";
+
     switch (status) {
       case "Confirmed":
         return {
-          backgroundColor: "#064e3b",
-          color: "#6ee7b7",
+          backgroundColor: isDark ? "#064e3b" : "#d1fae5",
+          color: isDark ? "#6ee7b7" : "#047857",
         };
 
       case "Scheduled":
         return {
-          backgroundColor: "#172554",
-          color: "#60a5fa",
+          backgroundColor: isDark ? "#172554" : "#dbeafe",
+          color: isDark ? "#60a5fa" : "#1d4ed8",
         };
 
       case "Pending":
         return {
-          backgroundColor: "#422006",
-          color: "#fbbf24",
+          backgroundColor: isDark ? "#422006" : "#fef3c7",
+          color: isDark ? "#fbbf24" : "#b45309",
         };
 
       case "Completed":
         return {
-          backgroundColor: "#052e16",
-          color: "#4ade80",
+          backgroundColor: isDark ? "#052e16" : "#dcfce7",
+          color: isDark ? "#4ade80" : "#15803d",
         };
 
       case "Cancelled":
         return {
-          backgroundColor: "#450a0a",
-          color: "#f87171",
+          backgroundColor: isDark ? "#450a0a" : "#fee2e2",
+          color: isDark ? "#f87171" : "#dc2626",
         };
 
       default:
         return {
-          backgroundColor: "#334155",
-          color: "#cbd5e1",
+          backgroundColor: isDark ? "#334155" : "#e2e8f0",
+          color: isDark ? "#cbd5e1" : "#475569",
         };
     }
   };
@@ -643,7 +650,7 @@ const Interviews = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          bgcolor: "#0f172a",
+          bgcolor: "background.default",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -651,7 +658,7 @@ const Interviews = () => {
       >
         <Typography
           sx={{
-            color: "#94a3b8",
+            color: "text.secondary",
           }}
         >
           Loading interviews...
@@ -665,10 +672,50 @@ const Interviews = () => {
   // ===================================================
 
   return (
+     <Box
+          sx={{
+            minHeight: '100vh',
+            bgcolor: 'background.default',
+            color: 'text.primary',
+          }}
+        >
+          {/* Navbar */}
+          <Box
+            component="header"
+            sx={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 50,
+            }}
+          >
+            <RNavbar />
+          </Box>
+    
+          {/* Sidebar + Main */}
+          <Box
+            sx={{
+              display: 'flex',
+              minWidth: 0,
+            }}
+          >
+            {/* Sidebar */}
+            <RSidebar />
+    
+            {/* Main */}
+            <Box
+              component="main"
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                bgcolor: 'background.default',
+                color: 'text.primary',
+                pt: 5
+              }}
+            >
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#0f172a",
+        bgcolor: "background.default",
         p: {
           xs: 2,
           sm: 3,
@@ -704,7 +751,7 @@ const Interviews = () => {
                 md: 34,
               },
               fontWeight: 700,
-              color: "#f8fafc",
+              color: "text.primary",
             }}
           >
             Interviews
@@ -714,7 +761,7 @@ const Interviews = () => {
             sx={{
               mt: 0.5,
               fontSize: 15,
-              color: "#94a3b8",
+              color: "text.secondary",
             }}
           >
             Manage, schedule and track
@@ -728,9 +775,8 @@ const Interviews = () => {
           startIcon={<AddRoundedIcon />}
           onClick={handleOpenSchedule}
           sx={{
-            background:
-              "linear-gradient(135deg,#6366f1,#8b5cf6)",
-            color: "#fff",
+            background: "linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})",
+            color: "common.white",
             fontWeight: 600,
             textTransform: "none",
             borderRadius: 2,
@@ -759,14 +805,14 @@ const Interviews = () => {
             mb: 3,
             p: 2,
             borderRadius: 2,
-            backgroundColor: "#3f1111",
-            border:
-              "1px solid #7f1d1d",
+            backgroundColor: "error.dark",
+            border: "1px solid",
+            borderColor: "error.main",
           }}
         >
           <Typography
             sx={{
-              color: "#f87171",
+              color: "error.light",
             }}
           >
             {error}
@@ -826,15 +872,14 @@ const Interviews = () => {
               sx={{
                 p: 2.5,
                 borderRadius: 3,
-                backgroundColor:
-                  "#1e293b",
-                border:
-                  "1px solid #334155",
+                backgroundColor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
               }}
             >
               <Typography
                 sx={{
-                  color: "#94a3b8",
+                  color: "text.secondary",
                   fontSize: 14,
                   mb: 1,
                 }}
@@ -844,7 +889,7 @@ const Interviews = () => {
 
               <Typography
                 sx={{
-                  color: "#f8fafc",
+                  color: "text.primary",
                   fontSize: 30,
                   fontWeight: 700,
                 }}
@@ -875,9 +920,9 @@ const Interviews = () => {
           mt: 3,
           p: 2,
           borderRadius: 3,
-          backgroundColor: "#172033",
-          border:
-            "1px solid #334155",
+          backgroundColor: "background.paper",
+          border: "1px solid",
+            borderColor: "divider",
           display: "flex",
           alignItems: "center",
           gap: 1.5,
@@ -896,29 +941,25 @@ const Interviews = () => {
             minWidth: 260,
 
             "& .MuiOutlinedInput-root": {
-              color: "#f8fafc",
-              backgroundColor:
-                "#111827",
+              color: "text.primary",
+              backgroundColor: "background.default",
               borderRadius: 2,
 
               "& fieldset": {
-                borderColor:
-                  "#334155",
+                borderColor: "divider",
               },
 
               "&:hover fieldset": {
-                borderColor:
-                  "#475569",
+                borderColor: "text.secondary",
               },
 
               "&.Mui-focused fieldset": {
-                borderColor:
-                  "#6366f1",
+                borderColor: "primary.main",
               },
             },
 
             "& input::placeholder": {
-              color: "#64748b",
+              color: "text.secondary",
               opacity: 1,
             },
           }}
@@ -926,7 +967,7 @@ const Interviews = () => {
             startAdornment: (
               <SearchRoundedIcon
                 sx={{
-                  color: "#94a3b8",
+                  color: "text.secondary",
                   mr: 1,
                 }}
               />
@@ -947,9 +988,8 @@ const Interviews = () => {
             minWidth: 145,
 
             "& .MuiOutlinedInput-root": {
-              color: "#e2e8f0",
-              backgroundColor:
-                "#111827",
+              color: "text.primary",
+              backgroundColor: "background.default",
               borderRadius: 2,
             },
           }}
@@ -992,9 +1032,8 @@ const Interviews = () => {
             minWidth: 165,
 
             "& .MuiOutlinedInput-root": {
-              color: "#e2e8f0",
-              backgroundColor:
-                "#111827",
+              color: "text.primary",
+              backgroundColor: "background.default",
               borderRadius: 2,
             },
           }}
@@ -1021,9 +1060,9 @@ const Interviews = () => {
         <Box
           sx={{
             display: "flex",
-            backgroundColor: "#111827",
-            border:
-              "1px solid #334155",
+            backgroundColor: "background.default",
+            border: "1px solid",
+            borderColor: "divider",
             borderRadius: 2,
             overflow: "hidden",
           }}
@@ -1039,11 +1078,11 @@ const Interviews = () => {
               height: 40,
               color:
                 viewMode === "list"
-                  ? "#fff"
-                  : "#94a3b8",
+                  ? "common.white"
+                  : "text.secondary",
               backgroundColor:
                 viewMode === "list"
-                  ? "#3730a3"
+                  ? "primary.dark"
                   : "transparent",
               textTransform: "none",
               borderRadius: 0,
@@ -1063,11 +1102,11 @@ const Interviews = () => {
               height: 40,
               color:
                 viewMode === "calendar"
-                  ? "#fff"
-                  : "#94a3b8",
+                  ? "common.white"
+                  : "text.secondary",
               backgroundColor:
                 viewMode === "calendar"
-                  ? "#3730a3"
+                  ? "primary.dark"
                   : "transparent",
               textTransform: "none",
               borderRadius: 0,
@@ -1090,9 +1129,9 @@ const Interviews = () => {
             md: 3,
           },
           borderRadius: 3,
-          backgroundColor: "#1e293b",
-          border:
-            "1px solid #334155",
+          backgroundColor: "background.paper",
+          border: "1px solid",
+            borderColor: "divider",
         }}
       >
         <Box
@@ -1108,7 +1147,7 @@ const Interviews = () => {
             sx={{
               fontSize: 20,
               fontWeight: 600,
-              color: "#f8fafc",
+              color: "text.primary",
             }}
           >
             Next Interview ⭐
@@ -1152,36 +1191,43 @@ const Interviews = () => {
               }}
             >
               <Box
-                sx={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: "50%",
-                  background:
-                    "linear-gradient(135deg,#6366f1,#8b5cf6)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent:
-                    "center",
-                  color: "#fff",
-                  fontWeight: 700,
-                }}
-              >
-                {getCandidateName(
-                  nextInterview
-                )
-                  .split(" ")
-                  .map(
-                    (word) => word[0]
-                  )
-                  .slice(0, 2)
-                  .join("")
-                  .toUpperCase()}
-              </Box>
+  sx={{
+    width: 52,
+    height: 52,
+    borderRadius: "50%",
+
+    background: `linear-gradient(
+      135deg,
+      ${theme.palette.primary.main},
+      ${theme.palette.secondary.main}
+    )`,
+
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+
+    color: "#ffffff",
+    fontWeight: 700,
+    fontSize: 16,
+
+    // Makes the initials clearly visible in both modes
+    textShadow: "0 1px 2px rgba(0, 0, 0, 0.25)",
+
+    flexShrink: 0,
+  }}
+>
+  {getCandidateName(nextInterview)
+    .split(" ")
+    .map((word) => word[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase()}
+</Box>
 
               <Box>
                 <Typography
                   sx={{
-                    color: "#f8fafc",
+                    color: "text.primary",
                     fontSize: 16,
                     fontWeight: 600,
                   }}
@@ -1193,7 +1239,7 @@ const Interviews = () => {
 
                 <Typography
                   sx={{
-                    color: "#a5b4fc",
+                    color: "primary.light",
                     fontSize: 14,
                   }}
                 >
@@ -1210,9 +1256,8 @@ const Interviews = () => {
                     px: 1.2,
                     py: 0.5,
                     borderRadius: 1.5,
-                    backgroundColor:
-                      "#312e81",
-                    color: "#c4b5fd",
+                    backgroundColor: "secondary.dark",
+                    color: "secondary.light",
                     fontSize: 12,
                   }}
                 >
@@ -1224,7 +1269,7 @@ const Interviews = () => {
             <Box>
               <Typography
                 sx={{
-                  color: "#e2e8f0",
+                  color: "text.primary",
                   fontSize: 14,
                 }}
               >
@@ -1236,7 +1281,7 @@ const Interviews = () => {
 
               <Typography
                 sx={{
-                  color: "#e2e8f0",
+                  color: "text.primary",
                   fontSize: 14,
                 }}
               >
@@ -1245,7 +1290,7 @@ const Interviews = () => {
 
               <Typography
                 sx={{
-                  color: "#94a3b8",
+                  color: "text.secondary",
                   fontSize: 14,
                 }}
               >
@@ -1276,7 +1321,7 @@ const Interviews = () => {
                   }
                   sx={{
                     background:
-                      "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                      `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                     textTransform:
                       "none",
                     boxShadow: "none",
@@ -1294,9 +1339,8 @@ const Interviews = () => {
                   )
                 }
                 sx={{
-                  color: "#cbd5e1",
-                  borderColor:
-                    "#475569",
+                  color: "text.primary",
+                  borderColor: "text.secondary",
                   textTransform:
                     "none",
                 }}
@@ -1308,7 +1352,7 @@ const Interviews = () => {
         ) : (
           <Typography
             sx={{
-              color: "#94a3b8",
+              color: "text.secondary",
               py: 2,
             }}
           >
@@ -1330,9 +1374,9 @@ const Interviews = () => {
               md: 3,
             },
             borderRadius: 3,
-            backgroundColor: "#1e293b",
-            border:
-              "1px solid #334155",
+            backgroundColor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider",
           }}
         >
           <Box
@@ -1349,7 +1393,7 @@ const Interviews = () => {
                 sx={{
                   fontSize: 20,
                   fontWeight: 600,
-                  color: "#f8fafc",
+                  color: "text.primary",
                 }}
               >
                 Upcoming Interviews
@@ -1359,7 +1403,7 @@ const Interviews = () => {
                 sx={{
                   mt: 0.5,
                   fontSize: 14,
-                  color: "#94a3b8",
+                  color: "text.secondary",
                 }}
               >
                 Your scheduled candidate
@@ -1369,7 +1413,7 @@ const Interviews = () => {
 
             <Typography
               sx={{
-                color: "#94a3b8",
+                color: "text.secondary",
                 fontSize: 13,
               }}
             >
@@ -1388,7 +1432,7 @@ const Interviews = () => {
             >
               <Typography
                 sx={{
-                  color: "#94a3b8",
+                  color: "text.secondary",
                 }}
               >
                 No interviews found.
@@ -1414,10 +1458,9 @@ const Interviews = () => {
                     p: 2,
                     mb: 2,
                     borderRadius: 2,
-                    backgroundColor:
-                      "#182235",
-                    border:
-                      "1px solid #334155",
+                    backgroundColor: "background.surface",
+                    border: "1px solid",
+                      borderColor: "divider",
                   }}
                 >
                   {/* Candidate */}
@@ -1425,7 +1468,7 @@ const Interviews = () => {
                   <Box>
                     <Typography
                       sx={{
-                        color: "#f8fafc",
+                        color: "text.primary",
                         fontSize: 15,
                         fontWeight: 600,
                       }}
@@ -1437,7 +1480,7 @@ const Interviews = () => {
 
                     <Typography
                       sx={{
-                        color: "#94a3b8",
+                        color: "text.secondary",
                         fontSize: 13,
                       }}
                     >
@@ -1448,7 +1491,7 @@ const Interviews = () => {
 
                     <Typography
                       sx={{
-                        color: "#a5b4fc",
+                        color: "primary.light",
                         fontSize: 13,
                       }}
                     >
@@ -1463,7 +1506,7 @@ const Interviews = () => {
                   <Box>
                     <Typography
                       sx={{
-                        color: "#e2e8f0",
+                        color: "text.primary",
                         fontSize: 13,
                       }}
                     >
@@ -1475,7 +1518,7 @@ const Interviews = () => {
 
                     <Typography
                       sx={{
-                        color: "#94a3b8",
+                        color: "text.secondary",
                         fontSize: 13,
                       }}
                     >
@@ -1489,7 +1532,7 @@ const Interviews = () => {
                   <Box>
                     <Typography
                       sx={{
-                        color: "#cbd5e1",
+                        color: "text.primary",
                         fontSize: 13,
                       }}
                     >
@@ -1498,7 +1541,7 @@ const Interviews = () => {
 
                     <Typography
                       sx={{
-                        color: "#94a3b8",
+                        color: "text.secondary",
                         fontSize: 12,
                         mt: 0.5,
                       }}
@@ -1543,10 +1586,9 @@ const Interviews = () => {
                         )
                       }
                       sx={{
-                        color:
-                          "#cbd5e1",
-                        border:
-                          "1px solid #475569",
+                        color: "text.primary",
+                        border: "1px solid",
+                          borderColor: "text.secondary",
                         textTransform:
                           "none",
                       }}
@@ -1562,14 +1604,12 @@ const Interviews = () => {
                         )
                       }
                       sx={{
-                        color: "#fff",
-                        backgroundColor:
-                          "#6366f1",
+                        color: "common.white",
+                        backgroundColor: "primary.main",
                         textTransform:
                           "none",
                         "&:hover": {
-                          backgroundColor:
-                            "#4f46e5",
+                          backgroundColor: "primary.dark",
                         },
                       }}
                     >
@@ -1605,10 +1645,9 @@ const Interviews = () => {
             sx={{
               p: 2.5,
               borderRadius: 3,
-              backgroundColor:
-                "#1e293b",
-              border:
-                "1px solid #334155",
+              backgroundColor: "background.paper",
+              border: "1px solid",
+                borderColor: "divider",
             }}
           >
             <Box
@@ -1622,7 +1661,7 @@ const Interviews = () => {
             >
               <Typography
                 sx={{
-                  color: "#f8fafc",
+                  color: "text.primary",
                   fontSize: 18,
                   fontWeight: 600,
                 }}
@@ -1650,7 +1689,7 @@ const Interviews = () => {
                     minWidth: 36,
                     width: 36,
                     height: 36,
-                    color: "#94a3b8",
+                    color: "text.secondary",
                   }}
                 >
                   <ChevronLeftRoundedIcon />
@@ -1664,7 +1703,7 @@ const Interviews = () => {
                     minWidth: 36,
                     width: 36,
                     height: 36,
-                    color: "#94a3b8",
+                    color: "text.secondary",
                   }}
                 >
                   <ChevronRightRoundedIcon />
@@ -1694,7 +1733,7 @@ const Interviews = () => {
                 <Typography
                   key={day}
                   sx={{
-                    color: "#64748b",
+                    color: "text.secondary",
                     fontSize: 11,
                     fontWeight: 600,
                     py: 0.8,
@@ -1780,14 +1819,8 @@ const Interviews = () => {
                             "center",
                           borderRadius:
                             "50%",
-                          backgroundColor:
-                            isSelected
-                              ? "#6366f1"
-                              : "transparent",
-                          color:
-                            isSelected
-                              ? "#fff"
-                              : "#e2e8f0",
+                          backgroundColor: isSelected ? "primary.main" : "transparent",
+                          color: isSelected ? "common.white" : "text.primary",
                           fontSize: 13,
                           fontWeight:
                             isSelected
@@ -1795,10 +1828,7 @@ const Interviews = () => {
                               : 400,
 
                           "&:hover": {
-                            backgroundColor:
-                              isSelected
-                                ? "#6366f1"
-                                : "#182235",
+                            backgroundColor: isSelected ? "primary.main" : "background.surface",
                           },
                         }}
                       >
@@ -1816,8 +1846,7 @@ const Interviews = () => {
                               height: 4,
                               borderRadius:
                                 "50%",
-                              backgroundColor:
-                                "#6366f1",
+                              backgroundColor: "primary.main",
                             }}
                           />
                         )}
@@ -1834,15 +1863,14 @@ const Interviews = () => {
             sx={{
               p: 2.5,
               borderRadius: 3,
-              backgroundColor:
-                "#1e293b",
-              border:
-                "1px solid #334155",
+              backgroundColor: "background.paper",
+              border: "1px solid",
+                borderColor: "divider",
             }}
           >
             <Typography
               sx={{
-                color: "#f8fafc",
+                color: "text.primary",
                 fontSize: 18,
                 fontWeight: 600,
                 mb: 2,
@@ -1863,7 +1891,7 @@ const Interviews = () => {
             0 ? (
               <Typography
                 sx={{
-                  color: "#64748b",
+                  color: "text.secondary",
                   textAlign:
                     "center",
                   py: 5,
@@ -1884,10 +1912,9 @@ const Interviews = () => {
                       p: 1.5,
                       mb: 1.5,
                       borderRadius: 2,
-                      backgroundColor:
-                        "#182235",
-                      border:
-                        "1px solid #334155",
+                      backgroundColor: "background.surface",
+                      border: "1px solid",
+                        borderColor: "divider",
                       cursor:
                         "pointer",
                     }}
@@ -1940,8 +1967,7 @@ const Interviews = () => {
 
                     <Typography
                       sx={{
-                        color:
-                          "#f8fafc",
+                        color: "text.primary",
                         fontSize: 14,
                         fontWeight: 600,
                         mt: 1,
@@ -1954,8 +1980,7 @@ const Interviews = () => {
 
                     <Typography
                       sx={{
-                        color:
-                          "#64748b",
+                        color: "text.secondary",
                         fontSize: 12,
                       }}
                     >
@@ -1966,8 +1991,7 @@ const Interviews = () => {
 
                     <Typography
                       sx={{
-                        color:
-                          "#64748b",
+                        color: "text.secondary",
                         fontSize: 12,
                       }}
                     >
@@ -1988,7 +2012,7 @@ const Interviews = () => {
               }
               sx={{
                 mt: 1,
-                color: "#818cf8",
+                color: "primary.light",
                 textTransform:
                   "none",
                 fontWeight: 600,
@@ -2014,9 +2038,8 @@ const Interviews = () => {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            backgroundColor:
-              "#1e293b",
-            color: "#f8fafc",
+            backgroundColor: "background.paper",
+            color: "text.primary",
             maxHeight: "90vh",
           },
         }}
@@ -2032,7 +2055,7 @@ const Interviews = () => {
         <DialogContent>
           <Typography
             sx={{
-              color: "#64748b",
+              color: "text.secondary",
               fontSize: 13,
               mb: 1,
             }}
@@ -2185,7 +2208,7 @@ const Interviews = () => {
             }
             sx={{
               background:
-                "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
               textTransform:
                 "none",
 
@@ -2230,7 +2253,7 @@ const Interviews = () => {
             }
             sx={{
               minWidth: 40,
-              color: "#64748b",
+              color: "text.secondary",
             }}
           >
             <CloseRoundedIcon />
@@ -2253,7 +2276,7 @@ const Interviews = () => {
 
             <Typography
               sx={{
-                color: "#94a3b8",
+                color: "text.secondary",
                 mb: 3,
               }}
             >
@@ -2417,7 +2440,7 @@ const Interviews = () => {
         <DialogContent>
           <Typography
             sx={{
-              color: "#64748b",
+              color: "text.secondary",
               fontSize: 13,
               mb: 1,
             }}
@@ -2534,7 +2557,23 @@ const Interviews = () => {
         </DialogActions>
       </Dialog>
     </Box>
+    </Box>
+    </Box>
+    </Box>
   );
 };
 
 export default Interviews;
+
+
+
+
+
+
+
+
+
+
+
+
+

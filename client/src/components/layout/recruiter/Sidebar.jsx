@@ -1,37 +1,80 @@
-import { useNavigate, useLocation } from "react-router-dom";
+
+import { useLocation, useNavigate } from "react-router-dom";
 
 import Sidebar from "../../dashboard/Sidebar.jsx";
 
-// Maps this Sidebar component's internal ids -> actual routes
-const ID_TO_PATH = {
-  dashboard: "/recruiter",
-  jobs: "/recruiter/jobs",
-  candidates: "/recruiter/candidates",
-  analytics: "/recruiter/analytics",
-  interviews: "/recruiter/interviews",
-  company: "/recruiter/company",
-  settings: "/recruiter/settings",
-};
+import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
+import WorkOutlineRoundedIcon from "@mui/icons-material/WorkOutlineRounded";
+import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
+import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
+import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
 
-// Reverse map: route path -> id (used to highlight the active item)
-const PATH_TO_ID = Object.fromEntries(
-  Object.entries(ID_TO_PATH).map(([id, path]) => [path, id])
-);
+const recruiterSidebarItems = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    path: "/recruiter",
+    icon: DashboardRoundedIcon,
+  },
+  {
+    id: "jobs",
+    label: "Manage Jobs",
+    path: "/recruiter/jobs",
+    icon: WorkOutlineRoundedIcon,
+  },
+  {
+    id: "candidates",
+    label: "Candidates",
+    path: "/recruiter/candidates",
+    icon: GroupOutlinedIcon,
+  },
+  {
+    id: "analytics",
+    label: "Analytics",
+    path: "/recruiter/analytics",
+    icon: InsightsRoundedIcon,
+  },
+  {
+    id: "interviews",
+    label: "Interviews",
+    path: "/recruiter/interviews",
+    icon: VideocamOutlinedIcon,
+  },
+  {
+    id: "profile",
+    label: "Profile",
+    path: "/recruiter/profile",
+    icon: PersonOutlineIcon,
+  },
+];
 
 const RSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const activeId = PATH_TO_ID[location.pathname] || "dashboard";
+  const activeItem =
+    recruiterSidebarItems.find(
+      (item) => location.pathname === item.path
+    ) || recruiterSidebarItems[0];
 
   const handleNavigate = (id) => {
-    const path = ID_TO_PATH[id];
-    if (path) {
-      navigate(path);
+    const item = recruiterSidebarItems.find(
+      (item) => item.id === id
+    );
+
+    if (item) {
+      navigate(item.path);
     }
   };
 
-  return <Sidebar active={activeId} onNavigate={handleNavigate} />;
+  return (
+    <Sidebar
+      items={recruiterSidebarItems}
+      active={activeItem.id}
+      onNavigate={handleNavigate}
+    />
+  );
 };
 
 export default RSidebar;

@@ -26,6 +26,9 @@ import { useNavigate } from "react-router-dom";
 import  useJobs  from "../../../hooks/useJob";
 import useSavedJobs from "../../../hooks/useSavedJobs";
 
+import ANavbar from '../../../components/layout/applicant/Navbar';
+import ASidebar from '../../../components/layout/applicant/Sidebar';
+
 const FindJobs = () => {
   const navigate = useNavigate();
 
@@ -94,6 +97,46 @@ const FindJobs = () => {
   };
 
   return (
+     <Box
+          sx={{
+            minHeight: '100vh',
+            bgcolor: 'background.default',
+            color: 'text.primary',
+          }}
+        >
+          {/* Navbar */}
+          <Box
+            component="header"
+            sx={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 50,
+            }}
+          >
+            <ANavbar />
+          </Box>
+    
+          {/* Sidebar + Main */}
+          <Box
+            sx={{
+              display: 'flex',
+              minWidth: 0,
+            }}
+          >
+            {/* Sidebar */}
+            <ASidebar />
+    
+            {/* Main */}
+            <Box
+              component="main"
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                bgcolor: 'background.default',
+                color: 'text.primary',
+                pt: 1
+              }}
+            >
     <Box sx={{ p: { xs: 2, md: 4 } }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
@@ -450,6 +493,9 @@ const FindJobs = () => {
         </Card>
       )}
     </Box>
+   </Box>
+   </Box>
+   </Box>
   );
 };
 

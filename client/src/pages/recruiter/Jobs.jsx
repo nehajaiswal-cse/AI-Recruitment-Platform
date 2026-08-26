@@ -7,6 +7,46 @@ import JobFilters from '../../components/sections/recruiter/JobFilters'
 
 const Job = () => {
   return (
+       <Box
+      sx={{
+        minHeight: '100vh',
+        bgcolor: 'background.default',
+        color: 'text.primary',
+      }}
+    >
+      {/* Navbar */}
+      <Box
+        component="header"
+        sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+        }}
+      >
+        <RNavbar />
+      </Box>
+
+      {/* Sidebar + Main */}
+      <Box
+        sx={{
+          display: 'flex',
+          minWidth: 0,
+        }}
+      >
+        {/* Sidebar */}
+        <RSidebar />
+
+        {/* Main */}
+        <Box
+          component="main"
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            bgcolor: 'background.default',
+            color: 'text.primary',
+            pt: 5
+          }}
+        >
     <Box
           sx={{
             minHeight: '100vh',
@@ -103,6 +143,9 @@ const Job = () => {
               </Box>
             </Box> 
           </Box>
+    </Box>
+    </Box>
+    </Box>
     </Box>
      
   );
