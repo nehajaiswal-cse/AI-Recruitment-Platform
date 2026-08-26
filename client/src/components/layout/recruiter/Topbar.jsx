@@ -196,13 +196,12 @@ export default function RTopbar() {
           md: 2,
         },
 
-<<<<<<< HEAD
         mb: 3,
       }}
     >
       <Box sx={{ position: 'relative', flex: 1 }}>
         <TextField
-          placeholder="Search Job , Interview and Candidates by Job name"
+          placeholder="Search Candidates"
           fullWidth
           size="small"
           value={search}
@@ -261,6 +260,7 @@ export default function RTopbar() {
                 {matchedJobs.map((job) => (
                   <ListItemButton
                     key={job._id}
+                    onMouseDown={(event) => event.preventDefault()}
                     onClick={() => goTo(`/recruiter/jobs/${job._id}`)}
                   >
                     <Box sx={{ minWidth: 0 }}>
@@ -294,6 +294,7 @@ export default function RTopbar() {
                 {matchedCandidates.map((candidate) => (
                   <ListItemButton
                     key={candidate._id}
+                    onMouseDown={(event) => event.preventDefault()}
                     onClick={() => goTo('/recruiter/candidates')}
                   >
                     <Box sx={{ minWidth: 0 }}>
@@ -327,6 +328,7 @@ export default function RTopbar() {
                 {matchedInterviews.map((interview) => (
                   <ListItemButton
                     key={interview._id}
+                    onMouseDown={(event) => event.preventDefault()}
                     onClick={() => goTo('/recruiter/interviews')}
                   >
                     <Box sx={{ minWidth: 0 }}>
@@ -349,35 +351,6 @@ export default function RTopbar() {
           </Paper>
         )}
       </Box>
-=======
-    pb: 2,
-
-    bgcolor: 'background.surface',
-    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
-    position: 'relative',
-    zIndex: 1,
-
-    mb: 3,
-  }}
->
-      <TextField
-        placeholder="Search Candidates"
-        fullWidth
-        size="small"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-            </InputAdornment>
-          ),
-          sx: {
-            bgcolor: 'background.paper',
-            borderRadius: 2,
-            height: 44,
-          },
-        }}
-      />
->>>>>>> 963d43269c71a3c7330c18f44fa3b77d31e72fd1
 
       <Button
         variant="contained"
