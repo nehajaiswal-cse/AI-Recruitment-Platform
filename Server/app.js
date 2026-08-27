@@ -11,6 +11,8 @@ import interviewRoutes from "./routes/interviewRoutes.js";
 import resumeRoutes from "./routes/resumeRoutes.js";
 import atsRoutes from "./routes/atsRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
+import recruiterSettingsRoutes from "./routes/recruiterSettingsRoutes.js";
+
 
 
 const app = express();
@@ -32,6 +34,7 @@ app.use("/api/interviews", interviewRoutes);
 app.use("/api/resumes", resumeRoutes);
 app.use("/api/ats", atsRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/recruiter/settings", recruiterSettingsRoutes);
 
 app.get("/", (req, res) => {
   res.json({
