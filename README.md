@@ -289,10 +289,3 @@ Repository:
 
 https://github.com/nehajaiswal-cse/AI-Recruitment-Platform
 
-## Author
-
-**Neha Jaiswal**
-
-B.Tech CSE (AI)
-
-University of Lucknow
