@@ -22,6 +22,7 @@ import RecruiterProfile from "./pages/recruiter/Profile";
 import Analytics from "./pages/recruiter/Analytics";
 import Candidates from "./pages/recruiter/Candidates"
 import Interview from "./pages/recruiter/Interviews"
+import Company from "./pages/recruiter/Company.jsx";
 
 import Jobs from "./pages/recruiter/jobs/Jobs.jsx";
 import CreateJob from "./pages/recruiter/jobs/createJob.jsx";
@@ -183,6 +184,10 @@ export default function App() {
               path="/recruiter/jobs/:id"
               element={<ViewJob />}
             />
+
+            <Route path="/recruiter/company" element={<Company></Company>}></Route>
+
+            
           </Route>
 
 
