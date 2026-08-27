@@ -26,9 +26,6 @@ import { useNavigate } from "react-router-dom";
 import  useJobs  from "../../../hooks/useJob";
 import useSavedJobs from "../../../hooks/useSavedJobs";
 
-import ANavbar from '../../../components/layout/applicant/Navbar';
-import ASidebar from '../../../components/layout/applicant/Sidebar';
-
 import ANavbar from "../../../components/layout/applicant/Navbar";
 import ASidebar from "../../../components/layout/applicant/Sidebar";
 
@@ -498,9 +495,6 @@ const FindJobs = () => {
         </Box>
       </Box>
     </Box>
-   </Box>
-   </Box>
-   </Box>
   );
 };
 
