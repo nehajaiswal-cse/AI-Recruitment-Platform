@@ -53,6 +53,7 @@ router.put(
   "/:id/status",
   authMiddleware,
   roleMiddleware("recruiter"),
-  updateInterviewStatus,
+  updateInterviewStatus
 );
+
 export default router;

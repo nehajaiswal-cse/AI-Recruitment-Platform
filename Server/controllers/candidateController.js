@@ -3,9 +3,6 @@ import Application from "../models/applications.js";
 import Job from "../models/job.js";
 
 
-
-
-
 export const createCandidate = async (req, res) => {
   try {
     const { applicationId } = req.body;

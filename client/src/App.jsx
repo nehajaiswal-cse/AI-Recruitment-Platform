@@ -30,6 +30,9 @@ import ViewJob from "./pages/recruiter/jobs/ViewJob.jsx";
 import AInterview from "./pages/applicant/Interview/Interviews"
 
 
+import Settings from "./pages/applicant/Settings";
+import Resume from "./pages/applicant/Resume";
+import ResumeBuilder from "./pages/applicant/ResumeBuilder";
 
 
 import ProtectedRoute from "./components/dashboard/ProtectedRoute.jsx";
@@ -87,7 +90,22 @@ export default function App() {
             
              <Route path="/applicant/saved-jobs" element={<SavedJob />} />
              <Route path="/applicant/interviews" element={<AInterview />} />
+
+            <Route
+              path="/applicant/settings"
+              element={<Settings />}
+            />  
             
+            <Route
+              path="/applicant/resume"
+              element={<Resume />}
+            />
+            
+            <Route
+  path="/applicant/resume-builder"
+  element={<ResumeBuilder />}
+/>
+
             <Route
             path="/applicant/jobs"
             element={<FindJobs></FindJobs>}

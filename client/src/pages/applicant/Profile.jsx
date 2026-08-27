@@ -541,41 +541,49 @@ const initialProfile = {
     "Frontend developer interested in building helpful, accessible products.",
 };
 
-const Profile = () => {
-  const theme = useTheme();
+const fieldSx = {
+  "& .MuiInputLabel-root": {
+    color: "text.secondary",
+  },
 
-  const [profile, setProfile] = useState(initialProfile);
-  const [isEditing, setIsEditing] = useState(false);
+  "& .MuiInputLabel-root.Mui-disabled": {
+    color: "text.secondary",
+  },
 
-  const fieldSx = {
-    "& .MuiInputLabel-root": {
-      color: theme.palette.text.secondary,
+  "& .MuiOutlinedInput-root": {
+    color: "text.primary",
+    backgroundColor: "background.default",
+
+    "& fieldset": {
+      borderColor: "divider",
     },
 
-    "& .MuiInputLabel-root.Mui-disabled": {
-      color: theme.palette.text.secondary,
+    "&:hover fieldset": {
+      borderColor: "text.secondary",
     },
 
-    "& .MuiOutlinedInput-root": {
-      color: theme.palette.text.primary,
-      backgroundColor: theme.palette.background.surface,
-
-      "& fieldset": {
-        borderColor: theme.palette.divider,
-      },
-
-      "&:hover fieldset": {
-        borderColor: theme.palette.text.secondary,
-      },
-
-      "&.Mui-focused fieldset": {
-        borderColor: theme.palette.primary.main,
-      },
+    "&.Mui-focused fieldset": {
+      borderColor: "primary.main",
     },
+  },
 
-    "& .MuiInputBase-input": {
-      color: theme.palette.text.primary,
-    },
+  // Normal text
+  "& .MuiInputBase-input": {
+    color: "text.primary",
+  },
+
+  // Disabled text
+  "& .MuiInputBase-input.Mui-disabled": {
+    WebkitTextFillColor: "currentColor",
+    color: "text.primary",
+    opacity: 1,
+  },
+
+  // Disabled input border
+  "& .MuiOutlinedInput-root.Mui-disabled fieldset": {
+    borderColor: "divider",
+  },
+};
 
     "& .MuiInputBase-input.Mui-disabled": {
       WebkitTextFillColor: theme.palette.text.primary,
@@ -683,7 +691,6 @@ const Profile = () => {
       sx={{
         minHeight: "100vh",
         bgcolor: "background.default",
-        color: "text.primary",
       }}
     >
       <Navbar />
@@ -761,16 +768,8 @@ const Profile = () => {
                 sx={{
                   width: 66,
                   height: 66,
-                   background:'linear-gradient(135deg, #3b82f6, #9333ea)',
-                   color: "#fff",
-                  // backgroundColor:
-                  //   theme.palette.mode === "dark"
-                  //     ? "#294b86"
-                  //     : "#dbeafe",
-                  // color:
-                  //   theme.palette.mode === "dark"
-                  //     ? "#dbeafe"
-                  //     : "#1d4ed8",
+                  backgroundColor: "primary.main",
+                  color: "primary.contrastText",
                   fontSize: "23px",
                   fontWeight: 700,
                 }}
@@ -815,14 +814,8 @@ const Profile = () => {
               <Chip
                 label="Applicant"
                 sx={{
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? "#124e35"
-                      : "#dcfce7",
-                  color:
-                    theme.palette.mode === "dark"
-                      ? "#65e6a0"
-                      : "#15803d",
+                  backgroundColor: "rgba(16, 185, 129, 0.15)",
+                  color: "success.main",
                   fontWeight: 600,
                   borderRadius: 2,
                   height: 32,
@@ -976,13 +969,13 @@ const Profile = () => {
                     onClick={handleCancel}
                     sx={{
                       color: "text.primary",
-                      borderColor: "text.secondary",
+                      borderColor: "divider",
                       textTransform: "none",
                       borderRadius: 1.5,
                       px: 2.5,
 
                       "&:hover": {
-                        borderColor: "text.primary",
+                        borderColor: "text.secondary",
                         backgroundColor: "action.hover",
                       },
                     }}
@@ -996,8 +989,7 @@ const Profile = () => {
                     onClick={handleSave}
                     sx={{
                       backgroundColor: "primary.main",
-                      background:'linear-gradient(135deg, #3b82f6, #9333ea)',
-                      color: "#ffffff",
+                      color: "primary.contrastText",
                       fontWeight: 700,
                       textTransform: "none",
                       borderRadius: 1.5,

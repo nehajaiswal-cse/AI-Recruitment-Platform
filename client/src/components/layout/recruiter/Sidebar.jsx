@@ -1,80 +1,55 @@
-
-import { useLocation, useNavigate } from "react-router-dom";
-
 import Sidebar from "../../dashboard/Sidebar.jsx";
 
-import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
-import WorkOutlineRoundedIcon from "@mui/icons-material/WorkOutlineRounded";
-import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
-import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
-import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutlined";
+import {
+  LuLayoutDashboard,
+  LuBriefcaseBusiness,
+  LuUsers,
+  LuChartNoAxesCombined,
+  LuVideo,
+  LuBuilding2,
+  LuSettings,
+} from "react-icons/lu";
 
 const recruiterSidebarItems = [
   {
-    id: "dashboard",
     label: "Dashboard",
     path: "/recruiter",
-    icon: DashboardRoundedIcon,
+    icon: LuLayoutDashboard,
   },
   {
-    id: "jobs",
     label: "Manage Jobs",
     path: "/recruiter/jobs",
-    icon: WorkOutlineRoundedIcon,
+    icon: LuBriefcaseBusiness,
   },
   {
-    id: "candidates",
     label: "Candidates",
     path: "/recruiter/candidates",
-    icon: GroupOutlinedIcon,
+    icon: LuUsers,
   },
   {
-    id: "analytics",
     label: "Analytics",
     path: "/recruiter/analytics",
-    icon: InsightsRoundedIcon,
+    icon: LuChartNoAxesCombined,
   },
   {
-    id: "interviews",
     label: "Interviews",
     path: "/recruiter/interviews",
-    icon: VideocamOutlinedIcon,
+    icon: LuVideo,
   },
   {
-    id: "profile",
-    label: "Profile",
-    path: "/recruiter/profile",
-    icon: PersonOutlineIcon,
+    label: "Company",
+    path: "/recruiter/company",
+    icon: LuBuilding2,
+  },
+  {
+    label: "Settings",
+    path: "/recruiter/settings",
+    icon: LuSettings,
   },
 ];
 
 const RSidebar = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const activeItem =
-    recruiterSidebarItems.find(
-      (item) => location.pathname === item.path
-    ) || recruiterSidebarItems[0];
-
-  const handleNavigate = (id) => {
-    const item = recruiterSidebarItems.find(
-      (item) => item.id === id
-    );
-
-    if (item) {
-      navigate(item.path);
-    }
-  };
-
-  return (
-    <Sidebar
-      items={recruiterSidebarItems}
-      active={activeItem.id}
-      onNavigate={handleNavigate}
-    />
-  );
+  return <Sidebar items={recruiterSidebarItems} />;
 };
 
 export default RSidebar;

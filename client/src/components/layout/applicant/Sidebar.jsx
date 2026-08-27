@@ -15,7 +15,7 @@ const applicantSidebarItems = [
     id: "dashboard",
     label: "Dashboard",
     path: "/applicant",
-    icon: DashboardRoundedIcon,
+    icon: LuLayoutDashboard,
   },
   {
     id: "findjobs",

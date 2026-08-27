@@ -41,6 +41,52 @@ const userSchema = new mongoose.Schema(
       companyDescription: String
     },
 
+    // ---- Settings page fields (new) ----
+    jobPreferences: {
+      preferredRole: { type: String, default: "" },
+      preferredLocation: { type: String, default: "" },
+      workMode: {
+        type: String,
+        enum: ["Remote", "Hybrid", "On-site"],
+        default: "Hybrid"
+      },
+      expectedSalary: { type: String, default: "" },
+      experienceLevel: {
+        type: String,
+        enum: ["Fresher", "Mid level (2-4 yrs)", "Senior (5+ yrs)"],
+        default: "Fresher"
+      },
+      employmentType: {
+        type: String,
+        enum: ["Full-time", "Part-time", "Internship"],
+        default: "Full-time"
+      }
+    },
+
+    notifications: {
+      jobRecommendations: { type: Boolean, default: true },
+      newJobAlerts: { type: Boolean, default: true },
+      applicationUpdates: { type: Boolean, default: true },
+      recruiterMessages: { type: Boolean, default: true },
+      emailNotifications: { type: Boolean, default: true },
+      pushNotifications: { type: Boolean, default: false }
+    },
+
+    privacy: {
+      profileVisibility: {
+        type: String,
+        enum: ["Public", "Recruiters only", "Private"],
+        default: "Public"
+      },
+      resumeVisibility: {
+        type: String,
+        enum: ["Everyone", "Recruiters only", "No one"],
+        default: "Recruiters only"
+      },
+      twoFactorEnabled: { type: Boolean, default: false }
+    },
+    // ---- end settings fields ----
+
     isActive: {
       type: Boolean,
       default: true
