@@ -277,7 +277,7 @@ const FindJobs = () => {
                 }}
               >
                 {filteredJobs.map((job) => {
-                  const isSaved = savedJobs.includes(job._id);
+                  const isSaved = savedJobIds.includes(job._id);
 
                   return (
                     <Card
