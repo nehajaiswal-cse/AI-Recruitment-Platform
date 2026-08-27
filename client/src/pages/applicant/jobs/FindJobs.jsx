@@ -42,7 +42,7 @@ const FindJobs = () => {
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
   const [jobType, setJobType] = useState("");
- // const [savedJobs, setSavedJobs] = useState([]);
+ const [savedJobs, setSavedJobs] = useState([]);
   const { savedJobIds, toggleSaveJob } = useSavedJobs();
 
   useEffect(() => {
