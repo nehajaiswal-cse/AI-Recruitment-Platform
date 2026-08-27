@@ -1,4 +1,337 @@
 
+// import {
+//   Card,
+//   CardContent,
+//   Typography,
+//   Box,
+//   Button,
+//   Chip,
+//   Divider,
+//   useTheme,
+// } from '@mui/material';
+
+// import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+// import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
+// import VideoCameraFrontOutlinedIcon from '@mui/icons-material/VideoCameraFrontOutlined';
+
+// const getInitials = (company) => {
+//   if (!company) return '';
+
+//   return company
+//     .split(' ')
+//     .map((word) => word[0])
+//     .join('')
+//     .slice(0, 2)
+//     .toUpperCase();
+// };
+
+// const formatDate = (date) => {
+//   const formattedDate = new Date(date);
+
+//   return formattedDate.toLocaleDateString('en-US', {
+//     month: 'short',
+//     day: 'numeric',
+//   });
+// };
+
+// export default function UpcomingInterviews({ interviews = [] }) {
+//   const theme = useTheme();
+//   const isDark = theme.palette.mode === 'dark';
+
+  
+
+//   const colors = {
+//   primaryText: theme.palette.text.primary,
+//   secondaryText: theme.palette.text.secondary,
+//   divider: theme.palette.divider,
+
+//   accent: theme.palette.secondary.main,
+
+//   // Interview card
+//   interviewBackground: isDark ? '#211b38' : '#faf5ff',
+//   interviewBorder: isDark ? '#3f3566' : '#e9d5ff',
+
+//   // Chips
+//   chipBackground: isDark ? '#1e2a4a' : '#eff6ff',
+//   chipText: isDark ? '#93c5fd' : '#2563eb',
+//   chipIcon: isDark ? '#60a5fa' : '#3b82f6',
+
+//   // Button
+//   buttonGradient: 'linear-gradient(135deg, #3b82f6, #9333ea)',
+//   buttonHoverGradient: 'linear-gradient(135deg, #2563eb, #7e22ce)',
+// };
+
+
+//   return (
+//     <Card
+//       sx={{
+//         height: '100%',
+//         display: 'flex',
+//         flexDirection: 'column',
+//         border: `1px solid ${colors.divider}`,
+//         boxShadow: 'none',
+//         borderRadius: 3,
+//         backgroundColor: theme.palette.background.paper,
+//       }}
+//     >
+//       <CardContent
+//         sx={{
+//           p: 2.5,
+//           pb: 1,
+//           flex: '1 1 auto',
+//           display: 'flex',
+//           flexDirection: 'column',
+//         }}
+//       >
+//         {/* Header */}
+//         <Box
+//           sx={{
+//             display: 'flex',
+//             alignItems: 'center',
+//             gap: 1,
+//             mb: 2,
+//             pl: 2,
+//           }}
+//         >
+//           <VideoCameraFrontOutlinedIcon
+//             sx={{
+//               color: colors.accent,
+//               fontSize: 24,
+//             }}
+//           />
+
+//           <Typography
+//             variant="h6"
+//             sx={{
+//               fontWeight: 700,
+//               color: colors.primaryText,
+//             }}
+//           >
+//             Upcoming Interviews
+//           </Typography>
+//         </Box>
+
+//         {/* Interviews */}
+//         <Box
+//           sx={{
+//             display: 'flex',
+//             flexDirection: 'column',
+//             gap: 1.5,
+//             flex: 1,
+//           }}
+//         >
+//           {interviews.length === 0 && (
+//             <Box
+//               sx={{
+//                 textAlign: 'center',
+//                 py: 4,
+//               }}
+//             >
+//               <Typography
+//                 variant="body2"
+//                 sx={{
+//                   color: colors.secondaryText,
+//                 }}
+//               >
+//                 No upcoming interviews
+//               </Typography>
+//             </Box>
+//           )}
+
+//           {interviews.slice(0, 2).map((interview, index) => (
+//             <Box key={interview.id}>
+//               {index > 0 && (
+//                 <Divider
+//                   sx={{
+//                     mb: 2,
+//                     borderColor: colors.divider,
+//                   }}
+//                 />
+//               )}
+
+//               <Box
+//                 sx={{
+//                   p: 2,
+//                   borderRadius: 3,
+
+//                   backgroundColor: colors.interviewBackground,
+//                   border: `1px solid ${colors.interviewBorder}`,
+//                 }}
+//               >
+//                 {/* Company + Position */}
+//                 <Box
+//                   sx={{
+//                     display: 'flex',
+//                     gap: 1.5,
+//                     alignItems: 'flex-start',
+//                     mb: 2,
+//                   }}
+//                 >
+//                   {/* Company Logo */}
+//                   <Box
+//                     sx={{
+//                       width: 68,
+//                       height: 68,
+//                       borderRadius: '50%',
+//                       backgroundColor:
+//                         interview.logo_color || theme.palette.primary.main,
+
+//                       display: 'flex',
+//                       alignItems: 'center',
+//                       justifyContent: 'center',
+
+//                       color: '#ffffff',
+//                       fontWeight: 700,
+//                       fontSize: '1rem',
+
+//                       flexShrink: 0,
+//                     }}
+//                   >
+//                     {getInitials(interview.company)}
+//                   </Box>
+
+//                   <Box
+//                     sx={{
+//                       flex: 1,
+//                       minWidth: 0,
+//                     }}
+//                   >
+//                     <Typography
+//                       variant="subtitle1"
+//                       sx={{
+//                         fontWeight: 600,
+//                         fontSize: '1rem',
+//                         lineHeight: 1.3,
+//                         mb: 0.25,
+//                         color: colors.primaryText,
+//                       }}
+//                     >
+//                       {interview.position}
+//                     </Typography>
+
+//                     <Typography
+//                       variant="body2"
+//                       sx={{
+//                         color: colors.secondaryText,
+//                         fontSize: '0.9rem',
+//                       }}
+//                     >
+//                       {interview.company}
+//                     </Typography>
+//                   </Box>
+//                 </Box>
+
+//                 {/* Date + Time */}
+//                 <Box
+//                   sx={{
+//                     display: 'flex',
+//                     gap: 0.75,
+//                     flexWrap: 'wrap',
+//                     mb: 1.75,
+//                   }}
+//                 >
+//                   <Chip
+//                     icon={
+//                       <CalendarMonthOutlinedIcon
+//                         sx={{
+//                           fontSize: '16px !important',
+//                         }}
+//                       />
+//                     }
+//                     label={formatDate(interview.interview_date)}
+//                     size="small"
+//                     sx={{
+//                       height: 30,
+//                       backgroundColor: colors.chipBackground,
+//                       color: colors.chipText,
+//                       border: `1px solid ${colors.interviewBorder}`,
+//                       fontWeight: 600,
+
+//                       '& .MuiChip-icon': {
+//                         color: colors.chipIcon,
+//                       },
+
+//                       '&:hover': {
+//                         backgroundColor: colors.chipBackground,
+//                       },
+//                     }}
+//                   />
+
+//                   <Chip
+//                     icon={
+//                       <AccessTimeOutlinedIcon
+//                         sx={{
+//                           fontSize: '16px !important',
+//                         }}
+//                       />
+//                     }
+//                     label={interview.interview_time}
+//                     size="small"
+//                     sx={{
+//                       height: 30,
+//                       backgroundColor: colors.chipBackground,
+//                       color: colors.chipText,
+//                       border: `1px solid ${colors.interviewBorder}`,
+//                       fontWeight: 600,
+
+//                       '& .MuiChip-icon': {
+//                         color: colors.chipIcon,
+//                       },
+
+//                       '&:hover': {
+//                         backgroundColor: colors.chipBackground,
+//                       },
+//                     }}
+//                   />
+//                 </Box>
+
+//                 {/* Join Interview */}
+//                 <Button
+//                   fullWidth
+//                   variant="contained"
+//                   size="medium"
+//                   startIcon={<VideoCameraFrontOutlinedIcon />}
+//                   component={interview.meeting_link ? 'a' : 'button'}
+//                   href={interview.meeting_link || undefined}
+//                   target={
+//                     interview.meeting_link ? '_blank' : undefined
+//                   }
+//                   rel={
+//                     interview.meeting_link
+//                       ? 'noopener noreferrer'
+//                       : undefined
+//                   }
+//                   sx={{
+//                     textTransform: 'none',
+//                     fontWeight: 600,
+//                     fontSize: '1rem',
+//                     borderRadius: 3,
+//                     py: 1.1,
+
+//                     background: colors.buttonGradient,
+                     
+//                     boxShadow: isDark
+//                       ? '0 2px 8px rgba(124,58,237,0.2)'
+//                       : '0 2px 8px rgba(124,58,237,0.3)',
+
+//                     '&:hover': {
+//                       background: colors.buttonHoverGradient,
+//                     },
+//                   }}
+//                 >
+//                   Join Interview
+//                 </Button>
+//               </Box>
+//             </Box>
+//           ))}
+//         </Box>
+//       </CardContent>
+//     </Card>
+//   );
+// }
+
+
+import { useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -7,12 +340,19 @@ import {
   Button,
   Chip,
   Divider,
+  Skeleton,
   useTheme,
 } from '@mui/material';
 
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import VideoCameraFrontOutlinedIcon from '@mui/icons-material/VideoCameraFrontOutlined';
+
+import useInterview from '../../../hooks/useInterview';
+
+// Cycled through per interview's company logo, since the backend
+// doesn't store a color per interview.
+const logoColors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981'];
 
 const getInitials = (company) => {
   if (!company) return '';
@@ -28,39 +368,59 @@ const getInitials = (company) => {
 const formatDate = (date) => {
   const formattedDate = new Date(date);
 
+  if (Number.isNaN(formattedDate.getTime())) return '-';
+
   return formattedDate.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
   });
 };
 
-export default function UpcomingInterviews({ interviews = [] }) {
+export default function UpcomingInterviews() {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
-  
+  // useInterview() already auto-fetches "my interviews" on mount and
+  // exposes upcomingInterviews — filtered to date >= now and not
+  // Completed/Cancelled, sorted soonest-first. Reused as-is.
+  const { upcomingInterviews, loading, error } = useInterview();
 
   const colors = {
-  primaryText: theme.palette.text.primary,
-  secondaryText: theme.palette.text.secondary,
-  divider: theme.palette.divider,
+    primaryText: theme.palette.text.primary,
+    secondaryText: theme.palette.text.secondary,
+    divider: theme.palette.divider,
 
-  accent: theme.palette.secondary.main,
+    accent: theme.palette.secondary.main,
 
-  // Interview card
-  interviewBackground: isDark ? '#211b38' : '#faf5ff',
-  interviewBorder: isDark ? '#3f3566' : '#e9d5ff',
+    // Interview card
+    interviewBackground: isDark ? '#211b38' : '#faf5ff',
+    interviewBorder: isDark ? '#3f3566' : '#e9d5ff',
 
-  // Chips
-  chipBackground: isDark ? '#1e2a4a' : '#eff6ff',
-  chipText: isDark ? '#93c5fd' : '#2563eb',
-  chipIcon: isDark ? '#60a5fa' : '#3b82f6',
+    // Chips
+    chipBackground: isDark ? '#1e2a4a' : '#eff6ff',
+    chipText: isDark ? '#93c5fd' : '#2563eb',
+    chipIcon: isDark ? '#60a5fa' : '#3b82f6',
 
-  // Button
-  buttonGradient: 'linear-gradient(135deg, #3b82f6, #9333ea)',
-  buttonHoverGradient: 'linear-gradient(135deg, #2563eb, #7e22ce)',
-};
+    // Button
+    buttonGradient: 'linear-gradient(135deg, #3b82f6, #9333ea)',
+    buttonHoverGradient: 'linear-gradient(135deg, #2563eb, #7e22ce)',
+  };
 
+  // Map backend interview shape (job.title, job.company, date, time,
+  // meetingLink) -> what this card renders.
+  const interviews = useMemo(
+    () =>
+      upcomingInterviews.slice(0, 2).map((interview, index) => ({
+        id: interview._id,
+        company: interview.job?.company || 'Unknown company',
+        position: interview.job?.title || 'Unknown position',
+        logo_color: logoColors[index % logoColors.length],
+        interview_date: interview.date,
+        interview_time: interview.time,
+        meeting_link: interview.meetingLink,
+      })),
+    [upcomingInterviews]
+  );
 
   return (
     <Card
@@ -111,6 +471,16 @@ export default function UpcomingInterviews({ interviews = [] }) {
           </Typography>
         </Box>
 
+        {/* Error state */}
+        {error && (
+          <Typography
+            variant="body2"
+            sx={{ color: 'error.main', px: 2, mb: 1 }}
+          >
+            {error}
+          </Typography>
+        )}
+
         {/* Interviews */}
         <Box
           sx={{
@@ -120,7 +490,15 @@ export default function UpcomingInterviews({ interviews = [] }) {
             flex: 1,
           }}
         >
-          {interviews.length === 0 && (
+          {loading && (
+            <Skeleton
+              variant="rounded"
+              height={220}
+              sx={{ borderRadius: 3 }}
+            />
+          )}
+
+          {!loading && interviews.length === 0 && (
             <Box
               sx={{
                 textAlign: 'center',
@@ -138,192 +516,195 @@ export default function UpcomingInterviews({ interviews = [] }) {
             </Box>
           )}
 
-          {interviews.slice(0, 2).map((interview, index) => (
-            <Box key={interview.id}>
-              {index > 0 && (
-                <Divider
-                  sx={{
-                    mb: 2,
-                    borderColor: colors.divider,
-                  }}
-                />
-              )}
-
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-
-                  backgroundColor: colors.interviewBackground,
-                  border: `1px solid ${colors.interviewBorder}`,
-                }}
-              >
-                {/* Company + Position */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: 1.5,
-                    alignItems: 'flex-start',
-                    mb: 2,
-                  }}
-                >
-                  {/* Company Logo */}
-                  <Box
+          {!loading &&
+            interviews.map((interview, index) => (
+              <Box key={interview.id}>
+                {index > 0 && (
+                  <Divider
                     sx={{
-                      width: 68,
-                      height: 68,
-                      borderRadius: '50%',
-                      backgroundColor:
-                        interview.logo_color || theme.palette.primary.main,
-
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-
-                      color: '#ffffff',
-                      fontWeight: 700,
-                      fontSize: '1rem',
-
-                      flexShrink: 0,
-                    }}
-                  >
-                    {getInitials(interview.company)}
-                  </Box>
-
-                  <Box
-                    sx={{
-                      flex: 1,
-                      minWidth: 0,
-                    }}
-                  >
-                    <Typography
-                      variant="subtitle1"
-                      sx={{
-                        fontWeight: 600,
-                        fontSize: '1rem',
-                        lineHeight: 1.3,
-                        mb: 0.25,
-                        color: colors.primaryText,
-                      }}
-                    >
-                      {interview.position}
-                    </Typography>
-
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: colors.secondaryText,
-                        fontSize: '0.9rem',
-                      }}
-                    >
-                      {interview.company}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* Date + Time */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    gap: 0.75,
-                    flexWrap: 'wrap',
-                    mb: 1.75,
-                  }}
-                >
-                  <Chip
-                    icon={
-                      <CalendarMonthOutlinedIcon
-                        sx={{
-                          fontSize: '16px !important',
-                        }}
-                      />
-                    }
-                    label={formatDate(interview.interview_date)}
-                    size="small"
-                    sx={{
-                      height: 30,
-                      backgroundColor: colors.chipBackground,
-                      color: colors.chipText,
-                      border: `1px solid ${colors.interviewBorder}`,
-                      fontWeight: 600,
-
-                      '& .MuiChip-icon': {
-                        color: colors.chipIcon,
-                      },
-
-                      '&:hover': {
-                        backgroundColor: colors.chipBackground,
-                      },
+                      mb: 2,
+                      borderColor: colors.divider,
                     }}
                   />
+                )}
 
-                  <Chip
-                    icon={
-                      <AccessTimeOutlinedIcon
-                        sx={{
-                          fontSize: '16px !important',
-                        }}
-                      />
-                    }
-                    label={interview.interview_time}
-                    size="small"
-                    sx={{
-                      height: 30,
-                      backgroundColor: colors.chipBackground,
-                      color: colors.chipText,
-                      border: `1px solid ${colors.interviewBorder}`,
-                      fontWeight: 600,
-
-                      '& .MuiChip-icon': {
-                        color: colors.chipIcon,
-                      },
-
-                      '&:hover': {
-                        backgroundColor: colors.chipBackground,
-                      },
-                    }}
-                  />
-                </Box>
-
-                {/* Join Interview */}
-                <Button
-                  fullWidth
-                  variant="contained"
-                  size="medium"
-                  startIcon={<VideoCameraFrontOutlinedIcon />}
-                  component={interview.meeting_link ? 'a' : 'button'}
-                  href={interview.meeting_link || undefined}
-                  target={
-                    interview.meeting_link ? '_blank' : undefined
-                  }
-                  rel={
-                    interview.meeting_link
-                      ? 'noopener noreferrer'
-                      : undefined
-                  }
+                <Box
                   sx={{
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    fontSize: '1rem',
+                    p: 2,
                     borderRadius: 3,
-                    py: 1.1,
 
-                    background: colors.buttonGradient,
-                     
-                    boxShadow: isDark
-                      ? '0 2px 8px rgba(124,58,237,0.2)'
-                      : '0 2px 8px rgba(124,58,237,0.3)',
-
-                    '&:hover': {
-                      background: colors.buttonHoverGradient,
-                    },
+                    backgroundColor: colors.interviewBackground,
+                    border: `1px solid ${colors.interviewBorder}`,
                   }}
                 >
-                  Join Interview
-                </Button>
+                  {/* Company + Position */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      gap: 1.5,
+                      alignItems: 'flex-start',
+                      mb: 2,
+                    }}
+                  >
+                    {/* Company Logo */}
+                    <Box
+                      sx={{
+                        width: 68,
+                        height: 68,
+                        borderRadius: '50%',
+                        backgroundColor:
+                          interview.logo_color ||
+                          theme.palette.primary.main,
+
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+
+                        color: '#ffffff',
+                        fontWeight: 700,
+                        fontSize: '1rem',
+
+                        flexShrink: 0,
+                      }}
+                    >
+                      {getInitials(interview.company)}
+                    </Box>
+
+                    <Box
+                      sx={{
+                        flex: 1,
+                        minWidth: 0,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: '1rem',
+                          lineHeight: 1.3,
+                          mb: 0.25,
+                          color: colors.primaryText,
+                        }}
+                      >
+                        {interview.position}
+                      </Typography>
+
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: colors.secondaryText,
+                          fontSize: '0.9rem',
+                        }}
+                      >
+                        {interview.company}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Date + Time */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      gap: 0.75,
+                      flexWrap: 'wrap',
+                      mb: 1.75,
+                    }}
+                  >
+                    <Chip
+                      icon={
+                        <CalendarMonthOutlinedIcon
+                          sx={{
+                            fontSize: '16px !important',
+                          }}
+                        />
+                      }
+                      label={formatDate(interview.interview_date)}
+                      size="small"
+                      sx={{
+                        height: 30,
+                        backgroundColor: colors.chipBackground,
+                        color: colors.chipText,
+                        border: `1px solid ${colors.interviewBorder}`,
+                        fontWeight: 600,
+
+                        '& .MuiChip-icon': {
+                          color: colors.chipIcon,
+                        },
+
+                        '&:hover': {
+                          backgroundColor: colors.chipBackground,
+                        },
+                      }}
+                    />
+
+                    <Chip
+                      icon={
+                        <AccessTimeOutlinedIcon
+                          sx={{
+                            fontSize: '16px !important',
+                          }}
+                        />
+                      }
+                      label={interview.interview_time}
+                      size="small"
+                      sx={{
+                        height: 30,
+                        backgroundColor: colors.chipBackground,
+                        color: colors.chipText,
+                        border: `1px solid ${colors.interviewBorder}`,
+                        fontWeight: 600,
+
+                        '& .MuiChip-icon': {
+                          color: colors.chipIcon,
+                        },
+
+                        '&:hover': {
+                          backgroundColor: colors.chipBackground,
+                        },
+                      }}
+                    />
+                  </Box>
+
+                  {/* Join Interview */}
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="medium"
+                    startIcon={<VideoCameraFrontOutlinedIcon />}
+                    component={interview.meeting_link ? 'a' : 'button'}
+                    href={interview.meeting_link || undefined}
+                    target={interview.meeting_link ? '_blank' : undefined}
+                    rel={
+                      interview.meeting_link
+                        ? 'noopener noreferrer'
+                        : undefined
+                    }
+                    disabled={!interview.meeting_link}
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      fontSize: '1rem',
+                      borderRadius: 3,
+                      py: 1.1,
+
+                      background: colors.buttonGradient,
+
+                      boxShadow: isDark
+                        ? '0 2px 8px rgba(124,58,237,0.2)'
+                        : '0 2px 8px rgba(124,58,237,0.3)',
+
+                      '&:hover': {
+                        background: colors.buttonHoverGradient,
+                      },
+                    }}
+                  >
+                    {interview.meeting_link
+                      ? 'Join Interview'
+                      : 'Link not shared yet'}
+                  </Button>
+                </Box>
               </Box>
-            </Box>
-          ))}
+            ))}
         </Box>
       </CardContent>
     </Card>

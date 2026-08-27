@@ -24,7 +24,7 @@ export const createApplication = async (formData) => {
 
 export const getMyApplications = async () => {
   const response = await api.get(
-    "/applications/my-applications"
+    "/applications/my"
   );
 
   return response.data;

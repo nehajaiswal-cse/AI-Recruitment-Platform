@@ -8,9 +8,11 @@ import ADashboard from "./pages/applicant/Dashboard";
 import ApplicantRegister from "./pages/applicant/ApplicantRegister";
 import ApplicantLogin from "./pages/applicant/ApplicantLogin";
 import ApplicantProfile from "./pages/applicant/Profile";
-import FindJobs from  "./pages/applicant/jobs/FindJobs.jsx"
-import Apply from "./pages/applicant/jobs/Apply.jsx"
-import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx"
+import SavedJob from "./pages/applicant/SavedJob.jsx";
+import FindJobs from  "./pages/applicant/jobs/FindJobs.jsx";
+import Apply from "./pages/applicant/jobs/Apply.jsx";
+import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx";
+
 
 import RDashboard from "./pages/recruiter/Dashboard";
 import RecruiterLogin from "./pages/recruiter/RecruiterLogin";
@@ -24,6 +26,9 @@ import Jobs from "./pages/recruiter/jobs/Jobs.jsx";
 import CreateJob from "./pages/recruiter/jobs/createJob.jsx";
 import EditJob from "./pages/recruiter/jobs/editJob.jsx";
 import ViewJob from "./pages/recruiter/jobs/ViewJob.jsx";
+
+import AInterview from "./pages/applicant/Interview/Interviews"
+
 
 import Settings from "./pages/applicant/Settings";
 import Resume from "./pages/applicant/Resume";
@@ -82,6 +87,9 @@ export default function App() {
               path="/applicant/profile"
               element={<ApplicantProfile />}
             />
+            
+             <Route path="/applicant/saved-jobs" element={<SavedJob />} />
+             <Route path="/applicant/interviews" element={<AInterview />} />
 
             <Route
               path="/applicant/settings"

@@ -49,6 +49,7 @@ export default function Sidebar({
             >
               {Icon && <Icon size={18} />}
             </ListItemIcon>
+
             <ListItemText
               primary={item.label}
               slotProps={{
@@ -84,7 +85,9 @@ export default function Sidebar({
         variant="temporary"
         open={mobileOpen}
         onClose={onMobileClose}
-        ModalProps={{ keepMounted: true }}
+        ModalProps={{
+          keepMounted: true,
+        }}
         sx={{
           display: { xs: "block", md: "none" },
           "& .MuiDrawer-paper": {
@@ -95,6 +98,7 @@ export default function Sidebar({
         }}
       >
         <Box sx={{ height: 72 }} />
+
         {navList(onMobileClose)}
       </Drawer>
     </>

@@ -24,6 +24,10 @@ import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 
 import { useNavigate } from "react-router-dom";
 import  useJobs  from "../../../hooks/useJob";
+import useSavedJobs from "../../../hooks/useSavedJobs";
+
+import ANavbar from '../../../components/layout/applicant/Navbar';
+import ASidebar from '../../../components/layout/applicant/Sidebar';
 
 import ANavbar from "../../../components/layout/applicant/Navbar";
 import ASidebar from "../../../components/layout/applicant/Sidebar";
@@ -41,7 +45,8 @@ const FindJobs = () => {
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
   const [jobType, setJobType] = useState("");
-  const [savedJobs, setSavedJobs] = useState([]);
+ // const [savedJobs, setSavedJobs] = useState([]);
+  const { savedJobIds, toggleSaveJob } = useSavedJobs();
 
   useEffect(() => {
     fetchAllJobs();
@@ -72,15 +77,19 @@ const FindJobs = () => {
     });
   }, [jobs, search, location, jobType]);
 
-  const handleSaveJob = (jobId) => {
-    setSavedJobs((prev) => {
-      if (prev.includes(jobId)) {
-        return prev.filter((id) => id !== jobId);
-      }
+  // const handleSaveJob = (jobId) => {
+  //   setSavedJobs((prev) => {
+  //     if (prev.includes(jobId)) {
+  //       return prev.filter((id) => id !== jobId);
+  //     }
 
-      return [...prev, jobId];
-    });
-  };
+  //     return [...prev, jobId];
+  //   });
+  // };
+
+  const handleSaveJob = (jobId) => {
+  toggleSaveJob(jobId);
+};
 
   const handleViewJob = (jobId) => {
     navigate(`/applicant/jobs/${jobId}`);
@@ -489,6 +498,9 @@ const FindJobs = () => {
         </Box>
       </Box>
     </Box>
+   </Box>
+   </Box>
+   </Box>
   );
 };
 
