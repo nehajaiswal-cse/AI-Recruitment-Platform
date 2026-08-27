@@ -12,6 +12,7 @@ import SavedJob from "./pages/applicant/SavedJob.jsx";
 import FindJobs from  "./pages/applicant/jobs/FindJobs.jsx";
 import Apply from "./pages/applicant/jobs/Apply.jsx";
 import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx";
+import Applications from "./pages/applicant/Applications.jsx";
 
 
 import RDashboard from "./pages/recruiter/Dashboard";
@@ -89,6 +90,7 @@ export default function App() {
             />
             
              <Route path="/applicant/saved-jobs" element={<SavedJob />} />
+              <Route path="/applicant/applications" element={<Applications />} />
              <Route path="/applicant/interviews" element={<AInterview />} />
 
             <Route
