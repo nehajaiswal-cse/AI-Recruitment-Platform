@@ -25,12 +25,9 @@ import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import { useNavigate } from "react-router-dom";
 import  useJobs  from "../../../hooks/useJob";
 import useSavedJobs from "../../../hooks/useSavedJobs";
-<<<<<<< HEAD
-=======
 
 import ANavbar from "../../../components/layout/applicant/Navbar";
 import ASidebar from "../../../components/layout/applicant/Sidebar";
->>>>>>> main
 
 const FindJobs = () => {
   const navigate = useNavigate();
@@ -45,11 +42,7 @@ const FindJobs = () => {
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
   const [jobType, setJobType] = useState("");
-<<<<<<< HEAD
- // const [savedJobs, setSavedJobs] = useState([]);
-=======
  const [savedJobs, setSavedJobs] = useState([]);
->>>>>>> main
   const { savedJobIds, toggleSaveJob } = useSavedJobs();
 
   useEffect(() => {
@@ -143,45 +136,6 @@ const FindJobs = () => {
             color: "text.primary",
           }}
         >
-<<<<<<< HEAD
-          <CircularProgress />
-        </Box>
-      )}
-
-      {/* Error */}
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Jobs */}
-      {!loading && filteredJobs.length > 0 && (
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              md: "repeat(2, 1fr)",
-            },
-            gap: 3,
-          }}
-        >
-          {filteredJobs.map((job) => {
-            //const isSaved = savedJobs.includes(job._id);
-            const isSaved = savedJobIds.includes(job._id);
-            return (
-              <Card
-                key={job._id}
-                sx={{
-                  borderRadius: 3,
-                  transition: "0.2s",
-                  "&:hover": {
-                    transform: "translateY(-3px)",
-                    boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-                  },
-                }}
-=======
           <Box sx={{ p: { xs: 2, md: 4 } }}>
             {/* Header */}
             <Box sx={{ mb: 4 }}>
@@ -189,7 +143,6 @@ const FindJobs = () => {
                 variant="h4"
                 fontWeight={700}
                 sx={{ mb: 1 }}
->>>>>>> main
               >
                 Find Jobs
               </Typography>

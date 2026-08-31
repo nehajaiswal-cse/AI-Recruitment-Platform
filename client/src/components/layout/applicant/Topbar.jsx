@@ -204,9 +204,6 @@ import SearchRoundedIcon from '@mui/icons-material/SearchRounded'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import { brandGradient } from '../../../theme.js'
 
-<<<<<<< HEAD
-export default function ATopbar() {
-=======
 import useJob from '../../../hooks/useJob'
 
 const RESULT_LIMIT = 6
@@ -259,7 +256,6 @@ export default function ATopbar() {
     navigate(`/applicant/jobs/${jobId}`)
   }
 
->>>>>>> main
   return (
     <Box
       sx={{
@@ -393,19 +389,3 @@ export default function ATopbar() {
 
 
 
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-
-
-
-
-
-=======
->>>>>>> main

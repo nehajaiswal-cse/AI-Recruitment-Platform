@@ -201,11 +201,7 @@ export default function RTopbar() {
     >
       <Box sx={{ position: 'relative', flex: 1 }}>
         <TextField
-<<<<<<< HEAD
-          placeholder="Search Job , Interview and Candidates by Job name"
-=======
           placeholder="Search Candidates"
->>>>>>> main
           fullWidth
           size="small"
           value={search}
@@ -264,10 +260,7 @@ export default function RTopbar() {
                 {matchedJobs.map((job) => (
                   <ListItemButton
                     key={job._id}
-<<<<<<< HEAD
-=======
                     onMouseDown={(event) => event.preventDefault()}
->>>>>>> main
                     onClick={() => goTo(`/recruiter/jobs/${job._id}`)}
                   >
                     <Box sx={{ minWidth: 0 }}>
@@ -301,10 +294,7 @@ export default function RTopbar() {
                 {matchedCandidates.map((candidate) => (
                   <ListItemButton
                     key={candidate._id}
-<<<<<<< HEAD
-=======
                     onMouseDown={(event) => event.preventDefault()}
->>>>>>> main
                     onClick={() => goTo('/recruiter/candidates')}
                   >
                     <Box sx={{ minWidth: 0 }}>
@@ -338,10 +328,7 @@ export default function RTopbar() {
                 {matchedInterviews.map((interview) => (
                   <ListItemButton
                     key={interview._id}
-<<<<<<< HEAD
-=======
                     onMouseDown={(event) => event.preventDefault()}
->>>>>>> main
                     onClick={() => goTo('/recruiter/interviews')}
                   >
                     <Box sx={{ minWidth: 0 }}>
