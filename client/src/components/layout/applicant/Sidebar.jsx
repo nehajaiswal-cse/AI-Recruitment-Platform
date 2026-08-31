@@ -12,7 +12,7 @@ import {
 const applicantSidebarItems = [
   {
     label: "Dashboard",
-    path: "/applicant/dashboard",
+    path: "/applicant",
     icon: LuLayoutDashboard,
   },
   {

@@ -18,7 +18,6 @@ import ThemeToggle from '../common/ThemeToggle.jsx'
 
 const Navbar = ({
   links = [],
-  onSidebarToggle,
   showLogout = false,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -36,16 +35,11 @@ const Navbar = ({
   }
 
   const handleLogout = () => {
-    // Remove authentication data
     localStorage.removeItem('token')
     localStorage.removeItem('user')
 
-    // Close mobile menu
     handleMenuClose()
-
-    // Navigate to login
     navigate('/')
-    showLogout = false
   }
 
   return (
@@ -89,25 +83,10 @@ const Navbar = ({
         }}
       >
 
-        {/* Mobile Sidebar Button */}
-        <IconButton
-          onClick={onSidebarToggle}
-          aria-label="Toggle sidebar"
-          sx={{
-            display: {
-              xs: 'inline-flex',
-              md: 'none',
-            },
+        {/* ========================= */}
+        {/* LOGO */}
+        {/* ========================= */}
 
-            color: 'text.primary',
-            flexShrink: 0,
-          }}
-        >
-          <MenuRoundedIcon />
-        </IconButton>
-
-
-        {/* Logo */}
         <Box
           sx={{
             flexShrink: 0,
@@ -130,11 +109,17 @@ const Navbar = ({
         </Box>
 
 
-        {/* Space */}
+        {/* ========================= */}
+        {/* SPACE */}
+        {/* ========================= */}
+
         <Box sx={{ flex: 1 }} />
 
 
-        {/* Desktop Navigation */}
+        {/* ========================= */}
+        {/* DESKTOP NAVIGATION */}
+        {/* ========================= */}
+
         <Box
           sx={{
             display: {
@@ -156,12 +141,12 @@ const Navbar = ({
             },
           }}
         >
-
           {links.map((link) => (
             <Button
               key={link.path}
               component={NavLink}
               to={link.path}
+              end
               sx={{
                 color: 'text.secondary',
 
@@ -193,12 +178,11 @@ const Navbar = ({
               {link.label}
             </Button>
           ))}
-
         </Box>
 
 
         {/* ========================= */}
-        {/* Desktop Logout */}
+        {/* DESKTOP LOGOUT */}
         {/* ========================= */}
 
         {showLogout && (
@@ -240,11 +224,13 @@ const Navbar = ({
         )}
 
 
-        {/* Theme Toggle */}
+        {/* ========================= */}
+        {/* THEME TOGGLE */}
+        {/* ========================= */}
+
         <Box
           sx={{
             flexShrink: 0,
-
             display: 'flex',
             alignItems: 'center',
           }}
@@ -253,7 +239,10 @@ const Navbar = ({
         </Box>
 
 
-        {/* Mobile Navigation Button */}
+        {/* ========================= */}
+        {/* RIGHT HAMBURGER */}
+        {/* ========================= */}
+
         <IconButton
           onClick={handleMenuOpen}
           aria-label="Open navigation menu"
@@ -272,7 +261,7 @@ const Navbar = ({
 
 
         {/* ========================= */}
-        {/* Mobile Navigation Menu */}
+        {/* MOBILE NAVIGATION MENU */}
         {/* ========================= */}
 
         <Menu
@@ -315,6 +304,7 @@ const Navbar = ({
               key={link.path}
               component={NavLink}
               to={link.path}
+              end
               onClick={handleMenuClose}
               sx={{
                 py: 1.25,
@@ -351,9 +341,7 @@ const Navbar = ({
               >
                 <LogoutRoundedIcon
                   fontSize="small"
-                  sx={{
-                    mr: 1.5,
-                  }}
+                  sx={{ mr: 1.5 }}
                 />
 
                 Logout
@@ -365,7 +353,7 @@ const Navbar = ({
           <Divider />
 
 
-          {/* Mobile Theme Toggle */}
+          {/* Mobile Theme */}
           <Box
             sx={{
               px: 2,

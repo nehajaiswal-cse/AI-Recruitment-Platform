@@ -864,7 +864,7 @@ import {
   Stack,
   TextField,
   Typography,
-  useTheme,
+ // useTheme,
 } from "@mui/material";
 
 import {
@@ -881,11 +881,13 @@ import {
 } from "@mui/icons-material";
 
 import useJob from "../../../hooks/useJob";
-import Navbar from "../../../components/dashboard/Navbar";
+
+import RNavbar from "../../../components/layout/recruiter/Navbar";
+import RSidebar from "../../../components/layout/recruiter/Sidebar";
 
 const Jobs = () => {
   const navigate = useNavigate();
-  const theme = useTheme();
+ // const theme = useTheme();
 
   const {
     jobs,
@@ -899,19 +901,9 @@ const Jobs = () => {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedJob, setSelectedJob] = useState(null);
 
-  const isDark = theme.palette.mode === "dark";
-
-  // ==========================================
-  // FETCH JOBS
-  // ==========================================
-
   useEffect(() => {
     fetchMyJobs();
   }, [fetchMyJobs]);
-
-  // ==========================================
-  // FILTER JOBS
-  // ==========================================
 
   const filteredJobs = useMemo(() => {
     if (!Array.isArray(jobs)) return [];
@@ -938,10 +930,6 @@ const Jobs = () => {
     );
   }, [jobs, search]);
 
-  // ==========================================
-  // MENU
-  // ==========================================
-
   const handleMenuOpen = (event, job) => {
     setMenuAnchor(event.currentTarget);
     setSelectedJob(job);
@@ -951,10 +939,6 @@ const Jobs = () => {
     setMenuAnchor(null);
     setSelectedJob(null);
   };
-
-  // ==========================================
-  // DELETE
-  // ==========================================
 
   const handleDelete = async () => {
     if (!selectedJob?._id) return;
@@ -968,53 +952,37 @@ const Jobs = () => {
     }
   };
 
-  // ==========================================
-  // STATUS
-  // ==========================================
-
   const getStatusConfig = (status) => {
     switch (status) {
       case "published":
         return {
           label: "Published",
-          color: theme.palette.success.main,
-          bg: isDark
-            ? "rgba(34,197,94,0.12)"
-            : "rgba(16,185,129,0.10)",
+          color: "success.main",
+          bg: "rgba(34,197,94,0.12)",
         };
 
       case "draft":
         return {
           label: "Draft",
-          color: theme.palette.warning.main,
-          bg: isDark
-            ? "rgba(251,191,36,0.12)"
-            : "rgba(245,158,11,0.10)",
+          color: "warning.main",
+          bg: "rgba(251,191,36,0.12)",
         };
 
       case "closed":
         return {
           label: "Closed",
-          color: theme.palette.error.main,
-          bg: isDark
-            ? "rgba(239,68,68,0.12)"
-            : "rgba(239,68,68,0.10)",
+          color: "error.main",
+          bg: "rgba(239,68,68,0.12)",
         };
 
       default:
         return {
           label: status || "Unknown",
-          color: theme.palette.text.secondary,
-          bg: isDark
-            ? "rgba(156,163,175,0.12)"
-            : "rgba(100,116,139,0.10)",
+          color: "text.secondary",
+          bg: "rgba(156,163,175,0.12)",
         };
     }
   };
-
-  // ==========================================
-  // DATE
-  // ==========================================
 
   const formatDate = (date) => {
     if (!date) return "Not specified";
@@ -1029,10 +997,6 @@ const Jobs = () => {
     );
   };
 
-  // ==========================================
-  // LOADING
-  // ==========================================
-
   if (loading && !jobs) {
     return (
       <Box
@@ -1046,607 +1010,490 @@ const Jobs = () => {
       >
         <CircularProgress
           size={42}
-          color="primary"
+          sx={{
+            color: "primary.main",
+          }}
         />
       </Box>
     );
   }
 
-  // ==========================================
-  // UI
-  // ==========================================
-
   return (
-    <>
-      <Navbar />
-
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        color: "text.primary",
+      }}
+    >
+      {/* Navbar */}
       <Box
+        component="header"
         sx={{
-          minHeight: "100vh",
-          bgcolor: "background.default",
-          color: "text.primary",
-          py: {
-            xs: 3,
-            md: 5,
-          },
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
         }}
       >
-        <Container maxWidth="lg">
+        <RNavbar />
+      </Box>
 
-          {/* ======================================
-              HEADER
-          ======================================= */}
+      {/* Sidebar + Main */}
+      <Box
+        sx={{
+          display: "flex",
+          minWidth: 0,
+        }}
+      >
+        {/* Sidebar */}
+        <RSidebar />
 
-          <Stack
-            direction={{
-              xs: "column",
-              sm: "row",
-            }}
-            spacing={3}
-            sx={{
-              justifyContent: "space-between",
-              alignItems: {
-                xs: "flex-start",
-                sm: "center",
-              },
-              mb: 4,
-            }}
-          >
-            {/* LEFT SIDE */}
+        {/* Main */}
+        <Box
+          component="main"
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            bgcolor: "background.default",
+            color: "text.primary",
+            py: {
+              xs: 3,
+              md: 5,
+            },
+          }}
+        >
+          <Container maxWidth="lg">
+            {/* HEADER */}
 
             <Stack
-              direction="row"
-              spacing={2}
+              direction={{
+                xs: "column",
+                sm: "row",
+              }}
+              spacing={3}
               sx={{
-                alignItems: "center",
+                justifyContent: "space-between",
+                alignItems: {
+                  xs: "flex-start",
+                  sm: "center",
+                },
+                mb: 4,
               }}
             >
-              {/* BACK ARROW */}
-
-              <IconButton
-                onClick={() =>
-                  navigate("/recruiter")
-                }
+              <Stack
+                direction="row"
+                spacing={2}
                 sx={{
-                  color: "text.secondary",
-                  bgcolor: "background.paper",
-                  border: "1px solid",
-                  borderColor: "divider",
-
-                  "&:hover": {
-                    bgcolor: "action.hover",
-                    borderColor: "primary.main",
-                    color: "primary.light",
-                  },
+                  alignItems: "center",
                 }}
               >
-                <ArrowBack />
-              </IconButton>
-
-              {/* TITLE */}
-
-              <Box>
-                <Typography
-                  variant="h4"
+                <IconButton
+                  onClick={() =>
+                    navigate("/recruiter")
+                  }
                   sx={{
-                    color: "text.primary",
-                    fontWeight: 700,
-                    fontSize: {
-                      xs: "1.8rem",
-                      md: "2.2rem",
+                    color: "text.secondary",
+                    bgcolor: "background.paper",
+                    border: "1px solid",
+                    borderColor: "divider",
+
+                    "&:hover": {
+                      bgcolor: "action.hover",
+                      borderColor: "primary.main",
+                      color: "primary.main",
                     },
                   }}
                 >
-                  Manage Jobs
-                </Typography>
+                  <ArrowBack />
+                </IconButton>
 
-                <Typography
-                  sx={{
-                    color: "text.secondary",
-                    mt: 0.7,
-                  }}
-                >
-                  Create, manage and track
-                  your job postings.
-                </Typography>
-              </Box>
+                <Box>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      color: "text.primary",
+                      fontWeight: 700,
+                      fontSize: {
+                        xs: "1.8rem",
+                        md: "2.2rem",
+                      },
+                    }}
+                  >
+                    Manage Jobs
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      color: "text.secondary",
+                      mt: 0.7,
+                    }}
+                  >
+                    Create, manage and track your job postings.
+                  </Typography>
+                </Box>
+              </Stack>
+
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() =>
+                  navigate("/recruiter/jobs/create")
+                }
+                sx={{
+                  minWidth: 150,
+                  px: 2.5,
+                  py: 1.2,
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  background: (theme) =>
+                    `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+
+                  "&:hover": {
+                    background: (theme) =>
+                      `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
+                  },
+                }}
+              >
+                Create Job
+              </Button>
             </Stack>
 
-            {/* CREATE JOB */}
-
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() =>
-                navigate(
-                  "/recruiter/jobs/create"
-                )
-              }
-              sx={{
-                minWidth: 150,
-                px: 2.5,
-                py: 1.2,
-                borderRadius: 2,
-                textTransform: "none",
-                fontWeight: 600,
-                background: brandGradient,
-
-                "&:hover": {
-                  background: brandGradient,
-                  filter: "brightness(0.92)",
-                },
-              }}
-            >
-              Create Job
-            </Button>
-          </Stack>
-
-          {/* ======================================
-              ERROR
-          ======================================= */}
-
-          {error && (
-            <Alert
-              severity="error"
-              sx={{
-                mb: 3,
-                borderRadius: 2,
-              }}
-            >
-              {error}
-            </Alert>
-          )}
-
-          {/* ======================================
-              SEARCH
-          ======================================= */}
-
-          <Card
-            sx={{
-              bgcolor: "background.paper",
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: 3,
-              mb: 3,
-              backgroundImage: "none",
-            }}
-          >
-            <CardContent>
-              <TextField
-                fullWidth
-                value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
-                placeholder="Search jobs by title, company, location..."
-                InputProps={{
-                  startAdornment: (
-                    <Search
-                      sx={{
-                        color: "text.secondary",
-                        mr: 1,
-                      }}
-                    />
-                  ),
+            {error && (
+              <Alert
+                severity="error"
+                sx={{
+                  mb: 3,
+                  borderRadius: 2,
                 }}
-                sx={inputStyle(theme)}
-              />
-            </CardContent>
-          </Card>
+              >
+                {error}
+              </Alert>
+            )}
 
-          {/* ======================================
-              JOB COUNT
-          ======================================= */}
+            {/* SEARCH */}
 
-          <Stack
-            direction="row"
-            sx={{
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2,
-            }}
-          >
-            <Typography
-              sx={{
-                color: "text.secondary",
-              }}
-            >
-              {filteredJobs.length}{" "}
-              {filteredJobs.length === 1
-                ? "job"
-                : "jobs"}{" "}
-              found
-            </Typography>
-          </Stack>
-
-          {/* ======================================
-              NO JOBS
-          ======================================= */}
-
-          {filteredJobs.length === 0 ? (
             <Card
               sx={{
                 bgcolor: "background.paper",
                 border: "1px solid",
                 borderColor: "divider",
                 borderRadius: 3,
-                backgroundImage: "none",
+                mb: 3,
               }}
             >
-              <CardContent
-                sx={{
-                  py: 8,
-                  textAlign: "center",
-                }}
-              >
-                <Work
-                  sx={{
-                    fontSize: 55,
-                    color: "primary.main",
-                    mb: 2,
-                  }}
-                />
-
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: "text.primary",
-                    fontWeight: 600,
-                  }}
-                >
-                  No jobs found
-                </Typography>
-
-                <Typography
-                  sx={{
-                    color: "text.secondary",
-                    mt: 1,
-                    mb: 3,
-                  }}
-                >
-                  Create your first job posting
-                  to get started.
-                </Typography>
-
-                <Button
-                  variant="contained"
-                  startIcon={<Add />}
-                  onClick={() =>
-                    navigate(
-                      "/recruiter/jobs/create"
-                    )
+              <CardContent>
+                <TextField
+                  fullWidth
+                  value={search}
+                  onChange={(event) =>
+                    setSearch(event.target.value)
                   }
-                  sx={{
-                    textTransform: "none",
-                    background: brandGradient,
-
-                    "&:hover": {
-                      background: brandGradient,
-                      filter: "brightness(0.92)",
-                    },
+                  placeholder="Search jobs by title, company, location..."
+                  InputProps={{
+                    startAdornment: (
+                      <Search
+                        sx={{
+                          color: "text.secondary",
+                          mr: 1,
+                        }}
+                      />
+                    ),
                   }}
-                >
-                  Create Job
-                </Button>
+                  sx={inputStyle}
+                />
               </CardContent>
             </Card>
-          ) : (
-            /* ======================================
-                JOB LIST
-            ======================================= */
 
-            <Grid
-              container
-              spacing={3}
+            {/* JOB COUNT */}
+
+            <Stack
+              direction="row"
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
             >
-              {filteredJobs.map((job) => {
-                const status =
-                  getStatusConfig(job.status);
+              <Typography
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
+                {filteredJobs.length}{" "}
+                {filteredJobs.length === 1 ? "job" : "jobs"} found
+              </Typography>
+            </Stack>
 
-                return (
-                  <Grid
-                    key={job._id}
-                    size={{
-                      xs: 12,
-                      md: 6,
+            {/* NO JOBS */}
+
+            {filteredJobs.length === 0 ? (
+              <Card
+                sx={{
+                  bgcolor: "background.paper",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 3,
+                }}
+              >
+                <CardContent
+                  sx={{
+                    py: 8,
+                    textAlign: "center",
+                  }}
+                >
+                  <Work
+                    sx={{
+                      fontSize: 55,
+                      color: "primary.main",
+                      mb: 2,
+                    }}
+                  />
+
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "text.primary",
+                      fontWeight: 600,
                     }}
                   >
-                    <Card
-                      sx={{
-                        height: "100%",
-                        bgcolor: "background.paper",
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: 3,
-                        color: "text.primary",
-                        backgroundImage: "none",
-                        transition: "0.2s",
+                    No jobs found
+                  </Typography>
 
-                        "&:hover": {
-                          borderColor:
-                            "primary.main",
-                          transform:
-                            "translateY(-2px)",
-                        },
+                  <Typography
+                    sx={{
+                      color: "text.secondary",
+                      mt: 1,
+                      mb: 3,
+                    }}
+                  >
+                    Create your first job posting to get started.
+                  </Typography>
+
+                  <Button
+                    variant="contained"
+                    startIcon={<Add />}
+                    onClick={() =>
+                      navigate("/recruiter/jobs/create")
+                    }
+                    sx={{
+                      textTransform: "none",
+                      background: (theme) =>
+                        `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                    }}
+                  >
+                    Create Job
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <Grid container spacing={3}>
+                {filteredJobs.map((job) => {
+                  const status = getStatusConfig(job.status);
+
+                  return (
+                    <Grid
+                      key={job._id}
+                      size={{
+                        xs: 12,
+                        md: 6,
                       }}
                     >
-                      <CardContent
+                      <Card
                         sx={{
-                          p: 3,
+                          height: "100%",
+                          bgcolor: "background.paper",
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 3,
+                          color: "text.primary",
+                          transition: "0.2s",
+
+                          "&:hover": {
+                            borderColor: "primary.main",
+                            transform: "translateY(-2px)",
+                          },
                         }}
                       >
-                        {/* TOP */}
-
-                        <Stack
-                          direction="row"
-                          sx={{
-                            justifyContent:
-                              "space-between",
-                            alignItems:
-                              "flex-start",
-                          }}
-                        >
+                        <CardContent sx={{ p: 3 }}>
                           <Stack
                             direction="row"
-                            spacing={2}
-                          >
-                            <Box
-                              sx={{
-                                width: 50,
-                                height: 50,
-                                borderRadius: 2,
-                                display: "flex",
-                                justifyContent:
-                                  "center",
-                                alignItems:
-                                  "center",
-                                bgcolor:
-                                  isDark
-                                    ? "rgba(99,102,241,0.15)"
-                                    : "rgba(59,130,246,0.10)",
-                              }}
-                            >
-                              <Work
-                                sx={{
-                                  color:
-                                    "primary.main",
-                                }}
-                              />
-                            </Box>
-
-                            <Box>
-                              <Typography
-                                variant="h6"
-                                sx={{
-                                  color:
-                                    "text.primary",
-                                  fontWeight:
-                                    600,
-                                }}
-                              >
-                                {job.title}
-                              </Typography>
-
-                              <Typography
-                                sx={{
-                                  color:
-                                    "text.secondary",
-                                  mt: 0.3,
-                                }}
-                              >
-                                {job.company ||
-                                  "Your Company"}
-                              </Typography>
-                            </Box>
-                          </Stack>
-
-                          <IconButton
-                            onClick={(event) =>
-                              handleMenuOpen(
-                                event,
-                                job
-                              )
-                            }
                             sx={{
-                              color:
-                                "text.secondary",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
                             }}
                           >
-                            <MoreVert />
-                          </IconButton>
-                        </Stack>
+                            <Stack direction="row" spacing={2}>
+                              <Box
+                                sx={{
+                                  width: 50,
+                                  height: 50,
+                                  borderRadius: 2,
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  bgcolor: "rgba(99,102,241,0.15)",
+                                }}
+                              >
+                                <Work sx={{ color: "primary.light" }} />
+                              </Box>
 
-                        <Divider
-                          sx={{
-                            my: 2.5,
-                          }}
-                        />
+                              <Box>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    color: "text.primary",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {job.title}
+                                </Typography>
 
-                        {/* JOB INFO */}
+                                <Typography
+                                  sx={{
+                                    color: "text.secondary",
+                                    mt: 0.3,
+                                  }}
+                                >
+                                  {job.company || "Your Company"}
+                                </Typography>
+                              </Box>
+                            </Stack>
 
-                        <Stack spacing={1.5}>
-                          <InfoRow
-                            icon={<LocationOn />}
-                            text={
-                              job.location ||
-                              "Location not specified"
-                            }
-                          />
+                            <IconButton
+                              onClick={(event) =>
+                                handleMenuOpen(event, job)
+                              }
+                              sx={{
+                                color: "text.secondary",
+                              }}
+                            >
+                              <MoreVert />
+                            </IconButton>
+                          </Stack>
 
-                          <InfoRow
-                            icon={<Work />}
-                            text={
-                              job.jobType ||
-                              "Job type not specified"
-                            }
-                          />
-
-                          <InfoRow
-                            icon={<CalendarToday />}
-                            text={`Deadline: ${formatDate(
-                              job.deadline
-                            )}`}
-                          />
-                        </Stack>
-
-                        {/* BOTTOM */}
-
-                        <Stack
-                          direction="row"
-                          sx={{
-                            justifyContent:
-                              "space-between",
-                            alignItems:
-                              "center",
-                            mt: 3,
-                          }}
-                        >
-                          <Chip
-                            label={status.label}
+                          <Divider
                             sx={{
-                              bgcolor:
-                                status.bg,
-                              color:
-                                status.color,
-                              fontWeight: 600,
+                              my: 2.5,
+                              borderColor: "divider",
                             }}
                           />
 
+                          <Stack spacing={1.5}>
+                            <InfoRow
+                              icon={<LocationOn />}
+                              text={job.location || "Location not specified"}
+                            />
+
+                            <InfoRow
+                              icon={<Work />}
+                              text={job.jobType || "Job type not specified"}
+                            />
+
+                            <InfoRow
+                              icon={<CalendarToday />}
+                              text={`Deadline: ${formatDate(job.deadline)}`}
+                            />
+                          </Stack>
+
                           <Stack
                             direction="row"
-                            spacing={1}
+                            sx={{
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              mt: 3,
+                            }}
                           >
-                            <Button
-                              size="small"
-                              startIcon={
-                                <Visibility />
-                              }
-                              onClick={() =>
-                                navigate(
-                                  `/recruiter/jobs/${job._id}`
-                                )
-                              }
+                            <Chip
+                              label={status.label}
                               sx={{
-                                color:
-                                  "primary.main",
-                                textTransform:
-                                  "none",
+                                bgcolor: status.bg,
+                                color: status.color,
+                                fontWeight: 600,
                               }}
-                            >
-                              View
-                            </Button>
+                            />
 
-                            <Button
-                              size="small"
-                              startIcon={
-                                <Edit />
-                              }
-                              onClick={() =>
-                                navigate(
-                                  `/recruiter/jobs/${job._id}/edit`
-                                )
-                              }
-                              sx={{
-                                color:
-                                  "primary.main",
-                                textTransform:
-                                  "none",
-                              }}
-                            >
-                              Edit
-                            </Button>
+                            <Stack direction="row" spacing={1}>
+                              <Button
+                                size="small"
+                                startIcon={<Visibility />}
+                                onClick={() =>
+                                  navigate(`/recruiter/jobs/${job._id}`)
+                                }
+                                sx={{
+                                  color: "primary.light",
+                                  textTransform: "none",
+                                }}
+                              >
+                                View
+                              </Button>
+
+                              <Button
+                                size="small"
+                                startIcon={<Edit />}
+                                onClick={() =>
+                                  navigate(`/recruiter/jobs/${job._id}/edit`)
+                                }
+                                sx={{
+                                  color: "primary.light",
+                                  textTransform: "none",
+                                }}
+                              >
+                                Edit
+                              </Button>
+                            </Stack>
                           </Stack>
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          )}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            )}
 
-          {/* ======================================
-              MENU
-          ======================================= */}
-
-          <Menu
-            anchorEl={menuAnchor}
-            open={Boolean(menuAnchor)}
-            onClose={handleMenuClose}
-            PaperProps={{
-              sx: {
-                bgcolor: "background.paper",
-                color: "text.primary",
-                border: "1px solid",
-                borderColor: "divider",
-                backgroundImage: "none",
-              },
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                navigate(
-                  `/recruiter/jobs/${selectedJob?._id}`
-                );
-                handleMenuClose();
-              }}
+            <Menu
+              anchorEl={menuAnchor}
+              open={Boolean(menuAnchor)}
+              onClose={handleMenuClose}
             >
-              <Visibility
-                fontSize="small"
-                sx={{
-                  mr: 1,
-                  color: "text.secondary",
+              <MenuItem
+                onClick={() => {
+                  navigate(`/recruiter/jobs/${selectedJob?._id}`);
+                  handleMenuClose();
                 }}
-              />
-              View
-            </MenuItem>
+              >
+                <Visibility fontSize="small" sx={{ mr: 1 }} />
+                View
+              </MenuItem>
 
-            <MenuItem
-              onClick={() => {
-                navigate(
-                  `/recruiter/jobs/${selectedJob?._id}/edit`
-                );
-                handleMenuClose();
-              }}
-            >
-              <Edit
-                fontSize="small"
-                sx={{
-                  mr: 1,
-                  color: "text.secondary",
+              <MenuItem
+                onClick={() => {
+                  navigate(`/recruiter/jobs/${selectedJob?._id}/edit`);
+                  handleMenuClose();
                 }}
-              />
-              Edit
-            </MenuItem>
+              >
+                <Edit fontSize="small" sx={{ mr: 1 }} />
+                Edit
+              </MenuItem>
 
-            <MenuItem
-              onClick={handleDelete}
-              sx={{
-                color: "error.main",
-              }}
-            >
-              <Delete
-                fontSize="small"
+              <MenuItem
+                onClick={handleDelete}
                 sx={{
-                  mr: 1,
+                  color: "error.main",
                 }}
-              />
-              Delete
-            </MenuItem>
-          </Menu>
-        </Container>
+              >
+                <Delete fontSize="small" sx={{ mr: 1 }} />
+                Delete
+              </MenuItem>
+            </Menu>
+          </Container>
+        </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 
-// ==========================================
-// INFO ROW
-// ==========================================
-
 const InfoRow = ({ icon, text }) => {
-  const theme = useTheme();
-
   return (
     <Stack
       direction="row"
@@ -1658,7 +1505,7 @@ const InfoRow = ({ icon, text }) => {
       <Box
         sx={{
           display: "flex",
-          color: theme.palette.primary.main,
+          color: "primary.light",
         }}
       >
         {icon}
@@ -1676,14 +1523,10 @@ const InfoRow = ({ icon, text }) => {
   );
 };
 
-// ==========================================
-// INPUT STYLE
-// ==========================================
-
-const inputStyle = (theme) => ({
+const inputStyle = {
   "& .MuiOutlinedInput-root": {
     color: "text.primary",
-    bgcolor: "background.surface",
+    bgcolor: "background.default",
 
     "& fieldset": {
       borderColor: "divider",
@@ -1703,10 +1546,10 @@ const inputStyle = (theme) => ({
   },
 
   "& .MuiInputBase-input::placeholder": {
-    color: theme.palette.text.secondary,
+    color: "text.secondary",
     opacity: 1,
   },
-});
+};
 
 // ==========================================
 // BRAND GRADIENT
@@ -1714,5 +1557,11 @@ const inputStyle = (theme) => ({
 
 const brandGradient =
   "linear-gradient(135deg, #3b82f6, #9333ea)";
+
+// ==========================================
+// BRAND GRADIENT
+// ==========================================
+
+//const brandGradient = "linear-gradient(135deg, #3b82f6, #9333ea)";
 
 export default Jobs;

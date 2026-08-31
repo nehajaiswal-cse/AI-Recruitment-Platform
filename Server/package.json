@@ -12,8 +12,9 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1116.0",
+    "@aws-sdk/client-s3": "^3.1119.0",
     "@aws-sdk/client-sts": "^3.1116.0",
+    "@aws-sdk/s3-request-presigner": "^3.1117.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -21,9 +22,11 @@
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
+    "mammoth": "^1.12.1",
     "mongoose": "^9.9.1",
     "multer": "^2.2.0",
-    "multer-s3": "^3.0.1"
+    "multer-s3": "^3.0.1",
+    "pdf-parse": "^2.4.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

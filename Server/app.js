@@ -6,16 +6,22 @@ import jobRoutes from "./routes/jobRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import Candidate from "./routes/candidateRoute.js";
-import interview from "./routes/interviewRoutes.js"
+import interview from "./routes/interviewRoutes.js";
+import interviewRoutes from "./routes/interviewRoutes.js";
+import resumeRoutes from "./routes/resumeRoutes.js";
+import atsRoutes from "./routes/atsRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
+import recruiterSettingsRoutes from "./routes/recruiterSettingsRoutes.js";
+
+
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+app.use(cors({ 
+  origin: ["http://localhost:5173", "http://localhost:5174"],
+  credentials: true 
+}))
+
 app.use(express.json());
 app.use("/api", protectedRoutes);
 app.use("/api/jobs", jobRoutes);
@@ -24,6 +30,11 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/candidates",Candidate)
 app.use("/api/interviews",interview)
+app.use("/api/interviews", interviewRoutes);
+app.use("/api/resumes", resumeRoutes);
+app.use("/api/ats", atsRoutes);
+app.use("/api/settings", settingsRoutes);
+app.use("/api/recruiter/settings", recruiterSettingsRoutes);
 
 app.get("/", (req, res) => {
   res.json({

@@ -3,9 +3,6 @@ import Application from "../models/applications.js";
 import Job from "../models/job.js";
 
 
-
-
-
 export const createCandidate = async (req, res) => {
   try {
     const { applicationId } = req.body;
@@ -166,7 +163,7 @@ export const getCandidateById = async (req, res) => {
 
     const candidate = await Candidate.findOne({
       _id: id,
-      recruiterId: req.user._id
+      recruiterId: req.user.id
     })
       .populate("applicantId", "name email phone")
       .populate("jobId", "title company description")
@@ -217,7 +214,7 @@ export const updateCandidate = async (req, res) => {
 
     const candidate = await Candidate.findOne({
       _id: id,
-      recruiterId: req.user._id
+      recruiterId: req.user.id
     });
 
     if (!candidate) {
@@ -306,7 +303,7 @@ export const updateCandidateStatus = async (req, res) => {
 
     const candidate = await Candidate.findOne({
       _id: id,
-      recruiterId: req.user._id
+      recruiterId:req.user.id
     });
 
     if (!candidate) {
@@ -349,7 +346,7 @@ export const deleteCandidate = async (req, res) => {
 
     const candidate = await Candidate.findOne({
       _id: id,
-      recruiterId: req.user._id
+      recruiterId: req.user.id
     });
 
     if (!candidate) {

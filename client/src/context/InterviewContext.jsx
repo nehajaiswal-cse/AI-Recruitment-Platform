@@ -43,6 +43,11 @@ export const InterviewProvider = ({ children }) => {
       setError("");
 
       const response = await getMyInterviews();
+      console.log("🔥 MY INTERVIEWS API RESPONSE:", response);
+console.log(
+  "🔥 INTERVIEWS FROM DB:",
+  response.interviews
+);
 
       setInterviews(response.interviews || []);
 

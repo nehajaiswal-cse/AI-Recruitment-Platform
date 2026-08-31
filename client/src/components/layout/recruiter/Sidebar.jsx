@@ -1,4 +1,3 @@
-
 import Sidebar from "../../dashboard/Sidebar.jsx";
 
 import {
@@ -14,7 +13,7 @@ import {
 const recruiterSidebarItems = [
   {
     label: "Dashboard",
-    path: "/recruiter/dashboard",
+    path: "/recruiter",
     icon: LuLayoutDashboard,
   },
   {
@@ -50,13 +49,7 @@ const recruiterSidebarItems = [
 ];
 
 const RSidebar = () => {
-  return (
-    <>
-      <Sidebar items={recruiterSidebarItems} />
-
-      {/* Your content */}
-    </>
-  );
+  return <Sidebar items={recruiterSidebarItems} />;
 };
 
 export default RSidebar;
