@@ -1,6 +1,8 @@
 import Interview from "../models/interview.js";
 import Job from "../models/job.js";
 import User from "../models/user.js";
+import Candidate from "../models/candidate.js";
+import transporter from "../config/mailer.js";
 
 const createInterview = async (req, res) => {
   try {
@@ -12,34 +14,51 @@ const createInterview = async (req, res) => {
       type,
       interviewer,
       meetingLink,
-      duration
+      duration,
     } = req.body;
 
     if (!candidate || !job || !date || !time || !type || !interviewer) {
       return res.status(400).json({
-        message: "Required interview details are missing"
+        message: "Required interview details are missing",
+      });
+    }
+    console.log("SELECTED CANDIDATE ID:", candidate);
+
+    const candidateData = await Candidate.findById(candidate).populate(
+      "applicantId",
+      "name email",
+    );
+
+    console.log("CANDIDATE DATA:", candidateData);
+
+    if (!candidateData) {
+      return res.status(404).json({
+        message: "Candidate not found",
       });
     }
 
-    const candidateUser = await User.findOne({
-      _id: candidate,
-      role: "applicant"
-    });
+    const candidateUser = candidateData.applicantId;
 
     if (!candidateUser) {
       return res.status(404).json({
-        message: "Applicant not found"
+        message: "Applicant user not found",
+      });
+    }
+
+    if (!candidateUser) {
+      return res.status(404).json({
+        message: "Applicant not found",
       });
     }
 
     const jobData = await Job.findOne({
       _id: job,
-      recruiterId: req.user.id
+      recruiterId: req.user.id,
     });
 
     if (!jobData) {
       return res.status(404).json({
-        message: "Job not found or you are not authorized"
+        message: "Job not found or you are not authorized",
       });
     }
 
@@ -52,27 +71,77 @@ const createInterview = async (req, res) => {
       type,
       interviewer,
       meetingLink,
-      duration
+      duration,
     });
 
+    console.log("📧 Sending email to:", candidateUser.email);
+
+const info = await transporter.sendMail({
+  from: process.env.EMAIL_USER,
+  to: candidateUser.email,
+  subject: "Interview Scheduled - AI Recruitment Platform",
+  text: `
+Hello ${candidateUser.name},
+
+Your interview has been scheduled.
+
+Job: ${jobData.title}
+Date: ${date}
+Time: ${time}
+Interview Type: ${type}
+Interviewer: ${interviewer}
+${meetingLink ? `Meeting Link: ${meetingLink}` : ""}
+
+Please be available at the scheduled time.
+
+Best regards,
+AI Recruitment Platform
+  `
+});
+
+console.log("✅ Email sent:", info.messageId);
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: candidateUser.email,
+      subject: "Interview Scheduled - AI Recruitment Platform",
+      text: `
+Hello ${candidateUser.name},
+
+Your interview has been scheduled.
+
+Job: ${jobData.title}
+Date: ${date}
+Time: ${time}
+Interview Type: ${type}
+Interviewer: ${interviewer}
+${meetingLink ? `Meeting Link: ${meetingLink}` : ""}
+
+Please be available at the scheduled time.
+
+Best regards,
+AI Recruitment Platform
+  `,
+    });
+
+    console.log("✅ Email sent:", info.messageId);
+    
     res.status(201).json({
       message: "Interview scheduled successfully",
-      interview
+      interview,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Failed to schedule interview",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-
 const getMyInterviews = async (req, res) => {
   try {
     const interviews = await Interview.find({
-      candidate: req.user.id
+      candidate: req.user.id,
     })
       .populate("job", "title company location employmentType")
       .populate("recruiter", "name email")
@@ -81,13 +150,12 @@ const getMyInterviews = async (req, res) => {
     res.status(200).json({
       message: "Interviews fetched successfully",
       count: interviews.length,
-      interviews
+      interviews,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch interviews",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -98,25 +166,24 @@ const getInterviewById = async (req, res) => {
     console.log("USER ID:", req.user.id);
     const interview = await Interview.findOne({
       _id: req.params.id,
-      candidate: req.user.id
+      candidate: req.user.id,
     })
       .populate("job", "title location employmentType")
       .populate("recruiter", "name email");
     if (!interview) {
       return res.status(404).json({
-        message: "Interview not found"
+        message: "Interview not found",
       });
     }
 
     res.status(200).json({
       message: "Interview fetched successfully",
-      interview
+      interview,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch interview",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -129,9 +196,9 @@ export const updateInterview = async (req, res) => {
       interviewId,
       req.body,
       {
-         returnDocument: "after",
+        returnDocument: "after",
         runValidators: true,
-      }
+      },
     )
       .populate("candidate", "name email")
       .populate("recruiter", "name email")
@@ -166,23 +233,23 @@ const updateInterviewStatus = async (req, res) => {
       "Confirmed",
       "Pending",
       "Completed",
-      "Cancelled"
+      "Cancelled",
     ];
 
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
-        message: "Invalid interview status"
+        message: "Invalid interview status",
       });
     }
 
     const interview = await Interview.findOne({
       _id: req.params.id,
-      recruiter: req.user.id
+      recruiter: req.user.id,
     });
 
     if (!interview) {
       return res.status(404).json({
-        message: "Interview not found or you are not authorized"
+        message: "Interview not found or you are not authorized",
       });
     }
 
@@ -192,13 +259,12 @@ const updateInterviewStatus = async (req, res) => {
 
     res.status(200).json({
       message: "Interview status updated successfully",
-      interview
+      interview,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Failed to update interview status",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -207,9 +273,7 @@ export const deleteInterview = async (req, res) => {
   try {
     const { interviewId } = req.params;
 
-    const deletedInterview = await Interview.findByIdAndDelete(
-      interviewId
-    );
+    const deletedInterview = await Interview.findByIdAndDelete(interviewId);
 
     if (!deletedInterview) {
       return res.status(404).json({
@@ -234,9 +298,9 @@ export const deleteInterview = async (req, res) => {
 const getRecruiterInterviews = async (req, res) => {
   try {
     const interviews = await Interview.find({
-      recruiter: req.user.id
+      recruiter: req.user.id,
     })
-  
+
       .populate("candidate", "name email phone")
       .populate("job", "title location employmentType")
       .sort({ date: 1 });
@@ -244,13 +308,12 @@ const getRecruiterInterviews = async (req, res) => {
     res.status(200).json({
       message: "Recruiter interviews fetched successfully",
       count: interviews.length,
-      interviews
+      interviews,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch recruiter interviews",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -260,5 +323,5 @@ export {
   getMyInterviews,
   getInterviewById,
   updateInterviewStatus,
-  getRecruiterInterviews
+  getRecruiterInterviews,
 };
