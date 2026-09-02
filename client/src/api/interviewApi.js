@@ -41,6 +41,19 @@ export const updateInterview = async (
   return response.data;
 };
 
+export const updateInterviewStatus = async (
+  interviewId,
+  status
+) => {
+  const response = await api.put(
+    `/interviews/${interviewId}/status`,
+    { status }
+  );
+
+  return response.data;
+};
+
+
 /* =====================================================
    DELETE INTERVIEW
 ===================================================== */

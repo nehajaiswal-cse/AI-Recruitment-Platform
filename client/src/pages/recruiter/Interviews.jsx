@@ -26,6 +26,8 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 import { useInterviewContext } from "../../context/InterviewContext";
+import { updateInterviewStatus } from "../../api/interviewApi";
+
 import { useCandidate } from "../../hooks/useCandidate";
 
 import RNavbar from "../../components/layout/recruiter/Navbar";
@@ -460,6 +462,30 @@ const Interviews = () => {
         err?.response?.data?.message ||
           err?.message ||
           "Failed to reschedule interview",
+      );
+    }
+  };
+
+  const handleCancelInterview = async (interview) => {
+    if (!interview) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this interview?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await updateInterviewStatus(interview._id || interview.id, "Cancelled");
+
+      alert("Interview cancelled successfully.");
+
+      await fetchRecruiterInterviews();
+    } catch (err) {
+      alert(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to cancel interview",
       );
     }
   };
@@ -966,6 +992,22 @@ const Interviews = () => {
                         }}
                       >
                         Reschedule
+                      </Button>
+
+                      <Button
+                        size="small"
+                        color="error"
+                        variant="outlined"
+                        onClick={() => handleCancelInterview(interview)}
+                        sx={{
+                          textTransform: "none",
+                          visibility:
+                            interview.status === "Cancelled"
+                              ? "hidden"
+                              : "visible",
+                        }}
+                      >
+                        Cancel
                       </Button>
                     </Box>
                   </Box>
