@@ -12,6 +12,7 @@ import {
   updateCandidate,
   updateCandidateStatus,
   deleteCandidate,
+  analyzeCandidateResume,
 } from "../api/candidateApi";
 
 const CandidateContext = createContext(null);
@@ -72,6 +73,79 @@ export const CandidateProvider = ({ children }) => {
       setLoading(false);
     }
   }, []);
+
+  // AI RESUME ANALYSIS
+  const analyzeResume = useCallback(
+    async (applicationId) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        if (!applicationId) {
+          throw new Error(
+            "Application ID is required"
+          );
+        }
+
+        console.log(
+          " Starting AI analysis:",
+          applicationId
+        );
+
+        const data =
+          await analyzeCandidateResume(
+            applicationId
+          );
+
+        console.log(
+          "🤖 AI analysis response:",
+          data
+        );
+
+        // Backend returns updated candidate
+        if (data?.candidate) {
+          const updatedCandidate =
+            data.candidate;
+
+          // Update candidate list
+          setCandidates((prev) =>
+            prev.map((candidate) =>
+              candidate._id ===
+              updatedCandidate._id
+                ? updatedCandidate
+                : candidate
+            )
+          );
+
+          // Update selected candidate
+          setSelectedCandidate((prev) =>
+            prev?._id ===
+            updatedCandidate._id
+              ? updatedCandidate
+              : prev
+          );
+        }
+
+        return data;
+      } catch (error) {
+        console.error(
+          "AI resume analysis error:",
+          error
+        );
+
+        setError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Failed to analyze resume"
+        );
+
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
 
   // Update candidate
@@ -226,6 +300,7 @@ export const CandidateProvider = ({ children }) => {
         editCandidate,
         changeCandidateStatus,
         removeCandidate,
+        analyzeResume,
 
         clearError,
         clearSelectedCandidate,

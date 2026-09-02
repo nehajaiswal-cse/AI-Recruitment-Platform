@@ -8,7 +8,6 @@ const router = express.Router();
 router.post(
   "/analyze",
   authMiddleware,
-  roleMiddleware("applicant"),
   analyzeResume
 );
 

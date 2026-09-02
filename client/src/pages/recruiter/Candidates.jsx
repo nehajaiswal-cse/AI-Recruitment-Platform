@@ -2,126 +2,126 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-  Alert,
-  Avatar,
   Box,
-  Button,
+  Typography,
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
   Card,
   CardContent,
+  Button,
   Chip,
   CircularProgress,
-  InputAdornment,
-  TextField,
-  Typography,
+  Alert,
 } from "@mui/material";
 
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import EventRoundedIcon from "@mui/icons-material/EventRounded";
-import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
-import WorkOutlineRoundedIcon from "@mui/icons-material/WorkOutlineRounded";
-
-import { useCandidate } from "../../hooks/useCandidate";
+import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 
 import RNavbar from "../../components/layout/recruiter/Navbar";
 import RSidebar from "../../components/layout/recruiter/Sidebar";
 
-const Candidate = () => {
+import { useCandidate } from "../../hooks/useCandidate";
+
+
+function Candidate() {
   const navigate = useNavigate();
 
   const {
-    candidates = [],
+    candidates,
     loading,
     error,
     fetchCandidates,
+    analyzeResume,
   } = useCandidate();
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [analyzingId, setAnalyzingId] = useState(null);
 
   useEffect(() => {
     fetchCandidates();
-  }, [fetchCandidates]);
-
-  const getApplicant = (candidate) => {
-    return candidate?.applicantId || {};
-  };
-
-  const getJob = (candidate) => {
-    return candidate?.jobId || {};
-  };
-
-  const getCandidateName = (candidate) => {
-    const applicant = getApplicant(candidate);
-
-    return (
-      applicant.name ||
-      applicant.fullName ||
-      "Unknown Candidate"
-    );
-  };
-
-  const getCandidateEmail = (candidate) => {
-    const applicant = getApplicant(candidate);
-
-    return applicant.email || "No email available";
-  };
-
-  const getJobTitle = (candidate) => {
-    const job = getJob(candidate);
-
-    return (
-      job.title ||
-      job.jobTitle ||
-      "Job not available"
-    );
-  };
-
-  const getInitials = (name) => {
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase();
-  };
+  }, []);
 
   const filteredCandidates = useMemo(() => {
-    const searchValue = search.toLowerCase().trim();
+    if (!candidates) return [];
 
     return candidates.filter((candidate) => {
-      const name = getCandidateName(candidate).toLowerCase();
-      const email = getCandidateEmail(candidate).toLowerCase();
-      const job = getJobTitle(candidate).toLowerCase();
+      const applicant = candidate.applicantId;
+      const job = candidate.jobId;
 
-      const status = candidate?.status || "Applied";
+      const name =
+        applicant?.name ||
+        applicant?.fullName ||
+        "";
+
+      const email =
+        applicant?.email ||
+        "";
+
+      const jobTitle =
+        job?.title ||
+        "";
+
+      const searchText = search.toLowerCase();
 
       const matchesSearch =
-        !searchValue ||
-        name.includes(searchValue) ||
-        email.includes(searchValue) ||
-        job.includes(searchValue);
+        name.toLowerCase().includes(searchText) ||
+        email.toLowerCase().includes(searchText) ||
+        jobTitle.toLowerCase().includes(searchText);
 
       const matchesStatus =
-        statusFilter === "All" ||
-        status === statusFilter;
+        statusFilter === "all" ||
+        candidate.status?.toLowerCase() ===
+          statusFilter.toLowerCase();
 
       return matchesSearch && matchesStatus;
     });
   }, [candidates, search, statusFilter]);
 
+  const handleAIAnalysis = async (candidate) => {
+    try {
+      if (!candidate?.applicationId) {
+        console.error("Application ID missing");
+        return;
+      }
+
+      const applicationId =
+        typeof candidate.applicationId === "object"
+        ? candidate.applicationId._id
+        : candidate.applicationId;
+
+      if (!applicationId) {
+        console.error("Application ID not found");
+        return;
+      }
+
+      setAnalyzingId(candidate._id);
+
+      console.log(
+        "Starting AI analysis for:",
+         applicationId
+      );
+
+      const response = await analyzeResume(applicationId);
+      
+
+      console.log("AI ANALYSIS RESPONSE:", response);
+
+    } catch (error) {
+      console.error(
+        "AI ANALYSIS ERROR:",
+        error.response?.data || error.message
+      );
+    } finally {
+      setAnalyzingId(null);
+    }
+  };
+
   const handleScheduleInterview = (candidate) => {
-    /*
-      We don't ask recruiter for Candidate ID.
-
-      We already have it:
-      candidate._id
-
-      Job ID is also already available:
-      candidate.jobId._id
-    */
-
     navigate("/recruiter/interviews", {
       state: {
         candidate,
@@ -129,33 +129,58 @@ const Candidate = () => {
     });
   };
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case "Shortlisted":
-        return {
-          color: "success.main",
-          borderColor: "success.main",
-        };
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case "shortlisted":
+        return "success";
 
-      case "Rejected":
-        return {
-          color: "error.main",
-          borderColor: "error.main",
-        };
+      case "rejected":
+        return "error";
 
-      case "Interview":
-        return {
-          color: "primary.main",
-          borderColor: "primary.main",
-        };
+      case "interview":
+        return "warning";
+
+      case "selected":
+        return "success";
+
+      case "hired":
+        return "success";
+
+      case "screening":
+        return "info";
 
       default:
-        return {
-          color: "text.secondary",
-          borderColor: "divider",
-        };
+        return "default";
     }
   };
+
+  const getScoreColor = (score) => {
+    if (score >= 80) {
+      return "success.main";
+    }
+
+    if (score >= 60) {
+      return "warning.main";
+    }
+
+    return "error.main";
+  };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "background.default",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -186,163 +211,38 @@ const Candidate = () => {
         {/* Sidebar */}
         <RSidebar />
 
-        {/* Main */}
+        {/* Main Content */}
         <Box
           component="main"
           sx={{
             flex: 1,
             minWidth: 0,
+            bgcolor: "background.default",
             p: {
               xs: 2,
-              sm: 3,
               md: 4,
+              lg: 5,
             },
           }}
         >
           {/* Header */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: {
-                xs: "flex-start",
-                md: "center",
-              },
-              flexDirection: {
-                xs: "column",
-                md: "row",
-              },
-              gap: 2,
-              mb: 4,
-            }}
-          >
-            <Box>
-              <Typography
-                sx={{
-                  fontSize: {
-                    xs: 28,
-                    md: 34,
-                  },
-                  fontWeight: 700,
-                }}
-              >
-                Candidates
-              </Typography>
-
-              <Typography
-                sx={{
-                  mt: 0.5,
-                  color: "text.secondary",
-                }}
-              >
-                Review applicants and manage your
-                recruitment pipeline.
-              </Typography>
-            </Box>
-
-            <Box
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="h4"
               sx={{
-                px: 2,
-                py: 1,
-                borderRadius: 2,
-                bgcolor: "background.paper",
-                border: "1px solid",
-                borderColor: "divider",
+                fontWeight: 700,
+                mb: 0.5,
               }}
             >
-              <Typography
-                sx={{
-                  fontSize: 13,
-                  color: "text.secondary",
-                }}
-              >
-                Total Candidates
-              </Typography>
+              Candidates
+            </Typography>
 
-              <Typography
-                sx={{
-                  fontSize: 22,
-                  fontWeight: 700,
-                }}
-              >
-                {candidates.length}
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Search + Filter */}
-          <Box
-            sx={{
-              display: "flex",
-              gap: 2,
-              flexWrap: "wrap",
-              mb: 3,
-            }}
-          >
-            <TextField
-              value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
-              placeholder="Search candidate, email or job..."
-              size="small"
-              sx={{
-                flex: 1,
-                minWidth: 260,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  bgcolor: "background.paper",
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchRoundedIcon
-                      color="action"
-                    />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              select
-              size="small"
-              value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value)
-              }
-              SelectProps={{
-                native: true,
-              }}
-              sx={{
-                minWidth: 160,
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                  bgcolor: "background.paper",
-                },
-              }}
+            <Typography
+              variant="body1"
+              color="text.secondary"
             >
-              <option value="All">
-                All Status
-              </option>
-
-              <option value="Applied">
-                Applied
-              </option>
-
-              <option value="Shortlisted">
-                Shortlisted
-              </option>
-
-              <option value="Interview">
-                Interview
-              </option>
-
-              <option value="Rejected">
-                Rejected
-              </option>
-            </TextField>
+              Review candidates and analyze their resumes using AI
+            </Typography>
           </Box>
 
           {/* Error */}
@@ -355,212 +255,267 @@ const Candidate = () => {
             </Alert>
           )}
 
-          {/* Loading */}
-          {loading && (
-            <Box
+          {/* Search + Filter */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              mb: 4,
+              flexWrap: "wrap",
+            }}
+          >
+            <TextField
+              placeholder="Search candidates..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               sx={{
-                display: "flex",
-                justifyContent: "center",
-                py: 8,
+                flex: 1,
+                minWidth: 250,
+              }}
+              InputProps={{
+                startAdornment: (
+                  <SearchRoundedIcon
+                    sx={{
+                      mr: 1,
+                      color: "text.secondary",
+                    }}
+                  />
+                ),
+              }}
+            />
+
+            <FormControl
+              sx={{
+                minWidth: 180,
               }}
             >
-              <CircularProgress />
+              <InputLabel>Status</InputLabel>
+
+              <Select
+                value={statusFilter}
+                label="Status"
+                onChange={(e) =>
+                  setStatusFilter(e.target.value)
+                }
+              >
+                <MenuItem value="all">
+                  All Status
+                </MenuItem>
+
+                <MenuItem value="applied">
+                  Applied
+                </MenuItem>
+
+                <MenuItem value="screening">
+                  Screening
+                </MenuItem>
+
+                <MenuItem value="shortlisted">
+                  Shortlisted
+                </MenuItem>
+
+                <MenuItem value="interview">
+                  Interview
+                </MenuItem>
+
+                <MenuItem value="selected">
+                  Selected
+                </MenuItem>
+
+                <MenuItem value="hired">
+                  Hired
+                </MenuItem>
+
+                <MenuItem value="rejected">
+                  Rejected
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* Candidate Count */}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 2 }}
+          >
+            Showing {filteredCandidates.length} candidate
+            {filteredCandidates.length !== 1 ? "s" : ""}
+          </Typography>
+
+          {/* Candidates */}
+          {filteredCandidates.length === 0 ? (
+            <Box
+              sx={{
+                py: 8,
+                textAlign: "center",
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{ mb: 1 }}
+              >
+                No candidates found
+              </Typography>
+
+              <Typography
+                color="text.secondary"
+              >
+                Try changing your search or status filter.
+              </Typography>
             </Box>
-          )}
+          ) : (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  md: "1fr 1fr",
+                  xl: "1fr 1fr 1fr",
+                },
+                gap: 3,
+              }}
+            >
+              {filteredCandidates.map((candidate) => {
+                const applicant = candidate.applicantId;
+                const job = candidate.jobId;
 
-          {/* Empty */}
-          {!loading &&
-            !error &&
-            filteredCandidates.length === 0 && (
-              <Card
-                sx={{
-                  borderRadius: 3,
-                  textAlign: "center",
-                  py: 8,
-                }}
-              >
-                <PersonRoundedIcon
-                  sx={{
-                    fontSize: 60,
-                    color: "text.secondary",
-                    mb: 2,
-                  }}
-                />
+                const applicantName =
+                  applicant?.name ||
+                  applicant?.fullName ||
+                  "Unknown Candidate";
 
-                <Typography
-                  variant="h6"
-                  fontWeight={600}
-                >
-                  No candidates found
-                </Typography>
+                const applicantEmail =
+                  applicant?.email ||
+                  "No email available";
 
-                <Typography
-                  sx={{
-                    mt: 1,
-                    color: "text.secondary",
-                  }}
-                >
-                  Candidates will appear here when
-                  applicants apply for your jobs.
-                </Typography>
-              </Card>
-            )}
+                const jobTitle =
+                  job?.title ||
+                  "Unknown Job";
 
-          {/* Candidate Grid */}
-          {!loading &&
-            !error &&
-            filteredCandidates.length > 0 && (
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: {
-                    xs: "1fr",
-                    md: "1fr 1fr",
-                    xl: "1fr 1fr 1fr",
-                  },
-                  gap: 3,
-                }}
-              >
-                {filteredCandidates.map(
-                  (candidate) => {
-                    const name =
-                      getCandidateName(candidate);
+                const hasAIAnalysis =
+                  candidate.aiScore !== null &&
+                  candidate.aiScore !== undefined;
 
-                    const email =
-                      getCandidateEmail(candidate);
+                return (
+                  <Card
+                    key={candidate._id}
+                    sx={{
+                      height: "100%",
+                      borderRadius: 3,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      backgroundColor: "background.paper",
+                      transition: "0.2s",
 
-                    const jobTitle =
-                      getJobTitle(candidate);
-
-                    const status =
-                      candidate.status ||
-                      "Applied";
-
-                    return (
-                      <Card
-                        key={candidate._id}
+                      "&:hover": {
+                        transform: "translateY(-3px)",
+                        boxShadow: 4,
+                      },
+                    }}
+                  >
+                    <CardContent
+                      sx={{
+                        p: 3,
+                      }}
+                    >
+                      {/* Candidate Name */}
+                      <Box
                         sx={{
-                          borderRadius: 3,
-                          border: "1px solid",
-                          borderColor: "divider",
-                          bgcolor: "background.paper",
-                          transition:
-                            "all .2s ease",
-
-                          "&:hover": {
-                            transform:
-                              "translateY(-3px)",
-                            boxShadow: 6,
-                          },
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          gap: 2,
+                          mb: 2,
                         }}
                       >
-                        <CardContent
+                        <Box>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontWeight: 700,
+                            }}
+                          >
+                            {applicantName}
+                          </Typography>
+
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                          >
+                            {applicantEmail}
+                          </Typography>
+                        </Box>
+
+                        <Chip
+                          label={
+                            candidate.status
+                              ? candidate.status
+                                  .charAt(0)
+                                  .toUpperCase() +
+                                candidate.status.slice(1)
+                              : "Applied"
+                          }
+                          color={getStatusColor(
+                            candidate.status
+                          )}
+                          size="small"
+                        />
+                      </Box>
+
+                      {/* Job */}
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                        >
+                          Applied for
+                        </Typography>
+
+                        <Typography
+                          variant="body1"
                           sx={{
-                            p: 3,
+                            fontWeight: 600,
                           }}
                         >
-                          {/* Candidate Header */}
+                          {jobTitle}
+                        </Typography>
+                      </Box>
+
+                      {/* AI Score */}
+                      {hasAIAnalysis && (
+                        <Box
+                          sx={{
+                            p: 2,
+                            mb: 2,
+                            borderRadius: 2,
+                            bgcolor:
+                              "background.default",
+                            border: "1px solid",
+                            borderColor:
+                              "divider",
+                          }}
+                        >
                           <Box
                             sx={{
                               display: "flex",
                               justifyContent:
                                 "space-between",
-                              gap: 2,
-                              mb: 3,
+                              alignItems: "center",
+                              mb: 1,
                             }}
                           >
                             <Box
                               sx={{
                                 display: "flex",
-                                gap: 1.5,
-                                minWidth: 0,
-                              }}
-                            >
-                              <Avatar
-                                sx={{
-                                  width: 52,
-                                  height: 52,
-                                  fontWeight: 700,
-                                  background:
-                                    "linear-gradient(135deg,#6366f1,#8b5cf6)",
-                                }}
-                              >
-                                {getInitials(name)}
-                              </Avatar>
-
-                              <Box
-                                sx={{
-                                  minWidth: 0,
-                                }}
-                              >
-                                <Typography
-                                  fontWeight={700}
-                                  noWrap
-                                >
-                                  {name}
-                                </Typography>
-
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    alignItems:
-                                      "center",
-                                    gap: 0.5,
-                                    mt: 0.5,
-                                  }}
-                                >
-                                  <EmailRoundedIcon
-                                    sx={{
-                                      fontSize: 15,
-                                      color:
-                                        "text.secondary",
-                                    }}
-                                  />
-
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                    noWrap
-                                  >
-                                    {email}
-                                  </Typography>
-                                </Box>
-                              </Box>
-                            </Box>
-
-                            <Chip
-                              label={status}
-                              size="small"
-                              variant="outlined"
-                              sx={{
-                                ...getStatusStyle(
-                                  status
-                                ),
-                              }}
-                            />
-                          </Box>
-
-                          {/* Job */}
-                          <Box
-                            sx={{
-                              p: 1.5,
-                              borderRadius: 2,
-                              bgcolor:
-                                "background.default",
-                              mb: 2,
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                display: "flex",
-                                gap: 1,
                                 alignItems:
                                   "center",
+                                gap: 1,
                               }}
                             >
-                              <WorkOutlineRoundedIcon
+                              <AutoAwesomeRoundedIcon
                                 sx={{
-                                  fontSize: 18,
+                                  fontSize: 20,
                                   color:
                                     "primary.main",
                                 }}
@@ -570,71 +525,223 @@ const Candidate = () => {
                                 variant="body2"
                                 color="text.secondary"
                               >
-                                Applied Position
+                                AI Match Score
                               </Typography>
                             </Box>
 
                             <Typography
-                              fontWeight={600}
                               sx={{
-                                mt: 0.5,
+                                fontSize: 24,
+                                fontWeight: 800,
+                                color:
+                                  getScoreColor(
+                                    candidate.aiScore
+                                  ),
                               }}
                             >
-                              {jobTitle}
+                              {candidate.aiScore}%
                             </Typography>
                           </Box>
 
-                          {/* Candidate ID hidden from UI */}
-                          <Typography
-                            sx={{
-                              display: "none",
-                            }}
-                          >
-                            {candidate._id}
-                          </Typography>
-
-                          {/* Actions */}
-                          <Box
-                            sx={{
-                              display: "flex",
-                              gap: 1,
-                              mt: 2,
-                            }}
-                          >
-                            <Button
-                              fullWidth
-                              variant="contained"
-                              startIcon={
-                                <EventRoundedIcon />
-                              }
-                              onClick={() =>
-                                handleScheduleInterview(
-                                  candidate
-                                )
-                              }
+                          {/* Recommendation */}
+                          {candidate.aiAnalysis
+                            ?.recommendation && (
+                            <Typography
+                              variant="body2"
                               sx={{
-                                textTransform:
-                                  "none",
                                 fontWeight: 600,
-                                borderRadius: 2,
-                                background:
-                                  "linear-gradient(135deg,#6366f1,#8b5cf6)",
                               }}
                             >
-                              Schedule Interview
-                            </Button>
+                              AI Recommendation:{" "}
+                              <Box
+                                component="span"
+                                sx={{
+                                  color:
+                                    candidate
+                                      .aiAnalysis
+                                      .recommendation ===
+                                    "Shortlist"
+                                      ? "success.main"
+                                      : candidate
+                                          .aiAnalysis
+                                          .recommendation ===
+                                        "Reject"
+                                      ? "error.main"
+                                      : "warning.main",
+                                }}
+                              >
+                                {
+                                  candidate
+                                    .aiAnalysis
+                                    .recommendation
+                                }
+                              </Box>
+                            </Typography>
+                          )}
+
+                          {/* Matching Skills */}
+                          {candidate.aiAnalysis
+                            ?.matchingSkills
+                            ?.length > 0 && (
+                            <Box sx={{ mt: 1.5 }}>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                Matching Skills
+                              </Typography>
+
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: 0.5,
+                                  mt: 0.5,
+                                }}
+                              >
+                                {candidate.aiAnalysis.matchingSkills
+                                  .slice(0, 5)
+                                  .map(
+                                    (
+                                      skill,
+                                      index
+                                    ) => (
+                                      <Chip
+                                        key={`${skill}-${index}`}
+                                        label={
+                                          skill
+                                        }
+                                        size="small"
+                                        variant="outlined"
+                                        color="success"
+                                      />
+                                    )
+                                  )}
+                              </Box>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
+
+                      {/* AI Analysis Summary */}
+                      {hasAIAnalysis &&
+                        candidate.aiAnalysis
+                          ?.summary && (
+                          <Box
+                            sx={{
+                              mb: 2,
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              AI Summary
+                            </Typography>
+
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                mt: 0.5,
+                                lineHeight: 1.6,
+                              }}
+                            >
+                              {
+                                candidate
+                                  .aiAnalysis
+                                  .summary
+                              }
+                            </Typography>
                           </Box>
-                        </CardContent>
-                      </Card>
-                    );
-                  }
-                )}
-              </Box>
-            )}
+                        )}
+
+                      {/* Actions */}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 1,
+                          mt: 2,
+                          flexDirection: "column",
+                        }}
+                      >
+                        {/* AI Analysis Button */}
+                        <Button
+                          fullWidth
+                          variant="contained"
+                          startIcon={
+                            analyzingId ===
+                            candidate._id ? (
+                              <CircularProgress
+                                size={18}
+                                color="inherit"
+                              />
+                            ) : (
+                              <AutoAwesomeRoundedIcon />
+                            )
+                          }
+                          onClick={() =>
+                            handleAIAnalysis(
+                              candidate
+                            )
+                          }
+                          disabled={
+                            analyzingId ===
+                            candidate._id
+                          }
+                          sx={{
+                            textTransform:
+                              "none",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            background:
+                              "linear-gradient(135deg,#6366f1,#8b5cf6)",
+
+                            "&:hover": {
+                              background:
+                                "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                            },
+                          }}
+                        >
+                          {analyzingId ===
+                          candidate._id
+                            ? "Analyzing Resume..."
+                            : hasAIAnalysis
+                            ? "Re-analyze Resume"
+                            : "Analyze Resume"}
+                        </Button>
+
+                        {/* Schedule Interview */}
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          startIcon={
+                            <EventRoundedIcon />
+                          }
+                          onClick={() =>
+                            handleScheduleInterview(
+                              candidate
+                            )
+                          }
+                          sx={{
+                            textTransform:
+                              "none",
+                            fontWeight: 600,
+                            borderRadius: 2,
+                          }}
+                        >
+                          Schedule Interview
+                        </Button>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>
   );
-};
+}
 
 export default Candidate;

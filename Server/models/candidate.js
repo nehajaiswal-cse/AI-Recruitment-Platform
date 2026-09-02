@@ -34,22 +34,47 @@ const candidateSchema = new mongoose.Schema(
     },
 
     aiAnalysis: {
-      skillsMatch: Number,
-      experienceMatch: Number,
-      educationMatch: Number,
-      summary: String
-    },
+      matchingSkills: {
+       type: [String],
+       default: []
+      },
 
-    skills: [
-      {
-        type: String
+      missingSkills: {
+       type: [String],
+       default: []
+      },
+
+      experienceAnalysis: {
+        type: String,
+        default: ""
+      },
+
+      educationAnalysis: {
+        type: String,
+        default: ""
+      },
+
+      strengths: {
+       type: [String],
+       default: []
+      },
+
+      weaknesses: {
+        type: [String],
+        default: []
+      },
+
+      summary: {
+       type: String,
+       default: ""
+      },
+
+      recommendation: {
+        type: String,
+        enum: ["Shortlist", "Consider", "Reject"],
+        default: "Consider"
       }
-    ],
-
-    experience: {
-      type: Number
     },
-
     recruiterNotes: {
       type: String
     },
