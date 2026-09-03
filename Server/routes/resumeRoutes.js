@@ -30,7 +30,6 @@ router.get(
 router.get(
   "/:id/url",
   authMiddleware,
-  roleMiddleware("applicant"),
   getResumeSignedUrl
 );
 
