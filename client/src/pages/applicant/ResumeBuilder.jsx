@@ -24,6 +24,7 @@ import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import DashboardCustomizeRoundedIcon from "@mui/icons-material/DashboardCustomizeRounded";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
@@ -36,6 +37,8 @@ import {
   saveBuilderResume,
   exportBuilderResume,
 } from "../../api/resumeBuilderApi";
+
+import ANavbar from "../../components/layout/applicant/Navbar";
 
 /* ------------------------------------------------------------------ */
 /* Config                                                             */
@@ -53,7 +56,7 @@ const STEPS = [
   { key: "preview", label: "Preview", sub: "Review and download" },
 ];
 
-const TEMPLATES = [
+export const TEMPLATES = [
   {
     id: "modern",
     name: "Modern",
@@ -140,33 +143,61 @@ const cardSx = {
 const Placeholder = ({ text }) => (
   <span style={{ color: "#9ca3af", fontStyle: "italic" }}>{text}</span>
 );
-
 const PreviewSection = ({ tpl, title, children }) => {
-  const ruleStyle =
-    tpl.rule === "accent"
-      ? { borderBottom: `2px solid ${tpl.accent}` }
-      : tpl.rule === "solid"
-        ? { borderBottom: "1px solid #333" }
-        : { borderBottom: "none" };
+  const template = tpl.id || "modern";
+
+  const styles = {
+    modern: {
+      color: tpl.accent || "#2563eb",
+      border: `2px solid ${tpl.accent || "#2563eb"}`,
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+      fontWeight: 700,
+    },
+
+    classic: {
+      color: "#111827",
+      border: "1px solid #111827",
+      textTransform: "none",
+      letterSpacing: "0.04em",
+      fontWeight: 700,
+    },
+
+    minimal: {
+      color: "#4b5563",
+      border: "none",
+      textTransform: "uppercase",
+      letterSpacing: "0.1em",
+      fontWeight: 600,
+    },
+  };
+
+  const style = styles[template] || styles.modern;
 
   return (
-    <div style={{ marginTop: 14 }}>
+    <div style={{ marginTop: 18 }}>
       <div
         style={{
           fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: tpl.rule === "accent" ? tpl.accent : "#111827",
-          paddingBottom: 3,
-          marginBottom: 6,
-          textAlign: tpl.rule === "solid" ? "left" : "left",
-          ...ruleStyle,
+          fontWeight: style.fontWeight,
+          letterSpacing: style.letterSpacing,
+          textTransform: style.textTransform,
+          color: style.color,
+          paddingBottom: 5,
+          marginBottom: 7,
+          borderBottom: style.border,
         }}
       >
         {title}
       </div>
-      <div style={{ fontSize: 11.5, lineHeight: 1.5, color: "#374151" }}>
+
+      <div
+        style={{
+          fontSize: 11.5,
+          lineHeight: 1.5,
+          color: "#374151",
+        }}
+      >
         {children}
       </div>
     </div>
@@ -189,7 +220,11 @@ const ResumeBuilder = () => {
   const [skillInput, setSkillInput] = useState("");
   const [achievementInput, setAchievementInput] = useState("");
 
-  const [toast, setToast] = useState({ open: false, msg: "", severity: "success" });
+  const [toast, setToast] = useState({
+    open: false,
+    msg: "",
+    severity: "success",
+  });
   const notify = (msg, severity = "success") =>
     setToast({ open: true, msg, severity });
 
@@ -284,7 +319,10 @@ const ResumeBuilder = () => {
       await persist();
       if (isLast) notify("Resume saved");
     } catch (err) {
-      notify(err.message || "Couldn't save to the server — you can keep editing", "error");
+      notify(
+        err.message || "Couldn't save to the server — you can keep editing",
+        "error",
+      );
     } finally {
       setSaving(false);
     }
@@ -296,12 +334,7 @@ const ResumeBuilder = () => {
       // Preferred path: backend renders the PDF (and stores to S3) → { url }
       const { url } = await exportBuilderResume(data);
       if (!url) throw new Error("No file url returned");
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `${data.personal.fullName || "resume"}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      window.open(url, "_blank");
       notify("Download started");
     } catch (err) {
       // Fallback so Download always works even before the export API is live
@@ -310,6 +343,12 @@ const ResumeBuilder = () => {
     } finally {
       setDownloading(false);
     }
+  };
+
+  const handleOpenPreview = () => {
+    sessionStorage.setItem("resumeBuilderPreview", JSON.stringify(data));
+
+    window.open("/applicant/resume-builder/preview", "_blank");
   };
 
   const chooseTemplate = (id) => {
@@ -324,262 +363,371 @@ const ResumeBuilder = () => {
         minHeight: "100vh",
         bgcolor: "background.default",
         color: "text.primary",
-        p: { xs: 2, sm: 3, md: 4 },
       }}
     >
-      {/* ---------------------------- Header ---------------------------- */}
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        justifyContent="space-between"
-        alignItems={{ xs: "flex-start", sm: "center" }}
-        spacing={2}
-        sx={{ mb: 3 }}
-      >
-        <Box>
-          <Typography sx={{ fontSize: { xs: 28, md: 32 }, fontWeight: 700 }}>
-            Resume Builder
-          </Typography>
-          <Typography sx={{ mt: 0.5, fontSize: 14, color: "text.secondary" }}>
-            Build your professional resume step by step.
-          </Typography>
-        </Box>
-
-        <Button
-          variant="outlined"
-          startIcon={
-            saving ? <CircularProgress size={16} color="inherit" /> : <SaveOutlinedIcon />
-          }
-          onClick={handleSaveDraft}
-          disabled={saving}
-          sx={{ width: { xs: "100%", sm: "auto" } }}
-        >
-          Save Draft
-        </Button>
-      </Stack>
-
-      {/* --------------------------- 3-col grid ------------------------- */}
+      {/* ---------------------- Applicant Navbar ---------------------- */}
       <Box
+        component="header"
         sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            lg: "270px minmax(0, 1fr) 400px",
-          },
-          gap: 2.5,
-          alignItems: "start",
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
         }}
       >
-        {/* -------------------------- Steps nav ------------------------- */}
-        <Paper elevation={0} sx={{ ...cardSx, p: 1.5, position: { lg: "sticky" }, top: { lg: 16 } }}>
-          <Box sx={{ px: 1, pt: 1, pb: 1.5 }}>
-            <Typography sx={{ fontSize: 12, color: "text.secondary" }}>
-              Step {activeStep + 1} of {STEPS.length}
-            </Typography>
-            <LinearProgress
-              variant="determinate"
-              value={progress}
-              sx={{ mt: 1, height: 6, borderRadius: 3 }}
-            />
-          </Box>
-
-          <Stack spacing={0.5}>
-            {STEPS.map((step, index) => {
-              const isActive = index === activeStep;
-              const isDone = index < activeStep;
-              return (
-                <Stack
-                  key={step.key}
-                  direction="row"
-                  spacing={1.5}
-                  alignItems="center"
-                  onClick={() => setActiveStep(index)}
-                  sx={{
-                    p: 1.25,
-                    borderRadius: 2,
-                    cursor: "pointer",
-                    border: "1px solid",
-                    borderColor: isActive ? "primary.main" : "transparent",
-                    bgcolor: isActive ? "action.selected" : "transparent",
-                    transition: "background-color .15s ease",
-                    "&:hover": { bgcolor: isActive ? "action.selected" : "action.hover" },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: "50%",
-                      flexShrink: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: isActive || isDone ? "#fff" : "text.secondary",
-                      bgcolor: isActive || isDone ? "primary.main" : "transparent",
-                      border: "1px solid",
-                      borderColor: isActive || isDone ? "primary.main" : "divider",
-                    }}
-                  >
-                    {isDone ? <CheckRoundedIcon sx={{ fontSize: 16 }} /> : index + 1}
-                  </Box>
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography
-                      sx={{
-                        fontSize: 13.5,
-                        fontWeight: isActive ? 700 : 500,
-                        color: isActive ? "text.primary" : "text.primary",
-                        lineHeight: 1.2,
-                      }}
-                      noWrap
-                    >
-                      {step.label}
-                    </Typography>
-                    <Typography sx={{ fontSize: 11.5, color: "text.secondary" }} noWrap>
-                      {step.sub}
-                    </Typography>
-                  </Box>
-                </Stack>
-              );
-            })}
-          </Stack>
-        </Paper>
-
-        {/* --------------------------- Form area ------------------------ */}
-        <Paper elevation={0} sx={{ ...cardSx, p: { xs: 2, sm: 3 } }}>
-          <StepForm
-            step={currentStep.key}
-            data={data}
-            setPersonal={setPersonal}
-            setData={setData}
-            addItem={addItem}
-            updateItem={updateItem}
-            removeItem={removeItem}
-            skillInput={skillInput}
-            setSkillInput={setSkillInput}
-            addSkill={addSkill}
-            achievementInput={achievementInput}
-            setAchievementInput={setAchievementInput}
-            addAchievement={addAchievement}
-            templates={TEMPLATES}
-            onChooseTemplate={chooseTemplate}
-          />
-
-          <Divider sx={{ my: 3 }} />
-
-          <Stack direction="row" justifyContent="space-between">
-            <Button
-              variant="outlined"
-              startIcon={<ArrowBackRoundedIcon />}
-              onClick={handleBack}
-              disabled={activeStep === 0}
-            >
-              Back
-            </Button>
-            <Button
-              variant="contained"
-              endIcon={
-                activeStep === STEPS.length - 1 ? (
-                  <SaveOutlinedIcon />
-                ) : (
-                  <ArrowForwardRoundedIcon />
-                )
-              }
-              onClick={handleSaveAndContinue}
-            >
-              {activeStep === STEPS.length - 1 ? "Save Resume" : "Save & Continue"}
-            </Button>
-          </Stack>
-        </Paper>
-
-        {/* ---------------------------- Preview ------------------------- */}
-        <Box sx={{ position: { lg: "sticky" }, top: { lg: 16 } }}>
-          <Paper elevation={0} sx={{ ...cardSx, p: { xs: 2, sm: 3 } }}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="flex-start"
-              sx={{ mb: 0.5 }}
-            >
-              <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
-                Resume Preview
-              </Typography>
-              <Button
-                size="small"
-                variant="outlined"
-                startIcon={<DashboardCustomizeRoundedIcon fontSize="small" />}
-                onClick={(e) => setTemplateAnchor(e.currentTarget)}
-              >
-                Change Template
-              </Button>
-            </Stack>
-            <Typography sx={{ fontSize: 12, color: "text.secondary", mb: 2 }}>
-              Live preview of your resume.
-            </Typography>
-
-            <ResumePreview data={data} tpl={tpl} />
-
-            <Button
-              fullWidth
-              variant="contained"
-              size="large"
-              startIcon={
-                downloading ? (
-                  <CircularProgress size={18} color="inherit" />
-                ) : (
-                  <DownloadRoundedIcon />
-                )
-              }
-              onClick={handleDownload}
-              disabled={downloading}
-              sx={{ mt: 2 }}
-            >
-              {downloading ? "Preparing..." : "Download Resume"}
-            </Button>
-          </Paper>
-        </Box>
+        <ANavbar />
       </Box>
 
-      {/* ----------------------- Template menu ------------------------- */}
-      <Menu
-        anchorEl={templateAnchor}
-        open={Boolean(templateAnchor)}
-        onClose={() => setTemplateAnchor(null)}
-      >
-        {TEMPLATES.map((t) => (
-          <MenuItem
-            key={t.id}
-            selected={t.id === data.template}
-            onClick={() => chooseTemplate(t.id)}
-            sx={{ gap: 1.5, minWidth: 220 }}
-          >
-            <Box sx={{ flex: 1 }}>
-              <Typography sx={{ fontSize: 14, fontWeight: 600 }}>{t.name}</Typography>
-              <Typography sx={{ fontSize: 12, color: "text.secondary" }}>
-                {t.desc}
-              </Typography>
-            </Box>
-            {t.id === data.template && (
-              <CheckRoundedIcon fontSize="small" color="primary" />
-            )}
-          </MenuItem>
-        ))}
-      </Menu>
-
-      <Snackbar
-        open={toast.open}
-        autoHideDuration={3500}
-        onClose={() => setToast((t) => ({ ...t, open: false }))}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          severity={toast.severity}
-          variant="filled"
-          onClose={() => setToast((t) => ({ ...t, open: false }))}
+      {/* ----------------------- Builder Content ---------------------- */}
+      <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+        {/* ---------------------------- Header ---------------------------- */}
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          spacing={2}
+          sx={{ mb: 3 }}
         >
-          {toast.msg}
-        </Alert>
-      </Snackbar>
+          <Box>
+            <Typography sx={{ fontSize: { xs: 28, md: 32 }, fontWeight: 700 }}>
+              Resume Builder
+            </Typography>
+            <Typography sx={{ mt: 0.5, fontSize: 14, color: "text.secondary" }}>
+              Build your professional resume step by step.
+            </Typography>
+          </Box>
+
+          <Stack direction="row" spacing={1} sx={{ width: "auto" }}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={
+                saving ? (
+                  <CircularProgress size={15} color="inherit" />
+                ) : (
+                  <SaveOutlinedIcon />
+                )
+              }
+              onClick={handleSaveDraft}
+              disabled={saving}
+              sx={{
+                px: 1.8,
+                py: 1,
+                minWidth: 120,
+                fontSize: 13,
+              }}
+            >
+              Save Draft
+            </Button>
+
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<VisibilityRoundedIcon />}
+              onClick={handleOpenPreview}
+              sx={{
+                px: 1.8,
+                py: 1,
+                minWidth: 145,
+                fontSize: 13,
+              }}
+            >
+              Preview Resume
+            </Button>
+          </Stack>
+        </Stack>
+
+        {/* --------------------------- 3-col grid ------------------------- */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              lg: "270px minmax(0, 1fr) 400px",
+            },
+            gap: 2.5,
+            alignItems: "start",
+          }}
+        >
+          {/* -------------------------- Steps nav ------------------------- */}
+          <Paper
+            elevation={0}
+            sx={{
+              ...cardSx,
+              p: 1.5,
+              position: { lg: "sticky" },
+              top: { lg: 16 },
+            }}
+          >
+            <Box sx={{ px: 1, pt: 1, pb: 1.5 }}>
+              <Typography sx={{ fontSize: 12, color: "text.secondary" }}>
+                Step {activeStep + 1} of {STEPS.length}
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={progress}
+                sx={{ mt: 1, height: 6, borderRadius: 3 }}
+              />
+            </Box>
+
+            <Stack spacing={0.5}>
+              {STEPS.map((step, index) => {
+                const isActive = index === activeStep;
+                const isDone = index < activeStep;
+                return (
+                  <Stack
+                    key={step.key}
+                    direction="row"
+                    spacing={1.5}
+                    alignItems="center"
+                    onClick={() => setActiveStep(index)}
+                    sx={{
+                      p: 1.25,
+                      borderRadius: 2,
+                      cursor: "pointer",
+                      border: "1px solid",
+                      borderColor: isActive ? "primary.main" : "transparent",
+                      bgcolor: isActive ? "action.selected" : "transparent",
+                      transition: "background-color .15s ease",
+                      "&:hover": {
+                        bgcolor: isActive ? "action.selected" : "action.hover",
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: "50%",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: isActive || isDone ? "#fff" : "text.secondary",
+                        bgcolor:
+                          isActive || isDone ? "primary.main" : "transparent",
+                        border: "1px solid",
+                        borderColor:
+                          isActive || isDone ? "primary.main" : "divider",
+                      }}
+                    >
+                      {isDone ? (
+                        <CheckRoundedIcon sx={{ fontSize: 16 }} />
+                      ) : (
+                        index + 1
+                      )}
+                    </Box>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography
+                        sx={{
+                          fontSize: 13.5,
+                          fontWeight: isActive ? 700 : 500,
+                          color: isActive ? "text.primary" : "text.primary",
+                          lineHeight: 1.2,
+                        }}
+                        noWrap
+                      >
+                        {step.label}
+                      </Typography>
+                      <Typography
+                        sx={{ fontSize: 11.5, color: "text.secondary" }}
+                        noWrap
+                      >
+                        {step.sub}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                );
+              })}
+            </Stack>
+          </Paper>
+
+          {/* --------------------------- Form area ------------------------ */}
+          <Paper elevation={0} sx={{ ...cardSx, p: { xs: 2, sm: 3 } }}>
+            <StepForm
+              step={currentStep.key}
+              data={data}
+              setPersonal={setPersonal}
+              setData={setData}
+              addItem={addItem}
+              updateItem={updateItem}
+              removeItem={removeItem}
+              skillInput={skillInput}
+              setSkillInput={setSkillInput}
+              addSkill={addSkill}
+              achievementInput={achievementInput}
+              setAchievementInput={setAchievementInput}
+              addAchievement={addAchievement}
+              templates={TEMPLATES}
+              onChooseTemplate={chooseTemplate}
+            />
+
+            <Divider sx={{ my: 3 }} />
+
+            <Stack direction="row" justifyContent="space-between">
+              <Button
+                variant="outlined"
+                startIcon={<ArrowBackRoundedIcon />}
+                onClick={handleBack}
+                disabled={activeStep === 0}
+              >
+                Back
+              </Button>
+              <Button
+                variant="contained"
+                endIcon={
+                  activeStep === STEPS.length - 1 ? (
+                    <SaveOutlinedIcon />
+                  ) : (
+                    <ArrowForwardRoundedIcon />
+                  )
+                }
+                onClick={handleSaveAndContinue}
+              >
+                {activeStep === STEPS.length - 1
+                  ? "Save Resume"
+                  : "Save & Continue"}
+              </Button>
+            </Stack>
+          </Paper>
+
+          {/* ---------------------------- Preview ------------------------- */}
+          <Box sx={{ position: { lg: "sticky" }, top: { lg: 16 } }}>
+            <Paper elevation={0} sx={{ ...cardSx, p: { xs: 2, sm: 3 } }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="flex-start"
+                sx={{ mb: 0.5 }}
+              >
+                <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                  Resume Preview
+                </Typography>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<DashboardCustomizeRoundedIcon fontSize="small" />}
+                  onClick={(e) => setTemplateAnchor(e.currentTarget)}
+                >
+                  Change Template
+                </Button>
+              </Stack>
+              <Typography sx={{ fontSize: 12, color: "text.secondary", mb: 2 }}>
+                Live preview of your resume.
+              </Typography>
+
+              <ResumePreview data={data} tpl={tpl} />
+
+              <Button
+                fullWidth
+                variant="contained"
+                size="large"
+                startIcon={
+                  downloading ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    <DownloadRoundedIcon />
+                  )
+                }
+                onClick={handleDownload}
+                disabled={downloading}
+                sx={{ mt: 2 }}
+              >
+                {downloading ? "Preparing..." : "Download Resume"}
+              </Button>
+            </Paper>
+          </Box>
+
+          <Menu
+            anchorEl={templateAnchor}
+            open={Boolean(templateAnchor)}
+            onClose={() => setTemplateAnchor(null)}
+          >
+            <MenuItem
+              selected={data.template === "modern"}
+              onClick={() => {
+                setData((prev) => ({
+                  ...prev,
+                  template: "modern",
+                }));
+                setTemplateAnchor(null);
+              }}
+            >
+              Modern
+            </MenuItem>
+
+            <MenuItem
+              selected={data.template === "classic"}
+              onClick={() => {
+                setData((prev) => ({
+                  ...prev,
+                  template: "classic",
+                }));
+                setTemplateAnchor(null);
+              }}
+            >
+              Classic
+            </MenuItem>
+
+            <MenuItem
+              selected={data.template === "minimal"}
+              onClick={() => {
+                setData((prev) => ({
+                  ...prev,
+                  template: "minimal",
+                }));
+                setTemplateAnchor(null);
+              }}
+            >
+              Minimal
+            </MenuItem>
+          </Menu>
+        </Box>
+
+        {/* ----------------------- Template menu ------------------------- */}
+        <Menu
+          anchorEl={templateAnchor}
+          open={Boolean(templateAnchor)}
+          onClose={() => setTemplateAnchor(null)}
+        >
+          {TEMPLATES.map((t) => (
+            <MenuItem
+              key={t.id}
+              selected={t.id === data.template}
+              onClick={() => chooseTemplate(t.id)}
+              sx={{ gap: 1.5, minWidth: 220 }}
+            >
+              <Box sx={{ flex: 1 }}>
+                <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                  {t.name}
+                </Typography>
+                <Typography sx={{ fontSize: 12, color: "text.secondary" }}>
+                  {t.desc}
+                </Typography>
+              </Box>
+              {t.id === data.template && (
+                <CheckRoundedIcon fontSize="small" color="primary" />
+              )}
+            </MenuItem>
+          ))}
+        </Menu>
+
+        <Snackbar
+          open={toast.open}
+          autoHideDuration={3500}
+          onClose={() => setToast((t) => ({ ...t, open: false }))}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            severity={toast.severity}
+            variant="filled"
+            onClose={() => setToast((t) => ({ ...t, open: false }))}
+          >
+            {toast.msg}
+          </Alert>
+        </Snackbar>
+      </Box>
     </Box>
   );
 };
@@ -615,8 +763,15 @@ const ItemCard = ({ title, onRemove, children }) => (
       bgcolor: "background.default",
     }}
   >
-    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-      <Typography sx={{ fontSize: 13, fontWeight: 600, color: "text.secondary" }}>
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      sx={{ mb: 1.5 }}
+    >
+      <Typography
+        sx={{ fontSize: 13, fontWeight: 600, color: "text.secondary" }}
+      >
         {title}
       </Typography>
       <Tooltip title="Remove">
@@ -630,7 +785,9 @@ const ItemCard = ({ title, onRemove, children }) => (
 );
 
 const EmptyHint = ({ text }) => (
-  <Typography sx={{ fontSize: 13, color: "text.secondary", mb: 2 }}>{text}</Typography>
+  <Typography sx={{ fontSize: 13, color: "text.secondary", mb: 2 }}>
+    {text}
+  </Typography>
 );
 
 const StepForm = (props) => {
@@ -745,7 +902,9 @@ const StepForm = (props) => {
             label="Summary"
             placeholder="Results-driven software engineer with 3+ years of experience building scalable web applications..."
             value={data.summary}
-            onChange={(e) => setData((d) => ({ ...d, summary: e.target.value }))}
+            onChange={(e) =>
+              setData((d) => ({ ...d, summary: e.target.value }))
+            }
             size="small"
             fullWidth
             multiline
@@ -779,7 +938,9 @@ const StepForm = (props) => {
                 <TextField
                   label="Institution"
                   value={ed.institution}
-                  onChange={(e) => updateItem("education", i, "institution", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("education", i, "institution", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -788,7 +949,9 @@ const StepForm = (props) => {
                   label="Degree"
                   placeholder="B.Tech, M.Sc, ..."
                   value={ed.degree}
-                  onChange={(e) => updateItem("education", i, "degree", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("education", i, "degree", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -796,7 +959,9 @@ const StepForm = (props) => {
                 <TextField
                   label="Field of Study"
                   value={ed.field}
-                  onChange={(e) => updateItem("education", i, "field", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("education", i, "field", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -804,7 +969,9 @@ const StepForm = (props) => {
                 <TextField
                   label="Grade / CGPA"
                   value={ed.grade}
-                  onChange={(e) => updateItem("education", i, "grade", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("education", i, "grade", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -813,7 +980,9 @@ const StepForm = (props) => {
                   label="Start Year"
                   placeholder="2020"
                   value={ed.startYear}
-                  onChange={(e) => updateItem("education", i, "startYear", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("education", i, "startYear", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -822,7 +991,9 @@ const StepForm = (props) => {
                   label="End Year"
                   placeholder="2024 (or Present)"
                   value={ed.endYear}
-                  onChange={(e) => updateItem("education", i, "endYear", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("education", i, "endYear", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -861,7 +1032,9 @@ const StepForm = (props) => {
                 <TextField
                   label="Company"
                   value={ex.company}
-                  onChange={(e) => updateItem("experience", i, "company", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("experience", i, "company", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -869,7 +1042,9 @@ const StepForm = (props) => {
                 <TextField
                   label="Role / Title"
                   value={ex.role}
-                  onChange={(e) => updateItem("experience", i, "role", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("experience", i, "role", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -878,7 +1053,9 @@ const StepForm = (props) => {
                   label="Start Date"
                   placeholder="Jan 2023"
                   value={ex.startDate}
-                  onChange={(e) => updateItem("experience", i, "startDate", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("experience", i, "startDate", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -887,7 +1064,9 @@ const StepForm = (props) => {
                   label="End Date"
                   placeholder="Present"
                   value={ex.endDate}
-                  onChange={(e) => updateItem("experience", i, "endDate", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("experience", i, "endDate", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -897,7 +1076,9 @@ const StepForm = (props) => {
                 label="Description"
                 placeholder="What you did and achieved (use bullet-style lines)"
                 value={ex.description}
-                onChange={(e) => updateItem("experience", i, "description", e.target.value)}
+                onChange={(e) =>
+                  updateItem("experience", i, "description", e.target.value)
+                }
                 size="small"
                 fullWidth
                 multiline
@@ -937,7 +1118,9 @@ const StepForm = (props) => {
                 <TextField
                   label="Project Name"
                   value={pr.name}
-                  onChange={(e) => updateItem("projects", i, "name", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("projects", i, "name", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -946,7 +1129,9 @@ const StepForm = (props) => {
                   label="Tech Stack"
                   placeholder="React, Node, MongoDB"
                   value={pr.tech}
-                  onChange={(e) => updateItem("projects", i, "tech", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("projects", i, "tech", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -956,7 +1141,9 @@ const StepForm = (props) => {
                 label="Link"
                 placeholder="https://github.com/you/project"
                 value={pr.link}
-                onChange={(e) => updateItem("projects", i, "link", e.target.value)}
+                onChange={(e) =>
+                  updateItem("projects", i, "link", e.target.value)
+                }
                 size="small"
                 fullWidth
                 sx={{ ...fieldSx, mt: 2 }}
@@ -964,7 +1151,9 @@ const StepForm = (props) => {
               <TextField
                 label="Description"
                 value={pr.description}
-                onChange={(e) => updateItem("projects", i, "description", e.target.value)}
+                onChange={(e) =>
+                  updateItem("projects", i, "description", e.target.value)
+                }
                 size="small"
                 fullWidth
                 multiline
@@ -1007,7 +1196,11 @@ const StepForm = (props) => {
               fullWidth
               sx={fieldSx}
             />
-            <Button variant="contained" onClick={addSkill} sx={{ flexShrink: 0 }}>
+            <Button
+              variant="contained"
+              onClick={addSkill}
+              sx={{ flexShrink: 0 }}
+            >
               Add
             </Button>
           </Stack>
@@ -1049,7 +1242,9 @@ const StepForm = (props) => {
                 <TextField
                   label="Name"
                   value={c.name}
-                  onChange={(e) => updateItem("certifications", i, "name", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("certifications", i, "name", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -1057,7 +1252,9 @@ const StepForm = (props) => {
                 <TextField
                   label="Issuer"
                   value={c.issuer}
-                  onChange={(e) => updateItem("certifications", i, "issuer", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("certifications", i, "issuer", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -1066,7 +1263,9 @@ const StepForm = (props) => {
                   label="Year"
                   placeholder="2024"
                   value={c.year}
-                  onChange={(e) => updateItem("certifications", i, "year", e.target.value)}
+                  onChange={(e) =>
+                    updateItem("certifications", i, "year", e.target.value)
+                  }
                   size="small"
                   fullWidth
                   sx={fieldSx}
@@ -1108,7 +1307,11 @@ const StepForm = (props) => {
               fullWidth
               sx={fieldSx}
             />
-            <Button variant="contained" onClick={addAchievement} sx={{ flexShrink: 0 }}>
+            <Button
+              variant="contained"
+              onClick={addAchievement}
+              sx={{ flexShrink: 0 }}
+            >
               Add
             </Button>
           </Stack>
@@ -1131,7 +1334,11 @@ const StepForm = (props) => {
                   }}
                 >
                   <Typography sx={{ fontSize: 13.5 }}>{a}</Typography>
-                  <IconButton size="small" color="error" onClick={() => removeItem("achievements", i)}>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => removeItem("achievements", i)}
+                  >
                     <DeleteOutlineRoundedIcon fontSize="small" />
                   </IconButton>
                 </Stack>
@@ -1176,11 +1383,21 @@ const StepForm = (props) => {
                     bgcolor: "background.default",
                   }}
                 >
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography sx={{ fontSize: 14, fontWeight: 600 }}>{t.name}</Typography>
-                    {selected && <CheckRoundedIcon fontSize="small" color="primary" />}
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
+                      {t.name}
+                    </Typography>
+                    {selected && (
+                      <CheckRoundedIcon fontSize="small" color="primary" />
+                    )}
                   </Stack>
-                  <Typography sx={{ fontSize: 12, color: "text.secondary", mt: 0.5 }}>
+                  <Typography
+                    sx={{ fontSize: 12, color: "text.secondary", mt: 0.5 }}
+                  >
                     {t.desc}
                   </Typography>
                 </Paper>
@@ -1188,8 +1405,8 @@ const StepForm = (props) => {
             })}
           </Box>
           <Alert severity="info" variant="outlined">
-            Your resume preview updates live on the right. Use “Download Resume” to
-            export it.
+            Your resume preview updates live on the right. Use “Download Resume”
+            to export it.
           </Alert>
         </>
       );
@@ -1203,149 +1420,566 @@ const StepForm = (props) => {
 /* Live preview (white "paper")                                       */
 /* ================================================================== */
 
-const ResumePreview = ({ data, tpl }) => {
-  const p = data.personal;
-  const contactLine = [p.email || "your.email@example.com", p.phone || "+91 9876543210"]
+export const ResumePreview = ({ data, tpl, fullPage = false }) => {
+  const p = data.personal || {};
+
+  /*
+   * IMPORTANT:
+   * TEMPLATES uses `id`, not `template`.
+   * So we must use tpl.id here.
+   */
+  const template = tpl?.id || data.template || "modern";
+
+  /*
+   * Safe fallback in case tpl is missing.
+   */
+  const activeTpl =
+    TEMPLATES.find((t) => t.id === template) || TEMPLATES[0];
+
+  const contactLine = [
+    p.email,
+    p.phone,
+  ]
     .filter(Boolean)
     .join("  |  ");
+
+  /*
+   * Template-specific styles
+   */
+  const templateStyles = {
+    modern: {
+      nameSize: 22,
+      nameWeight: 700,
+      nameColor: "#111827",
+
+      sectionColor: activeTpl.accent,
+      sectionBorder: `2px solid ${activeTpl.accent}`,
+      sectionTransform: "uppercase",
+      sectionSpacing: 18,
+
+      bodyColor: "#374151",
+      bodyFontSize: 11.5,
+      lineHeight: 1.5,
+
+      headerAlign: "left",
+      socialJustify: "flex-start",
+    },
+
+    classic: {
+      nameSize: 23,
+      nameWeight: 700,
+      nameColor: "#111827",
+
+      sectionColor: "#111827",
+      sectionBorder: "1px solid #111827",
+      sectionTransform: "none",
+      sectionSpacing: 16,
+
+      bodyColor: "#374151",
+      bodyFontSize: 11.5,
+      lineHeight: 1.5,
+
+      headerAlign: "center",
+      socialJustify: "center",
+    },
+
+    minimal: {
+      nameSize: 22,
+      nameWeight: 600,
+      nameColor: "#111827",
+
+      sectionColor: "#4b5563",
+      sectionBorder: "none",
+      sectionTransform: "uppercase",
+      sectionSpacing: 22,
+
+      bodyColor: "#374151",
+      bodyFontSize: 11.5,
+      lineHeight: 1.55,
+
+      headerAlign: "left",
+      socialJustify: "flex-start",
+    },
+  };
+
+  const style = templateStyles[template] || templateStyles.modern;
 
   return (
     <Box
       id="resume-preview-paper"
       sx={{
+        width: "100%",
+        boxSizing: "border-box",
+
         bgcolor: "#ffffff",
         color: "#111827",
-        borderRadius: 2,
-        p: 2.5,
-        maxHeight: 620,
-        overflowY: "auto",
-        border: "1px solid #e5e7eb",
-        fontFamily: tpl.font,
+
+        /*
+         * Normal preview = card
+         * Full page = content determines height
+         */
+        borderRadius: fullPage ? 0 : 2,
+
+        p: fullPage
+          ? {
+              xs: 3,
+              sm: 5,
+              md: 6,
+            }
+          : 2.5,
+
+        /*
+         * IMPORTANT:
+         * No fixed/minimum height for full page.
+         * Resume will end exactly after its content.
+         */
+        minHeight: "auto",
+        height: "auto",
+
+        maxHeight: fullPage ? "none" : 620,
+        overflowY: fullPage ? "visible" : "auto",
+
+        fontFamily: activeTpl.font,
+
+        border: fullPage ? "none" : "1px solid #e5e7eb",
+
+        /*
+         * Prevent weird page stretching.
+         */
+        "& > *:last-child": {
+          marginBottom: 0,
+        },
       }}
     >
-      {/* Header */}
-      <div style={{ textAlign: tpl.headerAlign }}>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#111827" }}>
+      {/* ============================================================ */}
+      {/* HEADER                                                        */}
+      {/* ============================================================ */}
+
+      <div
+        style={{
+          textAlign: style.headerAlign,
+        }}
+      >
+        {/* Name */}
+        <div
+          className="resume-name"
+          style={{
+            fontSize: style.nameSize,
+            fontWeight: style.nameWeight,
+            color: style.nameColor,
+            lineHeight: 1.2,
+          }}
+        >
           {p.fullName || "Your Name"}
         </div>
-        <div style={{ fontSize: 11.5, color: "#374151", marginTop: 2 }}>
-          {contactLine}
+
+        {/* Email + Phone */}
+        <div
+          style={{
+            fontSize: 11.5,
+            color: "#374151",
+            marginTop: 4,
+          }}
+        >
+          {contactLine || "your.email@example.com  |  +91 9876543210"}
         </div>
-        <div style={{ fontSize: 11.5, color: "#374151" }}>
+
+        {/* Location */}
+        <div
+          style={{
+            fontSize: 11.5,
+            color: "#374151",
+            marginTop: 1,
+          }}
+        >
           {p.location || "City, State, Country"}
         </div>
 
-        {/* Social row */}
+        {/* Social Links */}
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
             gap: 12,
-            marginTop: 6,
-            justifyContent: tpl.headerAlign === "center" ? "center" : "flex-start",
+            marginTop: 7,
+            justifyContent: style.socialJustify,
             fontSize: 11,
             color: "#374151",
           }}
         >
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
             <LinkedInIcon sx={{ fontSize: 14 }} />
-            {p.linkedin ? cleanUrl(p.linkedin) : "linkedin.com/in/yourname"}
+            {p.linkedin
+              ? cleanUrl(p.linkedin)
+              : "linkedin.com/in/yourname"}
           </span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
             <GitHubIcon sx={{ fontSize: 14 }} />
-            {p.github ? cleanUrl(p.github) : "github.com/yourname"}
+            {p.github
+              ? cleanUrl(p.github)
+              : "github.com/yourname"}
           </span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
             <LanguageRoundedIcon sx={{ fontSize: 14 }} />
-            {p.portfolio ? cleanUrl(p.portfolio) : "yourportfolio.com"}
+            {p.portfolio
+              ? cleanUrl(p.portfolio)
+              : "yourportfolio.com"}
           </span>
         </div>
       </div>
 
-      {/* Summary */}
-      <PreviewSection tpl={tpl} title="Professional Summary">
-        {data.summary || <Placeholder text="Your summary will appear here..." />}
+      {/* ============================================================ */}
+      {/* SUMMARY                                                       */}
+      {/* ============================================================ */}
+
+      <PreviewSection
+        tpl={{
+          ...activeTpl,
+          id: "modern",
+          accent: style.sectionColor,
+          rule: template === "minimal" ? "none" : template === "classic" ? "solid" : "accent",
+        }}
+        title="Professional Summary"
+      >
+        {data.summary ? (
+          <div style={{ whiteSpace: "pre-line" }}>
+            {data.summary}
+          </div>
+        ) : (
+          <Placeholder text="Your summary will appear here..." />
+        )}
       </PreviewSection>
 
-      {/* Education */}
-      <PreviewSection tpl={tpl} title="Education">
-        {data.education.length === 0 ? (
-          <Placeholder text="Your education details will appear here..." />
-        ) : (
-          data.education.map((ed, i) => (
-            <div key={i} style={{ marginBottom: 6 }}>
-              <div style={{ fontWeight: 600, color: "#111827" }}>
+      {/* ============================================================ */}
+      {/* EDUCATION                                                     */}
+      {/* ============================================================ */}
+
+      {data.education?.length > 0 ? (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Education"
+        >
+          {data.education.map((ed, i) => (
+            <div
+              key={i}
+              style={{
+                marginBottom: i === data.education.length - 1 ? 0 : 8,
+              }}
+            >
+              <div
+                style={{
+                  fontWeight: 600,
+                  color: "#111827",
+                }}
+              >
                 {ed.degree || "Degree"}
                 {ed.field ? `, ${ed.field}` : ""}
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>{ed.institution || "Institution"}</span>
-                <span style={{ color: "#6b7280" }}>
-                  {[ed.startYear, ed.endYear].filter(Boolean).join(" - ")}
-                </span>
-              </div>
-              {ed.grade && <div style={{ color: "#6b7280" }}>Grade: {ed.grade}</div>}
-            </div>
-          ))
-        )}
-      </PreviewSection>
 
-      {/* Experience */}
-      <PreviewSection tpl={tpl} title="Experience">
-        {data.experience.length === 0 ? (
-          <Placeholder text="Your experience details will appear here..." />
-        ) : (
-          data.experience.map((ex, i) => (
-            <div key={i} style={{ marginBottom: 8 }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontWeight: 600, color: "#111827" }}>
-                  {ex.role || "Role"}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 12,
+                }}
+              >
+                <span>
+                  {ed.institution || "Institution"}
                 </span>
-                <span style={{ color: "#6b7280" }}>
-                  {[ex.startDate, ex.endDate].filter(Boolean).join(" - ")}
+
+                <span
+                  style={{
+                    color: "#6b7280",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {[ed.startYear, ed.endYear]
+                    .filter(Boolean)
+                    .join(" - ")}
                 </span>
               </div>
-              <div style={{ color: "#374151" }}>{ex.company || "Company"}</div>
-              {ex.description && (
-                <div style={{ whiteSpace: "pre-line", marginTop: 2 }}>{ex.description}</div>
+
+              {ed.grade && (
+                <div style={{ color: "#6b7280" }}>
+                  Grade: {ed.grade}
+                </div>
               )}
             </div>
-          ))
-        )}
-      </PreviewSection>
+          ))}
+        </PreviewSection>
+      ) : (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Education"
+        >
+          <Placeholder text="Your education details will appear here..." />
+        </PreviewSection>
+      )}
 
-      {/* Projects */}
-      <PreviewSection tpl={tpl} title="Projects">
-        {data.projects.length === 0 ? (
-          <Placeholder text="Your projects will appear here..." />
-        ) : (
-          data.projects.map((pr, i) => (
-            <div key={i} style={{ marginBottom: 8 }}>
-              <div style={{ fontWeight: 600, color: "#111827" }}>
-                {pr.name || "Project"}
-                {pr.tech ? (
-                  <span style={{ fontWeight: 400, color: "#6b7280" }}> — {pr.tech}</span>
-                ) : null}
+      {/* ============================================================ */}
+      {/* EXPERIENCE                                                    */}
+      {/* ============================================================ */}
+
+      {data.experience?.length > 0 ? (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Experience"
+        >
+          {data.experience.map((ex, i) => (
+            <div
+              key={i}
+              style={{
+                marginBottom: i === data.experience.length - 1 ? 0 : 10,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 12,
+                }}
+              >
+                <span
+                  style={{
+                    fontWeight: 600,
+                    color: "#111827",
+                  }}
+                >
+                  {ex.role || "Role"}
+                </span>
+
+                <span
+                  style={{
+                    color: "#6b7280",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {[ex.startDate, ex.endDate]
+                    .filter(Boolean)
+                    .join(" - ")}
+                </span>
               </div>
-              {pr.description && <div style={{ whiteSpace: "pre-line" }}>{pr.description}</div>}
-              {pr.link && <div style={{ color: "#2563eb" }}>{cleanUrl(pr.link)}</div>}
-            </div>
-          ))
-        )}
-      </PreviewSection>
 
-      {/* Skills */}
-      <PreviewSection tpl={tpl} title="Skills">
-        {data.skills.length === 0 ? (
-          <Placeholder text="Your skills will appear here..." />
-        ) : (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              <div
+                style={{
+                  color: "#374151",
+                }}
+              >
+                {ex.company || "Company"}
+              </div>
+
+              {ex.description && (
+                <div
+                  style={{
+                    whiteSpace: "pre-line",
+                    marginTop: 3,
+                  }}
+                >
+                  {ex.description}
+                </div>
+              )}
+            </div>
+          ))}
+        </PreviewSection>
+      ) : (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Experience"
+        >
+          <Placeholder text="Your experience details will appear here..." />
+        </PreviewSection>
+      )}
+
+      {/* ============================================================ */}
+      {/* PROJECTS                                                      */}
+      {/* ============================================================ */}
+
+      {data.projects?.length > 0 ? (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Projects"
+        >
+          {data.projects.map((pr, i) => (
+            <div
+              key={i}
+              style={{
+                marginBottom: i === data.projects.length - 1 ? 0 : 10,
+              }}
+            >
+              <div
+                style={{
+                  fontWeight: 600,
+                  color: "#111827",
+                }}
+              >
+                {pr.name || "Project"}
+
+                {pr.tech && (
+                  <span
+                    style={{
+                      fontWeight: 400,
+                      color: "#6b7280",
+                    }}
+                  >
+                    {" "}
+                    — {pr.tech}
+                  </span>
+                )}
+              </div>
+
+              {pr.description && (
+                <div
+                  style={{
+                    whiteSpace: "pre-line",
+                    marginTop: 2,
+                  }}
+                >
+                  {pr.description}
+                </div>
+              )}
+
+              {pr.link && (
+                <div
+                  style={{
+                    color: "#2563eb",
+                    marginTop: 2,
+                  }}
+                >
+                  {cleanUrl(pr.link)}
+                </div>
+              )}
+            </div>
+          ))}
+        </PreviewSection>
+      ) : (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Projects"
+        >
+          <Placeholder text="Your projects will appear here..." />
+        </PreviewSection>
+      )}
+
+      {/* ============================================================ */}
+      {/* SKILLS                                                        */}
+      {/* ============================================================ */}
+
+      {data.skills?.length > 0 ? (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Skills"
+        >
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 6,
+            }}
+          >
             {data.skills.map((s, i) => (
               <span
                 key={`${s}-${i}`}
                 style={{
-                  background: "#f3f4f6",
-                  border: "1px solid #e5e7eb",
+                  background:
+                    template === "minimal"
+                      ? "transparent"
+                      : "#f3f4f6",
+
+                  border:
+                    template === "minimal"
+                      ? "none"
+                      : "1px solid #e5e7eb",
+
                   borderRadius: 4,
                   padding: "2px 8px",
                   fontSize: 11,
@@ -1355,167 +1989,144 @@ const ResumePreview = ({ data, tpl }) => {
               </span>
             ))}
           </div>
-        )}
-      </PreviewSection>
+        </PreviewSection>
+      ) : (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Skills"
+        >
+          <Placeholder text="Your skills will appear here..." />
+        </PreviewSection>
+      )}
 
-      {/* Certifications */}
-      <PreviewSection tpl={tpl} title="Certifications">
-        {data.certifications.length === 0 ? (
-          <Placeholder text="Your certifications will appear here..." />
-        ) : (
-          data.certifications.map((c, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: "space-between" }}>
+      {/* ============================================================ */}
+      {/* CERTIFICATIONS                                                */}
+      {/* ============================================================ */}
+
+      {data.certifications?.length > 0 ? (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Certifications"
+        >
+          {data.certifications.map((c, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 12,
+                marginBottom:
+                  i === data.certifications.length - 1 ? 0 : 5,
+              }}
+            >
               <span>
                 {c.name || "Certification"}
                 {c.issuer ? ` — ${c.issuer}` : ""}
               </span>
-              <span style={{ color: "#6b7280" }}>{c.year}</span>
-            </div>
-          ))
-        )}
-      </PreviewSection>
 
-      {/* Achievements */}
-      <PreviewSection tpl={tpl} title="Achievements">
-        {data.achievements.length === 0 ? (
-          <Placeholder text="Your achievements will appear here..." />
-        ) : (
-          <ul style={{ margin: 0, paddingLeft: 16 }}>
+              {c.year && (
+                <span
+                  style={{
+                    color: "#6b7280",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {c.year}
+                </span>
+              )}
+            </div>
+          ))}
+        </PreviewSection>
+      ) : (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Certifications"
+        >
+          <Placeholder text="Your certifications will appear here..." />
+        </PreviewSection>
+      )}
+
+      {/* ============================================================ */}
+      {/* ACHIEVEMENTS                                                   */}
+      {/* ============================================================ */}
+
+      {data.achievements?.length > 0 ? (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Achievements"
+        >
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: 17,
+            }}
+          >
             {data.achievements.map((a, i) => (
-              <li key={`${a}-${i}`}>{a}</li>
+              <li key={`${a}-${i}`}>
+                {a}
+              </li>
             ))}
           </ul>
-        )}
-      </PreviewSection>
+        </PreviewSection>
+      ) : (
+        <PreviewSection
+          tpl={{
+            ...activeTpl,
+            id: template,
+            accent: style.sectionColor,
+            rule:
+              template === "minimal"
+                ? "none"
+                : template === "classic"
+                ? "solid"
+                : "accent",
+          }}
+          title="Achievements"
+        >
+          <Placeholder text="Your achievements will appear here..." />
+        </PreviewSection>
+      )}
     </Box>
   );
 };
-
-/* ================================================================== */
-/* Utils + client-side print fallback                                 */
-/* ================================================================== */
-
-const cleanUrl = (url) =>
-  String(url).replace(/^https?:\/\//, "").replace(/\/$/, "");
-
-const esc = (s = "") =>
-  String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-// Fallback used when the backend export endpoint isn't available yet.
-// Opens a print-ready window (user can "Save as PDF").
-function printResume(data, tpl) {
-  const p = data.personal;
-  const accent = tpl.accent;
-  const sectionTitle = (t) =>
-    `<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:${
-      tpl.rule === "accent" ? accent : "#111827"
-    };border-bottom:${
-      tpl.rule === "none" ? "none" : tpl.rule === "accent" ? `2px solid ${accent}` : "1px solid #333"
-    };padding-bottom:3px;margin:14px 0 6px;">${t}</div>`;
-
-  const eduHtml = data.education
-    .map(
-      (ed) =>
-        `<div style="margin-bottom:6px;"><div style="font-weight:600;">${esc(ed.degree)}${
-          ed.field ? ", " + esc(ed.field) : ""
-        }</div><div style="display:flex;justify-content:space-between;"><span>${esc(
-          ed.institution,
-        )}</span><span style="color:#6b7280;">${[ed.startYear, ed.endYear]
-          .filter(Boolean)
-          .map(esc)
-          .join(" - ")}</span></div>${
-          ed.grade ? `<div style="color:#6b7280;">Grade: ${esc(ed.grade)}</div>` : ""
-        }</div>`,
-    )
-    .join("");
-
-  const expHtml = data.experience
-    .map(
-      (ex) =>
-        `<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;"><span style="font-weight:600;">${esc(
-          ex.role,
-        )}</span><span style="color:#6b7280;">${[ex.startDate, ex.endDate]
-          .filter(Boolean)
-          .map(esc)
-          .join(" - ")}</span></div><div>${esc(ex.company)}</div><div style="white-space:pre-line;">${esc(
-          ex.description,
-        )}</div></div>`,
-    )
-    .join("");
-
-  const projHtml = data.projects
-    .map(
-      (pr) =>
-        `<div style="margin-bottom:8px;"><div style="font-weight:600;">${esc(pr.name)}${
-          pr.tech ? ` — <span style="font-weight:400;color:#6b7280;">${esc(pr.tech)}</span>` : ""
-        }</div><div style="white-space:pre-line;">${esc(pr.description)}</div>${
-          pr.link ? `<div style="color:#2563eb;">${esc(cleanUrl(pr.link))}</div>` : ""
-        }</div>`,
-    )
-    .join("");
-
-  const skillsHtml = data.skills
-    .map(
-      (s) =>
-        `<span style="display:inline-block;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;padding:2px 8px;font-size:11px;margin:0 6px 6px 0;">${esc(
-          s,
-        )}</span>`,
-    )
-    .join("");
-
-  const certHtml = data.certifications
-    .map(
-      (c) =>
-        `<div style="display:flex;justify-content:space-between;"><span>${esc(c.name)}${
-          c.issuer ? " — " + esc(c.issuer) : ""
-        }</span><span style="color:#6b7280;">${esc(c.year)}</span></div>`,
-    )
-    .join("");
-
-  const achHtml = data.achievements.length
-    ? `<ul style="margin:0;padding-left:16px;">${data.achievements
-        .map((a) => `<li>${esc(a)}</li>`)
-        .join("")}</ul>`
-    : "";
-
-  const social = [
-    p.linkedin && cleanUrl(p.linkedin),
-    p.github && cleanUrl(p.github),
-    p.portfolio && cleanUrl(p.portfolio),
-  ]
-    .filter(Boolean)
-    .map(esc)
-    .join("&nbsp;&nbsp;•&nbsp;&nbsp;");
-
-  const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(
-    p.fullName || "Resume",
-  )}</title></head>
-  <body style="margin:0;padding:36px;font-family:${tpl.font};color:#111827;font-size:12px;line-height:1.5;">
-    <div style="text-align:${tpl.headerAlign};">
-      <div style="font-size:24px;font-weight:700;">${esc(p.fullName || "Your Name")}</div>
-      <div style="color:#374151;">${esc(p.email)}${p.email && p.phone ? "  |  " : ""}${esc(p.phone)}</div>
-      <div style="color:#374151;">${esc(p.location)}</div>
-      ${social ? `<div style="color:#374151;margin-top:4px;">${social}</div>` : ""}
-    </div>
-    ${data.summary ? sectionTitle("Professional Summary") + `<div>${esc(data.summary)}</div>` : ""}
-    ${eduHtml ? sectionTitle("Education") + eduHtml : ""}
-    ${expHtml ? sectionTitle("Experience") + expHtml : ""}
-    ${projHtml ? sectionTitle("Projects") + projHtml : ""}
-    ${skillsHtml ? sectionTitle("Skills") + skillsHtml : ""}
-    ${certHtml ? sectionTitle("Certifications") + certHtml : ""}
-    ${achHtml ? sectionTitle("Achievements") + achHtml : ""}
-  </body></html>`;
-
-  const win = window.open("", "_blank", "width=840,height=1100");
-  if (!win) return;
-  win.document.open();
-  win.document.write(html);
-  win.document.close();
-  win.focus();
-  setTimeout(() => win.print(), 400);
-}
-
 export default ResumeBuilder;
