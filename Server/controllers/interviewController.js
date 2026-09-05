@@ -20,14 +20,7 @@ const createInterview = async (req, res) => {
       duration,
     } = req.body;
 
-    if (
-      !candidate ||
-      !job ||
-      !date ||
-      !time ||
-      !type ||
-      !interviewer
-    ) {
+    if (!candidate || !job || !date || !time || !type || !interviewer) {
       return res.status(400).json({
         message: "Required interview details are missing",
       });
@@ -37,7 +30,7 @@ const createInterview = async (req, res) => {
 
     const candidateData = await Candidate.findById(candidate).populate(
       "applicantId",
-      "name email"
+      "name email",
     );
 
     console.log("CANDIDATE DATA:", candidateData);
@@ -79,10 +72,7 @@ const createInterview = async (req, res) => {
       duration,
     });
 
-    console.log(
-      "📧 Sending email to:",
-      candidateUser.email
-    );
+    console.log("📧 Sending email to:", candidateUser.email);
 
     const info = await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -123,7 +113,6 @@ AI Recruitment Platform
   }
 };
 
-
 // =====================================================
 // GET MY INTERVIEWS - APPLICANT
 // =====================================================
@@ -134,9 +123,7 @@ const getMyInterviews = async (req, res) => {
       applicantId: req.user.id,
     }).select("_id");
 
-    const candidateIds = candidates.map(
-      (candidate) => candidate._id
-    );
+    const candidateIds = candidates.map((candidate) => candidate._id);
 
     const interviews = await Interview.find({
       candidate: { $in: candidateIds },
@@ -148,14 +135,8 @@ const getMyInterviews = async (req, res) => {
           select: "name email",
         },
       })
-      .populate(
-        "job",
-        "title company location employmentType"
-      )
-      .populate(
-        "recruiter",
-        "name email"
-      )
+      .populate("job", "title company location employmentType")
+      .populate("recruiter", "name email")
       .sort({ date: 1 });
 
     return res.status(200).json({
@@ -164,10 +145,7 @@ const getMyInterviews = async (req, res) => {
       interviews,
     });
   } catch (error) {
-    console.error(
-      "Get my interviews error:",
-      error
-    );
+    console.error("Get my interviews error:", error);
 
     return res.status(500).json({
       message: "Failed to fetch interviews",
@@ -175,7 +153,6 @@ const getMyInterviews = async (req, res) => {
     });
   }
 };
-
 
 // =====================================================
 // GET INTERVIEW BY ID - APPLICANT
@@ -207,14 +184,8 @@ const getInterviewById = async (req, res) => {
           select: "name email",
         },
       })
-      .populate(
-        "job",
-        "title location employmentType"
-      )
-      .populate(
-        "recruiter",
-        "name email"
-      );
+      .populate("job", "title location employmentType")
+      .populate("recruiter", "name email");
 
     if (!interview) {
       return res.status(404).json({
@@ -227,10 +198,7 @@ const getInterviewById = async (req, res) => {
       interview,
     });
   } catch (error) {
-    console.error(
-      "Get interview error:",
-      error
-    );
+    console.error("Get interview error:", error);
 
     return res.status(500).json({
       message: "Failed to fetch interview",
@@ -238,7 +206,6 @@ const getInterviewById = async (req, res) => {
     });
   }
 };
-
 
 // =====================================================
 // UPDATE / RESCHEDULE INTERVIEW
@@ -248,9 +215,7 @@ const updateInterview = async (req, res) => {
   try {
     const { interviewId } = req.params;
 
-    const interview = await Interview.findById(
-      interviewId
-    );
+    const interview = await Interview.findById(interviewId);
 
     if (!interview) {
       return res.status(404).json({
@@ -262,48 +227,34 @@ const updateInterview = async (req, res) => {
 
     await interview.save();
 
-    const updatedInterview =
-      await Interview.findById(interview._id)
-        .populate({
-          path: "candidate",
-          populate: {
-            path: "applicantId",
-            select: "name email",
-          },
-        })
-        .populate(
-          "recruiter",
-          "name email"
-        )
-        .populate(
-          "job",
-          "title"
-        );
+    const updatedInterview = await Interview.findById(interview._id)
+      .populate({
+        path: "candidate",
+        populate: {
+          path: "applicantId",
+          select: "name email",
+        },
+      })
+      .populate("recruiter", "name email")
+      .populate("job", "title");
 
-    const candidateUser =
-      updatedInterview.candidate?.applicantId;
+    const candidateUser = updatedInterview.candidate?.applicantId;
 
     if (candidateUser?.email) {
-      console.log(
-        "📧 Sending reschedule email to:",
-        candidateUser.email
-      );
+      console.log("📧 Sending reschedule email to:", candidateUser.email);
 
       const info = await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: candidateUser.email,
         subject: `Interview Rescheduled - ${
-          updatedInterview.job?.title ||
-          "Interview"
+          updatedInterview.job?.title || "Interview"
         } - ${updatedInterview.date}`,
         text: `
 Hello ${candidateUser.name},
 
 Your interview has been rescheduled.
 
-Job: ${
-  updatedInterview.job?.title || "N/A"
-}
+Job: ${updatedInterview.job?.title || "N/A"}
 Date: ${updatedInterview.date}
 Time: ${updatedInterview.time}
 Interview Type: ${updatedInterview.type}
@@ -321,31 +272,22 @@ AI Recruitment Platform
         `,
       });
 
-      console.log(
-        "✅ Reschedule email sent:",
-        info.messageId
-      );
+      console.log("✅ Reschedule email sent:", info.messageId);
     }
 
     return res.status(200).json({
-      message:
-        "Interview rescheduled successfully",
+      message: "Interview rescheduled successfully",
       interview: updatedInterview,
     });
   } catch (error) {
-    console.error(
-      "Update interview error:",
-      error
-    );
+    console.error("Update interview error:", error);
 
     return res.status(500).json({
-      message:
-        "Failed to reschedule interview",
+      message: "Failed to reschedule interview",
       error: error.message,
     });
   }
 };
-
 
 // =====================================================
 // UPDATE INTERVIEW STATUS
@@ -388,29 +330,34 @@ const updateInterviewStatus = async (req, res) => {
       });
     }
 
-    // Update status
+    // =====================================================
+    // UPDATE STATUS
+    // =====================================================
+
     interview.status = status;
 
     await interview.save();
 
-    // Send cancellation email
-    if (
-      status === "Cancelled" &&
-      interview.candidate?.applicantId?.email
-    ) {
+    console.log(`✅ Interview ${interview._id} status updated to: ${status}`);
+
+    // =====================================================
+    // SEND CANCELLATION EMAIL
+    // =====================================================
+
+    if (status === "Cancelled" && interview.candidate?.applicantId?.email) {
       const candidateUser = interview.candidate.applicantId;
 
-      console.log(
-        "📧 Sending cancellation email to:",
-        candidateUser.email
-      );
+      try {
+        console.log("📧 Sending cancellation email to:", candidateUser.email);
 
-      const info = await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: candidateUser.email,
-        subject: `Interview Cancelled - ${interview.job?.title || "Interview"}`,
-        text: `
-Hello ${candidateUser.name},
+        const info = await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: candidateUser.email,
+          subject: `Interview Cancelled - ${
+            interview.job?.title || "Interview"
+          }`,
+          text: `
+Hello ${candidateUser.name || "Candidate"},
 
 Your scheduled interview has been cancelled.
 
@@ -424,22 +371,30 @@ Please contact the recruiter if you have any questions.
 
 Best regards,
 AI Recruitment Platform
-        `,
-      });
+          `,
+        });
 
-      console.log(
-        "✅ Cancellation email sent:",
-        info.messageId
+        console.log("✅ Cancellation email sent:", info.messageId);
+      } catch (emailError) {
+        // Email failure should NOT make status update fail
+        console.error("❌ Cancellation email failed:", emailError.message);
+      }
+    } else if (status === "Cancelled") {
+      console.warn(
+        "⚠️ Interview cancelled, but candidate email was not found.",
       );
     }
+
+    // =====================================================
+    // RESPONSE
+    // =====================================================
 
     return res.status(200).json({
       message: "Interview status updated successfully",
       interview,
     });
-
   } catch (error) {
-    console.error("Update interview status error:", error);
+    console.error("❌ Update interview status error:", error);
 
     return res.status(500).json({
       message: "Failed to update interview status",
@@ -456,10 +411,7 @@ const deleteInterview = async (req, res) => {
   try {
     const { interviewId } = req.params;
 
-    const deletedInterview =
-      await Interview.findByIdAndDelete(
-        interviewId
-      );
+    const deletedInterview = await Interview.findByIdAndDelete(interviewId);
 
     if (!deletedInterview) {
       return res.status(404).json({
@@ -468,24 +420,18 @@ const deleteInterview = async (req, res) => {
     }
 
     return res.status(200).json({
-      message:
-        "Interview deleted successfully",
+      message: "Interview deleted successfully",
       interview: deletedInterview,
     });
   } catch (error) {
-    console.error(
-      "Delete interview error:",
-      error
-    );
+    console.error("Delete interview error:", error);
 
     return res.status(500).json({
-      message:
-        "Failed to delete interview",
+      message: "Failed to delete interview",
       error: error.message,
     });
   }
 };
-
 
 // =====================================================
 // GET RECRUITER INTERVIEWS
@@ -503,32 +449,23 @@ const getRecruiterInterviews = async (req, res) => {
           select: "name email phone",
         },
       })
-      .populate(
-        "job",
-        "title location employmentType"
-      )
+      .populate("job", "title location employmentType")
       .sort({ date: 1 });
 
     return res.status(200).json({
-      message:
-        "Recruiter interviews fetched successfully",
+      message: "Recruiter interviews fetched successfully",
       count: interviews.length,
       interviews,
     });
   } catch (error) {
-    console.error(
-      "Get recruiter interviews error:",
-      error
-    );
+    console.error("Get recruiter interviews error:", error);
 
     return res.status(500).json({
-      message:
-        "Failed to fetch recruiter interviews",
+      message: "Failed to fetch recruiter interviews",
       error: error.message,
     });
   }
 };
-
 
 // =====================================================
 // EXPORTS
