@@ -43,7 +43,9 @@ import {getResumeUrl} from "../../api/resumeApi";
 
 function Candidate() {
   const navigate = useNavigate();
+const [searchParams] = useSearchParams();
 
+const jobId = searchParams.get("jobId");
   const {
     candidates,
     loading,
@@ -81,6 +83,10 @@ function Candidate() {
     return candidates.filter((candidate) => {
       const applicant = candidate.applicantId;
       const job = candidate.jobId;
+
+      if (jobId && job?._id !== jobId) {
+      return false;
+    }
 
       const name =
         applicant?.name ||
