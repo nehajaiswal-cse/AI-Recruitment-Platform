@@ -12,6 +12,7 @@ import resumeRoutes from "./routes/resumeRoutes.js";
 import atsRoutes from "./routes/atsRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import recruiterSettingsRoutes from "./routes/recruiterSettingsRoutes.js";
+import resumeBuilderRoutes from "./routes/resumeBuilderRoutes.js";
 
 
 
@@ -35,6 +36,7 @@ app.use("/api/resumes", resumeRoutes);
 app.use("/api/ats", atsRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/recruiter/settings", recruiterSettingsRoutes);
+app.use("/api/resume-builder", resumeBuilderRoutes);
 
 app.get("/", (req, res) => {
   res.json({

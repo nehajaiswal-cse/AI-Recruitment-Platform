@@ -1,32 +1,5 @@
 import api from "./api";
 
-// Resume Builder API — structured resume data (NOT the uploaded PDF/DOCX flow,
-// which lives in resumeApi.js). Uses the same shared axios instance (baseURL
-// + JWT interceptor) and the same error-handling style as resumeApi.js.
-//
-// ─────────────────────────────────────────────────────────────────────────
-// BACKEND ROUTES this expects (create these in Express, mounted so the axios
-// baseURL "/api" resolves them — i.e. http://localhost:5000/api/resume-builder):
-//
-//   GET    /resume-builder/me      -> 200 { _id, ...resumeData } | 404 (no draft)
-//   POST   /resume-builder         -> 201 { _id, ...resumeData }
-//   PUT    /resume-builder/:id     -> 200 { _id, ...resumeData }
-//   POST   /resume-builder/export  -> 200 { url }   (S3 PDF url)
-//
-// Payload shape sent for save/update/export:
-//   {
-//     template: "modern" | "classic" | "minimal",
-//     personal: { fullName, email, phone, location, linkedin, github, portfolio },
-//     summary: string,
-//     education:     [{ institution, degree, field, startYear, endYear, grade }],
-//     experience:    [{ company, role, startDate, endDate, description }],
-//     projects:      [{ name, tech, link, description }],
-//     skills:        [string],
-//     certifications:[{ name, issuer, year }],
-//     achievements:  [string],
-//   }
-// ─────────────────────────────────────────────────────────────────────────
-
 // Fetch the current user's saved builder resume. Returns null if none exists.
 export const getMyBuilderResume = async () => {
   try {

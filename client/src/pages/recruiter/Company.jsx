@@ -11,8 +11,9 @@ import {
   Grid,
   TextField,
   Stack,
-  Chip,
 } from "@mui/material";
+
+import { useTheme } from "@mui/material/styles";
 
 import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -23,7 +24,12 @@ import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
 import PeopleOutlineOutlinedIcon from "@mui/icons-material/PeopleOutlineOutlined";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 
+import RNavbar from "../../components/layout/recruiter/Navbar";
+import RSidebar from "../../components/layout/recruiter/Sidebar";
+
 const Company = () => {
+  const theme = useTheme();
+
   const [editing, setEditing] = useState(false);
 
   const [company, setCompany] = useState({
@@ -56,434 +62,492 @@ const Company = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundColor: "#080f1f",
-        color: "#fff",
-        p: { xs: 2, md: 4 },
+        backgroundColor: "background.default",
+        color: "text.primary",
       }}
     >
-      {/* ================= HEADER ================= */}
+      {/* Recruiter Navbar */}
+      <RNavbar />
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: { xs: "flex-start", md: "center" },
-          flexDirection: { xs: "column", md: "row" },
-          gap: 2,
-          mb: 4,
-        }}
-      >
-        <Box>
-          <Typography
-            sx={{
-              fontSize: "28px",
-              fontWeight: 700,
-              color: "#fff",
-            }}
-          >
-            Company
-          </Typography>
+      <Box sx={{ display: "flex" }}>
+        {/* Recruiter Sidebar */}
+        <RSidebar />
 
-          <Typography
-            sx={{
-              color: "#8190aa",
-              fontSize: "14px",
-              mt: 0.7,
-            }}
-          >
-            Manage your company profile and information
-          </Typography>
-        </Box>
+        {/* Company Content */}
+        <Box
+          component="main"
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            minHeight: "calc(100vh - 72px)",
+            p: { xs: 2, md: 4 },
+            overflow: "hidden",
+          }}
+        >
+          {/* ================= HEADER ================= */}
 
-        {!editing ? (
-          <Button
-            variant="contained"
-            startIcon={<EditOutlinedIcon />}
-            onClick={() => setEditing(true)}
-            sx={{
-              textTransform: "none",
-              backgroundColor: "#315db5",
-              borderRadius: "10px",
-              px: 2.5,
-              py: 1.1,
-              fontWeight: 600,
-              boxShadow: "none",
-              "&:hover": {
-                backgroundColor: "#3b6bc9",
-                boxShadow: "none",
-              },
-            }}
-          >
-            Edit Company
-          </Button>
-        ) : (
-          <Stack direction="row" spacing={1.5}>
-            <Button
-              variant="outlined"
-              onClick={() => setEditing(false)}
-              sx={{
-                textTransform: "none",
-                color: "#aebbd0",
-                borderColor: "#293750",
-                borderRadius: "10px",
-                px: 2.5,
-              }}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={handleSave}
-              sx={{
-                textTransform: "none",
-                backgroundColor: "#315db5",
-                borderRadius: "10px",
-                px: 2.5,
-                fontWeight: 600,
-                boxShadow: "none",
-                "&:hover": {
-                  backgroundColor: "#3b6bc9",
-                  boxShadow: "none",
-                },
-              }}
-            >
-              Save Changes
-            </Button>
-          </Stack>
-        )}
-      </Box>
-
-      {/* ================= COMPANY PROFILE ================= */}
-
-      <Card
-        sx={{
-          backgroundColor: "#101a2e",
-          border: "1px solid #202d45",
-          borderRadius: "16px",
-          color: "#fff",
-          boxShadow: "none",
-          mb: 2.5,
-        }}
-      >
-        <CardContent sx={{ p: 3.5 }}>
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
-              gap: 2.5,
-              mb: 3,
+              justifyContent: "space-between",
+              alignItems: { xs: "flex-start", md: "center" },
+              flexDirection: { xs: "column", md: "row" },
+              gap: 2,
+              mb: 4,
             }}
           >
-            {/* LOGO */}
-
-            <Box sx={{ position: "relative" }}>
-              <Avatar
+            <Box>
+              <Typography
                 sx={{
-                  width: 85,
-                  height: 85,
-                  backgroundColor: "#1b3159",
-                  color: "#6ca8ff",
-                  border: "1px solid #294775",
+                  fontSize: "28px",
+                  fontWeight: 700,
+                  color: "text.primary",
                 }}
               >
-                <BusinessOutlinedIcon sx={{ fontSize: 38 }} />
-              </Avatar>
-
-              {editing && (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    bottom: -5,
-                    right: -5,
-                    width: 30,
-                    height: 30,
-                    borderRadius: "50%",
-                    backgroundColor: "#315db5",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                  }}
-                >
-                  <CloudUploadOutlinedIcon
-                    sx={{
-                      fontSize: 17,
-                      color: "#fff",
-                    }}
-                  />
-                </Box>
-              )}
-            </Box>
-
-            {/* COMPANY NAME */}
-
-            <Box>
-              {editing ? (
-                <TextField
-                  name="name"
-                  value={company.name}
-                  onChange={handleChange}
-                  variant="standard"
-                  sx={{
-                    "& input": {
-                      color: "#fff",
-                      fontSize: "23px",
-                      fontWeight: 600,
-                    },
-                    "& .MuiInput-underline:before": {
-                      borderColor: "#293750",
-                    },
-                    "& .MuiInput-underline:hover:before": {
-                      borderColor: "#4675c8",
-                    },
-                  }}
-                />
-              ) : (
-                <Typography
-                  sx={{
-                    fontSize: "23px",
-                    fontWeight: 650,
-                    color: "#fff",
-                  }}
-                >
-                  {company.name}
-                </Typography>
-              )}
+                Company
+              </Typography>
 
               <Typography
                 sx={{
-                  color: "#8190aa",
+                  color: "text.secondary",
                   fontSize: "14px",
-                  mt: 0.5,
+                  mt: 0.7,
                 }}
               >
-                {company.industry}
+                Manage your company profile and information
               </Typography>
+            </Box>
 
+            {!editing ? (
+              <Button
+                variant="contained"
+                startIcon={<EditOutlinedIcon />}
+                onClick={() => setEditing(true)}
+                sx={{
+                  textTransform: "none",
+                  backgroundColor: "primary.main",
+                  borderRadius: "10px",
+                  px: 2.5,
+                  py: 1.1,
+                  fontWeight: 600,
+                  boxShadow: "none",
+
+                  "&:hover": {
+                    backgroundColor: "primary.dark",
+                    boxShadow: "none",
+                  },
+                }}
+              >
+                Edit Company
+              </Button>
+            ) : (
+              <Stack direction="row" spacing={1.5}>
+                <Button
+                  variant="outlined"
+                  onClick={() => setEditing(false)}
+                  sx={{
+                    textTransform: "none",
+                    color: "text.secondary",
+                    borderColor: "divider",
+                    borderRadius: "10px",
+                    px: 2.5,
+
+                    "&:hover": {
+                      borderColor: "text.secondary",
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  variant="contained"
+                  onClick={handleSave}
+                  sx={{
+                    textTransform: "none",
+                    backgroundColor: "primary.main",
+                    borderRadius: "10px",
+                    px: 2.5,
+                    fontWeight: 600,
+                    boxShadow: "none",
+
+                    "&:hover": {
+                      backgroundColor: "primary.dark",
+                      boxShadow: "none",
+                    },
+                  }}
+                >
+                  Save Changes
+                </Button>
+              </Stack>
+            )}
+          </Box>
+
+          {/* ================= COMPANY PROFILE ================= */}
+
+          <Card
+            sx={{
+              backgroundColor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: "16px",
+              color: "text.primary",
+              boxShadow: "none",
+              mb: 2.5,
+            }}
+          >
+            <CardContent sx={{ p: 3.5 }}>
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 0.5,
-                  mt: 0.8,
+                  gap: 2.5,
+                  mb: 3,
                 }}
               >
-                <LocationOnOutlinedIcon
-                  sx={{
-                    fontSize: 17,
-                    color: "#71819d",
-                  }}
-                />
+                {/* LOGO */}
 
+                <Box sx={{ position: "relative" }}>
+                  <Avatar
+                    sx={{
+                      width: 85,
+                      height: 85,
+
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? "rgba(59, 130, 246, 0.18)"
+                          : "rgba(59, 130, 246, 0.10)",
+
+                      color: "primary.main",
+
+                      border: "1px solid",
+                      borderColor:
+                        theme.palette.mode === "dark"
+                          ? "rgba(59, 130, 246, 0.35)"
+                          : "rgba(59, 130, 246, 0.20)",
+                    }}
+                  >
+                    <BusinessOutlinedIcon sx={{ fontSize: 38 }} />
+                  </Avatar>
+
+                  {editing && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: -5,
+                        right: -5,
+                        width: 30,
+                        height: 30,
+                        borderRadius: "50%",
+                        backgroundColor: "primary.main",
+
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+
+                        cursor: "pointer",
+
+                        "&:hover": {
+                          backgroundColor: "primary.dark",
+                        },
+                      }}
+                    >
+                      <CloudUploadOutlinedIcon
+                        sx={{
+                          fontSize: 17,
+                          color: "common.white",
+                        }}
+                      />
+                    </Box>
+                  )}
+                </Box>
+
+                {/* COMPANY NAME */}
+
+                <Box>
+                  {editing ? (
+                    <TextField
+                      name="name"
+                      value={company.name}
+                      onChange={handleChange}
+                      variant="standard"
+                      sx={{
+                        "& input": {
+                          color: "text.primary",
+                          fontSize: "23px",
+                          fontWeight: 600,
+                        },
+
+                        "& .MuiInput-underline:before": {
+                          borderColor: "divider",
+                        },
+
+                        "& .MuiInput-underline:hover:before": {
+                          borderColor: "primary.main",
+                        },
+
+                        "& .MuiInput-underline:after": {
+                          borderColor: "primary.main",
+                        },
+                      }}
+                    />
+                  ) : (
+                    <Typography
+                      sx={{
+                        fontSize: "23px",
+                        fontWeight: 650,
+                        color: "text.primary",
+                      }}
+                    >
+                      {company.name}
+                    </Typography>
+                  )}
+
+                  <Typography
+                    sx={{
+                      color: "text.secondary",
+                      fontSize: "14px",
+                      mt: 0.5,
+                    }}
+                  >
+                    {company.industry}
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      mt: 0.8,
+                    }}
+                  >
+                    <LocationOnOutlinedIcon
+                      sx={{
+                        fontSize: 17,
+                        color: "text.secondary",
+                      }}
+                    />
+
+                    <Typography
+                      sx={{
+                        color: "text.secondary",
+                        fontSize: "13px",
+                      }}
+                    >
+                      {company.location}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+
+              <Divider sx={{ borderColor: "divider" }} />
+
+              {/* ABOUT */}
+
+              <Box sx={{ mt: 3 }}>
                 <Typography
                   sx={{
-                    color: "#71819d",
-                    fontSize: "13px",
+                    color: "text.primary",
+                    fontSize: "17px",
+                    fontWeight: 600,
+                    mb: 2,
                   }}
                 >
-                  {company.location}
+                  About Company
                 </Typography>
+
+                {editing ? (
+                  <TextField
+                    fullWidth
+                    multiline
+                    minRows={4}
+                    name="description"
+                    value={company.description}
+                    onChange={handleChange}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        color: "text.primary",
+                        backgroundColor: "background.default",
+                        borderRadius: "10px",
+                      },
+
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "divider",
+                      },
+
+                      "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
+                        {
+                          borderColor: "text.secondary",
+                        },
+
+                      "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                      },
+
+                      "& textarea": {
+                        color: "text.primary",
+                      },
+                    }}
+                  />
+                ) : (
+                  <Typography
+                    sx={{
+                      color: "text.secondary",
+                      fontSize: "14px",
+                      lineHeight: 1.8,
+                      maxWidth: "900px",
+                    }}
+                  >
+                    {company.description}
+                  </Typography>
+                )}
               </Box>
-            </Box>
-          </Box>
+            </CardContent>
+          </Card>
 
-          <Divider sx={{ borderColor: "#202d45" }} />
+          {/* ================= COMPANY INFORMATION ================= */}
 
-          {/* ABOUT */}
-
-          <Box sx={{ mt: 3 }}>
-            <Typography
-              sx={{
-                color: "#fff",
-                fontSize: "17px",
-                fontWeight: 600,
-                mb: 2,
-              }}
-            >
-              About Company
-            </Typography>
-
-            {editing ? (
-              <TextField
-                fullWidth
-                multiline
-                minRows={4}
-                name="description"
-                value={company.description}
-                onChange={handleChange}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    color: "#dce5f4",
-                    backgroundColor: "#0c1527",
-                    borderRadius: "10px",
-                  },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#293750",
-                  },
-                  "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                    {
-                      borderColor: "#405576",
-                    },
-                  "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#4675c8",
-                  },
-                }}
-              />
-            ) : (
+          <Card
+            sx={{
+              backgroundColor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: "16px",
+              color: "text.primary",
+              boxShadow: "none",
+              mb: 2.5,
+            }}
+          >
+            <CardContent sx={{ p: 3.5 }}>
               <Typography
                 sx={{
-                  color: "#8998b1",
-                  fontSize: "14px",
-                  lineHeight: 1.8,
-                  maxWidth: "900px",
+                  color: "text.primary",
+                  fontSize: "17px",
+                  fontWeight: 600,
+                  mb: 3,
                 }}
               >
-                {company.description}
+                Company Information
               </Typography>
-            )}
-          </Box>
-        </CardContent>
-      </Card>
 
-      {/* ================= COMPANY INFORMATION ================= */}
+              <Grid container spacing={3}>
+                {/* COMPANY NAME */}
 
-      <Card
-        sx={{
-          backgroundColor: "#101a2e",
-          border: "1px solid #202d45",
-          borderRadius: "16px",
-          color: "#fff",
-          boxShadow: "none",
-          mb: 2.5,
-        }}
-      >
-        <CardContent sx={{ p: 3.5 }}>
-          <Typography
+                <Grid item xs={12} md={6}>
+                  <CompanyField
+                    label="Company Name"
+                    icon={<BusinessOutlinedIcon />}
+                    editing={editing}
+                    name="name"
+                    value={company.name}
+                    onChange={handleChange}
+                  />
+                </Grid>
+
+                {/* INDUSTRY */}
+
+                <Grid item xs={12} md={6}>
+                  <CompanyField
+                    label="Industry"
+                    editing={editing}
+                    name="industry"
+                    value={company.industry}
+                    onChange={handleChange}
+                  />
+                </Grid>
+
+                {/* COMPANY SIZE */}
+
+                <Grid item xs={12} md={6}>
+                  <CompanyField
+                    label="Company Size"
+                    icon={<PeopleOutlineOutlinedIcon />}
+                    editing={editing}
+                    name="employees"
+                    value={company.employees}
+                    onChange={handleChange}
+                  />
+                </Grid>
+
+                {/* LOCATION */}
+
+                <Grid item xs={12} md={6}>
+                  <CompanyField
+                    label="Location"
+                    icon={<LocationOnOutlinedIcon />}
+                    editing={editing}
+                    name="location"
+                    value={company.location}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+
+          {/* ================= CONTACT INFORMATION ================= */}
+
+          <Card
             sx={{
-              color: "#fff",
-              fontSize: "17px",
-              fontWeight: 600,
-              mb: 3,
+              backgroundColor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: "16px",
+              color: "text.primary",
+              boxShadow: "none",
             }}
           >
-            Company Information
-          </Typography>
+            <CardContent sx={{ p: 3.5 }}>
+              <Typography
+                sx={{
+                  color: "text.primary",
+                  fontSize: "17px",
+                  fontWeight: 600,
+                  mb: 3,
+                }}
+              >
+                Contact Information
+              </Typography>
 
-          <Grid container spacing={3}>
-            {/* COMPANY NAME */}
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <CompanyField
+                    label="Email Address"
+                    icon={<EmailOutlinedIcon />}
+                    editing={editing}
+                    name="email"
+                    value={company.email}
+                    onChange={handleChange}
+                  />
+                </Grid>
 
-            <Grid item xs={12} md={6}>
-              <CompanyField
-                label="Company Name"
-                icon={<BusinessOutlinedIcon />}
-                editing={editing}
-                name="name"
-                value={company.name}
-                onChange={handleChange}
-              />
-            </Grid>
+                <Grid item xs={12} md={6}>
+                  <CompanyField
+                    label="Phone Number"
+                    icon={<PhoneOutlinedIcon />}
+                    editing={editing}
+                    name="phone"
+                    value={company.phone}
+                    onChange={handleChange}
+                  />
+                </Grid>
 
-            {/* INDUSTRY */}
-
-            <Grid item xs={12} md={6}>
-              <CompanyField
-                label="Industry"
-                editing={editing}
-                name="industry"
-                value={company.industry}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            {/* COMPANY SIZE */}
-
-            <Grid item xs={12} md={6}>
-              <CompanyField
-                label="Company Size"
-                icon={<PeopleOutlineOutlinedIcon />}
-                editing={editing}
-                name="employees"
-                value={company.employees}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            {/* LOCATION */}
-
-            <Grid item xs={12} md={6}>
-              <CompanyField
-                label="Location"
-                icon={<LocationOnOutlinedIcon />}
-                editing={editing}
-                name="location"
-                value={company.location}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      {/* ================= CONTACT INFORMATION ================= */}
-
-      <Card
-        sx={{
-          backgroundColor: "#101a2e",
-          border: "1px solid #202d45",
-          borderRadius: "16px",
-          color: "#fff",
-          boxShadow: "none",
-        }}
-      >
-        <CardContent sx={{ p: 3.5 }}>
-          <Typography
-            sx={{
-              color: "#fff",
-              fontSize: "17px",
-              fontWeight: 600,
-              mb: 3,
-            }}
-          >
-            Contact Information
-          </Typography>
-
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <CompanyField
-                label="Email Address"
-                icon={<EmailOutlinedIcon />}
-                editing={editing}
-                name="email"
-                value={company.email}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <CompanyField
-                label="Phone Number"
-                icon={<PhoneOutlinedIcon />}
-                editing={editing}
-                name="phone"
-                value={company.phone}
-                onChange={handleChange}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <CompanyField
-                label="Website"
-                icon={<LanguageOutlinedIcon />}
-                editing={editing}
-                name="website"
-                value={company.website}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+                <Grid item xs={12}>
+                  <CompanyField
+                    label="Website"
+                    icon={<LanguageOutlinedIcon />}
+                    editing={editing}
+                    name="website"
+                    value={company.website}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
     </Box>
   );
 };
@@ -500,11 +564,13 @@ const CompanyField = ({
   value,
   onChange,
 }) => {
+  const theme = useTheme();
+
   return (
     <Box>
       <Typography
         sx={{
-          color: "#71809b",
+          color: "text.secondary",
           fontSize: "12px",
           fontWeight: 500,
           mb: 1,
@@ -522,22 +588,27 @@ const CompanyField = ({
           size="small"
           sx={{
             "& .MuiOutlinedInput-root": {
-              color: "#dce5f4",
-              backgroundColor: "#0c1527",
+              color: "text.primary",
+              backgroundColor: "background.default",
               borderRadius: "9px",
             },
 
             "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: "#293750",
+              borderColor: "divider",
             },
 
             "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
               {
-                borderColor: "#405576",
+                borderColor: "text.secondary",
               },
 
-            "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: "#4675c8",
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
+              {
+                borderColor: "primary.main",
+              },
+
+            "& .MuiInputBase-input": {
+              color: "text.primary",
             },
           }}
         />
@@ -546,20 +617,36 @@ const CompanyField = ({
           sx={{
             minHeight: 44,
             px: 1.75,
-            backgroundColor: "#0c1527",
-            border: "1px solid #202d45",
+
+            backgroundColor: "background.default",
+
+            border: "1px solid",
+            borderColor: "divider",
+
             borderRadius: "9px",
+
             display: "flex",
             alignItems: "center",
             gap: 1,
+
             boxSizing: "border-box",
+
+            transition: "border-color 0.2s ease",
+
+            "&:hover": {
+              borderColor:
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.20)"
+                  : "rgba(0,0,0,0.20)",
+            },
           }}
         >
           {icon && (
             <Box
               sx={{
                 display: "flex",
-                color: "#6b9ce6",
+                color: "primary.main",
+
                 "& svg": {
                   fontSize: 19,
                 },
@@ -571,7 +658,7 @@ const CompanyField = ({
 
           <Typography
             sx={{
-              color: "#d7dfed",
+              color: "text.primary",
               fontSize: "14px",
             }}
           >

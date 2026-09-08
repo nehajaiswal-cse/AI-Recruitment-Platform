@@ -45,7 +45,12 @@ router.get(
   getInterviewById
 );
 
-router.put("/:interviewId", updateInterview);
+router.put(
+  "/:interviewId",
+  authMiddleware,
+  roleMiddleware("recruiter"),
+  updateInterview
+);
 
 router.delete("/:interviewId", deleteInterview);
 
