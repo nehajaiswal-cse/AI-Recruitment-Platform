@@ -1,4 +1,3 @@
-//import { useEffect, useState } from "react";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -24,7 +23,10 @@ import WorkOutlineRoundedIcon from "@mui/icons-material/WorkOutlineRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import BusinessCenterOutlinedIcon from "@mui/icons-material/BusinessCenterOutlined";
 
-import  useJob  from "../../../hooks/useJob";
+import ANavbar from "../../../components/layout/applicant/Navbar";
+import ASidebar from "../../../components/layout/applicant/Sidebar";
+
+import useJob from "../../../hooks/useJob";
 import useSavedJobs from "../../../hooks/useSavedJobs";
 
 const ApplicantViewJob = () => {
@@ -38,9 +40,10 @@ const ApplicantViewJob = () => {
     fetchJobById,
   } = useJob();
 
-  //const [saved, setSaved] = useState(false);
   const { isJobSaved, toggleSaveJob } = useSavedJobs();
-   const saved = isJobSaved(jobId);
+
+  const saved = isJobSaved(jobId);
+
   // ==========================================
   // FETCH JOB
   // ==========================================
@@ -57,11 +60,6 @@ const ApplicantViewJob = () => {
 
   const handleSaveJob = () => {
     toggleSaveJob(jobId);
-    //setSaved((previous) => !previous);
-    
-    // Later connect this with backend:
-    // saveJob(jobId)
-    // removeSavedJob(jobId)
   };
 
   // ==========================================
@@ -73,11 +71,69 @@ const ApplicantViewJob = () => {
   };
 
   // ==========================================
+  // COMMON PAGE LAYOUT
+  // ==========================================
+
+  const renderPage = (content) => {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "background.default",
+          color: "text.primary",
+        }}
+      >
+        {/* ==========================================
+            NAVBAR
+        ========================================== */}
+
+        <Box
+          component="header"
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1200,
+          }}
+        >
+          <ANavbar />
+        </Box>
+
+        {/* ==========================================
+            SIDEBAR + MAIN CONTENT
+        ========================================== */}
+
+        <Box
+          sx={{
+            display: "flex",
+            minWidth: 0,
+          }}
+        >
+          {/* Sidebar */}
+          <ASidebar />
+
+          {/* Main Content */}
+          <Box
+            component="main"
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              bgcolor: "background.default",
+              color: "text.primary",
+            }}
+          >
+            {content}
+          </Box>
+        </Box>
+      </Box>
+    );
+  };
+
+  // ==========================================
   // LOADING
   // ==========================================
 
   if (loading && !currentJob) {
-    return (
+    return renderPage(
       <Box
         sx={{
           minHeight: "70vh",
@@ -96,8 +152,14 @@ const ApplicantViewJob = () => {
   // ==========================================
 
   if (error && !currentJob) {
-    return (
-      <Box sx={{ p: { xs: 2, md: 4 } }}>
+    return renderPage(
+      <Box
+        sx={{
+          p: { xs: 2, sm: 3, md: 4 },
+          maxWidth: 1200,
+          mx: "auto",
+        }}
+      >
         <Alert severity="error">
           {error}
         </Alert>
@@ -108,9 +170,7 @@ const ApplicantViewJob = () => {
             mt: 2,
             textTransform: "none",
           }}
-          onClick={() =>
-            navigate("/applicant/jobs")
-          }
+          onClick={() => navigate("/applicant/jobs")}
         >
           Back to Jobs
         </Button>
@@ -123,8 +183,14 @@ const ApplicantViewJob = () => {
   // ==========================================
 
   if (!currentJob) {
-    return (
-      <Box sx={{ p: { xs: 2, md: 4 } }}>
+    return renderPage(
+      <Box
+        sx={{
+          p: { xs: 2, sm: 3, md: 4 },
+          maxWidth: 1200,
+          mx: "auto",
+        }}
+      >
         <Alert severity="warning">
           Job not found.
         </Alert>
@@ -135,9 +201,7 @@ const ApplicantViewJob = () => {
             mt: 2,
             textTransform: "none",
           }}
-          onClick={() =>
-            navigate("/applicant/jobs")
-          }
+          onClick={() => navigate("/applicant/jobs")}
         >
           Back to Jobs
         </Button>
@@ -145,10 +209,14 @@ const ApplicantViewJob = () => {
     );
   }
 
-  return (
+  // ==========================================
+  // MAIN JOB DETAILS
+  // ==========================================
+
+  return renderPage(
     <Box
       sx={{
-        p: { xs: 2, md: 4 },
+        p: { xs: 2, sm: 3, md: 4 },
         maxWidth: 1200,
         mx: "auto",
       }}
@@ -159,9 +227,7 @@ const ApplicantViewJob = () => {
 
       <Button
         startIcon={<ArrowBackRoundedIcon />}
-        onClick={() =>
-          navigate("/applicant/jobs")
-        }
+        onClick={() => navigate("/applicant/jobs")}
         sx={{
           mb: 3,
           textTransform: "none",
@@ -213,12 +279,11 @@ const ApplicantViewJob = () => {
                 variant="h6"
                 color="text.secondary"
               >
-                {currentJob.company ||
-                  "Company"}
+                {currentJob.company || "Company"}
               </Typography>
             </Box>
 
-            {/* Save */}
+            {/* Save Job */}
             <IconButton
               onClick={handleSaveJob}
               color={saved ? "primary" : "default"}
@@ -257,9 +322,7 @@ const ApplicantViewJob = () => {
                   gap: 1,
                 }}
               >
-                <LocationOnOutlinedIcon
-                  color="action"
-                />
+                <LocationOnOutlinedIcon color="action" />
 
                 <Box>
                   <Typography
@@ -284,9 +347,7 @@ const ApplicantViewJob = () => {
                   gap: 1,
                 }}
               >
-                <WorkOutlineRoundedIcon
-                  color="action"
-                />
+                <WorkOutlineRoundedIcon color="action" />
 
                 <Box>
                   <Typography
@@ -311,9 +372,7 @@ const ApplicantViewJob = () => {
                   gap: 1,
                 }}
               >
-                <AccessTimeRoundedIcon
-                  color="action"
-                />
+                <AccessTimeRoundedIcon color="action" />
 
                 <Box>
                   <Typography
@@ -338,9 +397,7 @@ const ApplicantViewJob = () => {
                   gap: 1,
                 }}
               >
-                <BusinessCenterOutlinedIcon
-                  color="action"
-                />
+                <BusinessCenterOutlinedIcon color="action" />
 
                 <Box>
                   <Typography
@@ -471,7 +528,7 @@ const ApplicantViewJob = () => {
           <Typography
             variant="h6"
             fontWeight={700}
-            sx={{ mb: 2} }
+            sx={{ mb: 2 }}
           >
             Requirements
           </Typography>
@@ -512,7 +569,7 @@ const ApplicantViewJob = () => {
           <Typography
             variant="h6"
             fontWeight={700}
-            sx={{ mb: 2} }
+            sx={{ mb: 2 }}
           >
             Skills Required
           </Typography>
@@ -525,15 +582,13 @@ const ApplicantViewJob = () => {
                 gap: 1,
               }}
             >
-              {currentJob.skills.map(
-                (skill, index) => (
-                  <Chip
-                    key={index}
-                    label={skill}
-                    variant="outlined"
-                  />
-                )
-              )}
+              {currentJob.skills.map((skill, index) => (
+                <Chip
+                  key={index}
+                  label={skill}
+                  variant="outlined"
+                />
+              ))}
             </Box>
           ) : (
             <Typography color="text.secondary">
