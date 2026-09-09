@@ -46,9 +46,44 @@ export const updateCandidateStatus = async (candidateId, status) => {
 
 // Delete candidate
 export const deleteCandidate = async (candidateId) => {
+
   const response = await api.delete(
     `/candidates/${candidateId}`
   );
 
   return response.data;
+};
+
+export const analyzeCandidateResume = async (applicationId) => {
+  try {
+    console.log(
+      "🤖 API received applicationId:",
+      applicationId
+    );
+
+    if (!applicationId) {
+      throw new Error("Application ID is missing");
+    }
+
+    const response = await api.post(
+      "/ats/analyze",
+      {
+        applicationId,
+      }
+    );
+
+    console.log(
+      "🤖 AI API response:",
+      response.data
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "❌ Analyze candidate resume API error:",
+      error?.response?.data || error.message
+    );
+
+    throw error;
+  }
 };

@@ -2,6 +2,7 @@ import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3 from "../config/s3.js";
 import Resume from "../models/Resume.js";
+import Application from "../models/applications.js";
 
 const getFileTypeFromMime = (mimetype) => {
   if (mimetype === "application/pdf") return "PDF";
@@ -68,30 +69,52 @@ export const getMyResumes = async (req, res) => {
 // GET SIGNED URL (for view / download)
 // ==========================================
 
+
 export const getResumeSignedUrl = async (req, res) => {
   try {
-    const userId = req.user.id || req.user._id;
     const { id } = req.params;
 
-    const resume = await Resume.findOne({ _id: id, user: userId });
+    const application = await Application.findById(id);
 
-    if (!resume) {
-      return res.status(404).json({ message: "Resume not found" });
+    if (!application) {
+      return res.status(404).json({
+        message: "Application not found",
+      });
     }
+
+    if (!application.resume?.fileUrl) {
+      return res.status(404).json({
+        message: "Resume not found",
+      });
+    }
+
+    // Convert full S3 URL into S3 object key
+    const fileUrl = new URL(application.resume.fileUrl);
+    const key = decodeURIComponent(fileUrl.pathname.substring(1));
+
 
     const command = new GetObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: resume.fileKey,
+      Key: key,
     });
 
-    const url = await getSignedUrl(s3, command, { expiresIn: 300 }); // 5 minutes
+    const url = await getSignedUrl(s3, command, {
+      expiresIn: 300,
+    });
 
-    res.status(200).json({ url });
+    console.log("Signed URL generated successfully");
+
+    return res.status(200).json({ url });
+
   } catch (error) {
     console.error("Get signed url error:", error);
-    res.status(500).json({ message: "Failed to generate resume link" });
+
+    return res.status(500).json({
+      message: "Failed to generate resume link",
+    });
   }
 };
+
 
 // ==========================================
 // SET DEFAULT RESUME
