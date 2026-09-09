@@ -7,6 +7,7 @@ import {
   LuFileText,
   LuUser,
   LuSettings,
+  LuCalendarDays,
 } from "react-icons/lu";
 
 const applicantSidebarItems = [
@@ -29,6 +30,11 @@ const applicantSidebarItems = [
     label: "My Applications",
     path: "/applicant/applications",
     icon: LuFileText,
+  },
+  {
+    label: "Interviews",
+    path: "/applicant/interviews",
+    icon: LuCalendarDays,
   },
   {
     label: "Resume",
