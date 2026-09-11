@@ -67,30 +67,49 @@ export const analyzeResume = async (req, res) => {
     // 4. GET S3 KEY FROM FILE URL
     // ==========================================
 
-    const resumeUrl = application.resume.fileUrl;
+    // const resumeUrl = application.resume.fileUrl;
 
-    const bucketName = process.env.AWS_S3_BUCKET_NAME;
+    // const bucketName = process.env.AWS_S3_BUCKET_NAME;
 
-    const bucketUrl = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/`;
+    // const bucketUrl = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/`;
 
-    let fileKey;
+    // let fileKey;
 
-    if (resumeUrl.startsWith(bucketUrl)) {
-      fileKey = decodeURIComponent(
-        resumeUrl.replace(bucketUrl, "")
-      );
-    } else {
-      return res.status(400).json({
-        message: "Invalid resume S3 URL",
-      });
-    }
+    // if (resumeUrl.startsWith(bucketUrl)) {
+    //   fileKey = decodeURIComponent(
+    //     resumeUrl.replace(bucketUrl, "")
+    //   );
+    // } else {
+    //   return res.status(400).json({
+    //     message: "Invalid resume S3 URL",
+    //   });
+    // }
 
-    console.log("S3 File Key:", fileKey);
+    // console.log("S3 File Key:", fileKey);
+
+   const resumeUrl = application.resume.fileUrl;
+
+const url = new URL(resumeUrl);
+
+// Example:
+// https://bucket-name.s3.us-east-1.amazonaws.com/resumes/file.pdf
+
+const hostParts = url.hostname.split(".");
+
+const bucketName = hostParts[0];
+
+const fileKey = decodeURIComponent(
+  url.pathname.substring(1)
+);
+
+console.log("S3 Bucket:", bucketName);
+console.log("S3 File Key:", fileKey);
 
     // ==========================================
     // 5. DOWNLOAD RESUME FROM S3
     // ==========================================
 
+    
     const command = new GetObjectCommand({
       Bucket: bucketName,
       Key: fileKey,

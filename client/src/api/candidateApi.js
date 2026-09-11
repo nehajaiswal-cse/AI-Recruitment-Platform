@@ -79,11 +79,12 @@ export const analyzeCandidateResume = async (applicationId) => {
 
     return response.data;
   } catch (error) {
-    console.error(
-      "❌ Analyze candidate resume API error:",
-      error?.response?.data || error.message
-    );
+  console.error("❌ Analyze candidate resume API error:");
 
-    throw error;
-  }
+  console.error("Status:", error.response?.status);
+  console.error("Response data:", error.response?.data);
+  console.error("Request:", error.config?.data);
+
+  throw error;
+}
 };
