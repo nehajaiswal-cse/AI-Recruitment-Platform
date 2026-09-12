@@ -31,9 +31,8 @@
     "pdf-poppler": "^0.2.3",
     "pdf2pic": "^3.2.0",
     "pdfjs-dist": "^6.3.289",
-    "tesseract.js": "^7.0.0"
+    "tesseract.js": "^7.0.0",
     "nodemailer": "^9.1.0",
-    "pdf-parse": "^2.4.5",
     "pdfkit": "^0.20.2"
   },
   "devDependencies": {
