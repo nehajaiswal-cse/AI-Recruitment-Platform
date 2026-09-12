@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
 
 import {
   Box,
@@ -44,9 +43,7 @@ import {getResumeUrl} from "../../api/resumeApi";
 
 function Candidate() {
   const navigate = useNavigate();
-const [searchParams] = useSearchParams();
 
-const jobId = searchParams.get("jobId");
   const {
     candidates,
     loading,
@@ -84,10 +81,6 @@ const jobId = searchParams.get("jobId");
     return candidates.filter((candidate) => {
       const applicant = candidate.applicantId;
       const job = candidate.jobId;
-
-      if (jobId && job?._id !== jobId) {
-      return false;
-    }
 
       const name =
         applicant?.name ||

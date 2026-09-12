@@ -80,11 +80,10 @@ export const analyzeCandidateResume = async (applicationId) => {
     return response.data;
   } catch (error) {
   console.error("❌ Analyze candidate resume API error:");
-
   console.error("Status:", error.response?.status);
   console.error("Response data:", error.response?.data);
-  console.error("Request:", error.config?.data);
-
+  console.error("Response message:", error.response?.data?.message);
+  console.error("Full error:", error);
   throw error;
 }
 };
