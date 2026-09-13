@@ -90,6 +90,13 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true
+    },
+    // ---- Subscription / Premium plan ----
+
+    plan: {
+      type: String,
+      enum: ["free", "pro"],
+      default: "free"
     }
   },
   {

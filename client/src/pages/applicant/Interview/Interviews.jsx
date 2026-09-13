@@ -22,6 +22,7 @@ import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import SmartToyRoundedIcon from "@mui/icons-material/SmartToyRounded";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import LightbulbRoundedIcon from "@mui/icons-material/LightbulbRounded";
+import AIInterviewHistoryList from "./AIInterviewHistoryList";
 
 import useInterview from "../../../hooks/useInterview";
 
@@ -803,6 +804,26 @@ const Interviews = () => {
         >
           Start Practicing
         </Button>
+      </Box>
+
+
+{/* =====================================================
+          AI PRACTICE HISTORY 
+      ===================================================== */}
+
+      <Box sx={{ mb: 3 }}>
+        <Typography
+          sx={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: "text.primary",
+            mb: 1.5,
+          }}
+        >
+          AI Practice History
+        </Typography>
+
+        <AIInterviewHistoryList />
       </Box>
 
       {/* =====================================================

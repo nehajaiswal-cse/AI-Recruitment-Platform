@@ -7,12 +7,12 @@ import applicationRoutes from "./routes/applicationRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import Candidate from "./routes/candidateRoute.js";
 import interview from "./routes/interviewRoutes.js";
-import interviewRoutes from "./routes/interviewRoutes.js";
 import resumeRoutes from "./routes/resumeRoutes.js";
 import atsRoutes from "./routes/atsRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import recruiterSettingsRoutes from "./routes/recruiterSettingsRoutes.js";
 import resumeBuilderRoutes from "./routes/resumeBuilderRoutes.js";
+import aiInterviewRoutes from "./routes/aiInterviewRoutes.js";
 
 
 
@@ -31,12 +31,12 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/candidates",Candidate)
 app.use("/api/interviews",interview)
-app.use("/api/interviews", interviewRoutes);
 app.use("/api/resumes", resumeRoutes);
 app.use("/api/ats", atsRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/recruiter/settings", recruiterSettingsRoutes);
 app.use("/api/resume-builder", resumeBuilderRoutes);
+app.use("/api/ai-interviews", aiInterviewRoutes);
 
 app.get("/", (req, res) => {
   res.json({

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -8,6 +8,7 @@ import {
   TextField,
   MenuItem,
   LinearProgress,
+  CircularProgress,
 } from "@mui/material";
 
 import SmartToyRoundedIcon from "@mui/icons-material/SmartToyRounded";
@@ -15,62 +16,145 @@ import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
+import { AuthContext } from "../../../context/AuthContext";
+import {
+  startAiInterview,
+  submitAiAnswer,
+  completeAiInterview,
+} from "../../../api/aiInterviewApi";
+
 const AIInterviewCoach = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+
+  const isPro = user?.plan === "pro";
 
   const [started, setStarted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const [role, setRole] = useState("Frontend Developer");
   const [type, setType] = useState("Technical");
   const [answer, setAnswer] = useState("");
-  const [questionNumber, setQuestionNumber] = useState(1);
 
-  // Store all answers
-  const [answers, setAnswers] = useState([]);
+  const [interviewId, setInterviewId] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [questionIndex, setQuestionIndex] = useState(0);
 
-  const questions = [
-    "Tell me about yourself and your technical background.",
-    "What is the difference between let, var and const in JavaScript?",
-    "Explain how React components work.",
-    "What is REST API and how have you used it?",
-    "How would you handle a difficult bug in production?",
-  ];
+  const currentQuestion = questions[questionIndex];
 
-  const currentQuestion = questions[questionNumber - 1];
+  // =========================================================
+  // FREE USER — LOCKED SCREEN
+  // =========================================================
 
-  const startPractice = () => {
-    setStarted(true);
+  if (!isPro) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "#07111f",
+          color: "#f8fafc",
+          p: { xs: 2, sm: 3, md: 4 },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box
+          sx={{
+            maxWidth: 500,
+            textAlign: "center",
+            p: 4,
+            borderRadius: 4,
+            border: "1px solid #293752",
+            background:
+              "radial-gradient(circle at 90% 10%, rgba(124,58,237,0.18), transparent 35%), #0e1a2b",
+          }}
+        >
+          <Typography sx={{ fontSize: 40, mb: 1 }}>🔒</Typography>
+
+          <Typography sx={{ fontSize: 24, fontWeight: 700, mb: 1 }}>
+            AI Interview Coach is a Pro Feature
+          </Typography>
+
+          <Typography sx={{ color: "#94a3b8", mb: 3 }}>
+            Practice with a personalized AI interviewer tailored to your
+            resume and target role. Upgrade to Pro to unlock this feature.
+          </Typography>
+
+          <Button
+            fullWidth
+            onClick={() => navigate("/applicant/settings")}
+            sx={{
+              py: 1.3,
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 600,
+              color: "#fff",
+              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+            }}
+          >
+            Upgrade to Pro
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
+
+  // =========================================================
+  // START INTERVIEW (calls backend)
+  // =========================================================
+
+  const startPractice = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await startAiInterview({ role, type });
+
+      setInterviewId(data.interview._id);
+      setQuestions(data.interview.questions.map((q) => q.question));
+      setQuestionIndex(0);
+      setStarted(true);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Failed to start interview"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const submitAnswer = () => {
+  // =========================================================
+  // SUBMIT ANSWER
+  // =========================================================
+
+  const submitCurrentAnswer = async () => {
     if (!answer.trim()) return;
 
-    // Save current answer
-    const newAnswer = {
-      question: currentQuestion,
-      answer: answer.trim(),
-    };
+    try {
+      setLoading(true);
+      setError("");
 
-    const allAnswers = [...answers, newAnswer];
+      await submitAiAnswer(interviewId, questionIndex, answer.trim());
 
-    // If this is the last question
-    if (questionNumber === questions.length) {
-      // Navigate to feedback page
-      navigate("/applicant/interviews/feedback", {
-        state: {
-          role,
-          type,
-          questions,
-          answers: allAnswers,
-        },
-      });
+      if (questionIndex === questions.length - 1) {
+        const result = await completeAiInterview(interviewId);
 
-      return;
+        navigate("/applicant/interviews/feedback", {
+          state: { interview: result.interview },
+        });
+
+        return;
+      }
+
+      setAnswer("");
+      setQuestionIndex((prev) => prev + 1);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to submit answer");
+    } finally {
+      setLoading(false);
     }
-
-    // Move to next question
-    setAnswers(allAnswers);
-    setAnswer("");
-    setQuestionNumber((prev) => prev + 1);
   };
 
   // =========================================================
@@ -87,30 +171,32 @@ const AIInterviewCoach = () => {
           p: { xs: 2, sm: 3, md: 4 },
         }}
       >
-        {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography
-            sx={{
-              fontSize: { xs: 30, md: 36 },
-              fontWeight: 700,
-            }}
-          >
-            AI Interview Coach
+          <Typography sx={{ fontSize: { xs: 30, md: 36 }, fontWeight: 700 }}>
+            AI Interview Coach{" "}
+            <Box
+              component="span"
+              sx={{
+                fontSize: 13,
+                color: "#a78bfa",
+                border: "1px solid #4c1d95",
+                px: 1,
+                py: 0.3,
+                borderRadius: 5,
+                ml: 1,
+                verticalAlign: "middle",
+              }}
+            >
+              PREMIUM
+            </Box>
           </Typography>
 
-          <Typography
-            sx={{
-              mt: 0.7,
-              color: "#94a3b8",
-              fontSize: 15,
-            }}
-          >
+          <Typography sx={{ mt: 0.7, color: "#94a3b8", fontSize: 15 }}>
             Practice with an AI interviewer and improve your interview
             performance.
           </Typography>
         </Box>
 
-        {/* Main Card */}
         <Box
           sx={{
             maxWidth: 850,
@@ -122,7 +208,6 @@ const AIInterviewCoach = () => {
               "radial-gradient(circle at 90% 10%, rgba(124,58,237,0.18), transparent 35%), #0e1a2b",
           }}
         >
-          {/* Icon */}
           <Box
             sx={{
               width: 70,
@@ -140,35 +225,18 @@ const AIInterviewCoach = () => {
             <SmartToyRoundedIcon sx={{ fontSize: 36 }} />
           </Box>
 
-          <Typography
-            sx={{
-              textAlign: "center",
-              fontSize: 25,
-              fontWeight: 700,
-            }}
-          >
+          <Typography sx={{ textAlign: "center", fontSize: 25, fontWeight: 700 }}>
             Start Your AI Interview
           </Typography>
 
-          <Typography
-            sx={{
-              textAlign: "center",
-              color: "#94a3b8",
-              mt: 1,
-              mb: 4,
-            }}
-          >
-            Configure your interview and start practicing.
+          <Typography sx={{ textAlign: "center", color: "#94a3b8", mt: 1, mb: 4 }}>
+            Your Pro plan gives you access to personalized AI interview practice.
           </Typography>
 
-          {/* Selectors */}
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                md: "1fr 1fr",
-              },
+              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
               gap: 2,
               mb: 3,
             }}
@@ -181,21 +249,10 @@ const AIInterviewCoach = () => {
               fullWidth
               sx={inputStyle}
             >
-              <MenuItem value="Frontend Developer">
-                Frontend Developer
-              </MenuItem>
-
-              <MenuItem value="Backend Developer">
-                Backend Developer
-              </MenuItem>
-
-              <MenuItem value="Full Stack Developer">
-                Full Stack Developer
-              </MenuItem>
-
-              <MenuItem value="Software Engineer">
-                Software Engineer
-              </MenuItem>
+              <MenuItem value="Frontend Developer">Frontend Developer</MenuItem>
+              <MenuItem value="Backend Developer">Backend Developer</MenuItem>
+              <MenuItem value="Full Stack Developer">Full Stack Developer</MenuItem>
+              <MenuItem value="Software Engineer">Software Engineer</MenuItem>
             </TextField>
 
             <TextField
@@ -212,50 +269,23 @@ const AIInterviewCoach = () => {
             </TextField>
           </Box>
 
-          {/* Info */}
-          <Box
-            sx={{
-              p: 2,
-              mb: 3,
-              borderRadius: 2,
-              bgcolor: "#111c31",
-              border: "1px solid #24334a",
-            }}
-          >
-            <Typography sx={{ fontSize: 13, color: "#94a3b8" }}>
-              🎯 Role:{" "}
-              <strong style={{ color: "#e2e8f0" }}>{role}</strong>
+          {error && (
+            <Typography sx={{ color: "#f87171", fontSize: 13, mb: 2 }}>
+              {error}
             </Typography>
-
-            <Typography
-              sx={{
-                fontSize: 13,
-                color: "#94a3b8",
-                mt: 0.7,
-              }}
-            >
-              💡 Type:{" "}
-              <strong style={{ color: "#e2e8f0" }}>{type}</strong>
-            </Typography>
-
-            <Typography
-              sx={{
-                fontSize: 13,
-                color: "#94a3b8",
-                mt: 0.7,
-              }}
-            >
-              ⏱️ Questions:{" "}
-              <strong style={{ color: "#e2e8f0" }}>
-                {questions.length}
-              </strong>
-            </Typography>
-          </Box>
+          )}
 
           <Button
             fullWidth
             onClick={startPractice}
-            endIcon={<ArrowForwardRoundedIcon />}
+            disabled={loading}
+            endIcon={
+              loading ? (
+                <CircularProgress size={16} sx={{ color: "#fff" }} />
+              ) : (
+                <ArrowForwardRoundedIcon />
+              )
+            }
             sx={{
               py: 1.4,
               borderRadius: 2,
@@ -263,15 +293,11 @@ const AIInterviewCoach = () => {
               fontWeight: 600,
               fontSize: 15,
               color: "#fff",
-              background:
-                "linear-gradient(135deg,#6366f1,#8b5cf6)",
-              "&:hover": {
-                background:
-                  "linear-gradient(135deg,#5859e8,#7c3aed)",
-              },
+              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+              "&:hover": { background: "linear-gradient(135deg,#5859e8,#7c3aed)" },
             }}
           >
-            Start Practice
+            {loading ? "Generating Questions..." : "Start Practice"}
           </Button>
         </Box>
       </Box>
@@ -291,79 +317,49 @@ const AIInterviewCoach = () => {
         p: { xs: 2, sm: 3, md: 4 },
       }}
     >
-      {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Typography
-          sx={{
-            fontSize: 30,
-            fontWeight: 700,
-          }}
-        >
+        <Typography sx={{ fontSize: 30, fontWeight: 700 }}>
           AI Interview Practice
         </Typography>
-
-        <Typography
-          sx={{
-            color: "#94a3b8",
-            mt: 0.5,
-          }}
-        >
+        <Typography sx={{ color: "#94a3b8", mt: 0.5 }}>
           {role} • {type} Interview
         </Typography>
       </Box>
 
-      {/* Progress */}
       <Box sx={{ mb: 3 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            mb: 1,
-          }}
-        >
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
           <Typography sx={{ color: "#94a3b8", fontSize: 13 }}>
-            Question {questionNumber} of {questions.length}
+            Question {questionIndex + 1} of {questions.length}
           </Typography>
-
           <Typography sx={{ color: "#a78bfa", fontSize: 13 }}>
-            {Math.round((questionNumber / questions.length) * 100)}%
+            {Math.round(((questionIndex + 1) / questions.length) * 100)}%
           </Typography>
         </Box>
 
         <LinearProgress
           variant="determinate"
-          value={(questionNumber / questions.length) * 100}
+          value={((questionIndex + 1) / questions.length) * 100}
           sx={{
             height: 7,
             borderRadius: 5,
             bgcolor: "#1e293b",
             "& .MuiLinearProgress-bar": {
-              background:
-                "linear-gradient(90deg,#6366f1,#8b5cf6)",
+              background: "linear-gradient(90deg,#6366f1,#8b5cf6)",
             },
           }}
         />
       </Box>
 
-      {/* AI Question */}
       <Box
         sx={{
           p: { xs: 2.5, md: 3 },
           mb: 3,
           borderRadius: 3,
           border: "1px solid #2d285e",
-          background:
-            "linear-gradient(110deg,#171938,#11162d)",
+          background: "linear-gradient(110deg,#171938,#11162d)",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1.5,
-            mb: 2,
-          }}
-        >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
           <Box
             sx={{
               width: 45,
@@ -380,48 +376,20 @@ const AIInterviewCoach = () => {
           </Box>
 
           <Box>
-            <Typography sx={{ fontWeight: 700 }}>
-              AI Interviewer
-            </Typography>
-
-            <Typography
-              sx={{
-                color: "#64748b",
-                fontSize: 12,
-              }}
-            >
-              Question {questionNumber}
+            <Typography sx={{ fontWeight: 700 }}>AI Interviewer</Typography>
+            <Typography sx={{ color: "#64748b", fontSize: 12 }}>
+              Question {questionIndex + 1}
             </Typography>
           </Box>
         </Box>
 
-        <Typography
-          sx={{
-            fontSize: { xs: 18, md: 21 },
-            fontWeight: 600,
-            lineHeight: 1.5,
-          }}
-        >
+        <Typography sx={{ fontSize: { xs: 18, md: 21 }, fontWeight: 600, lineHeight: 1.5 }}>
           {currentQuestion}
         </Typography>
       </Box>
 
-      {/* Answer */}
-      <Box
-        sx={{
-          p: { xs: 2.5, md: 3 },
-          borderRadius: 3,
-          bgcolor: "#0e1a2b",
-          border: "1px solid #24334a",
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: 16,
-            fontWeight: 600,
-            mb: 1.5,
-          }}
-        >
+      <Box sx={{ p: { xs: 2.5, md: 3 }, borderRadius: 3, bgcolor: "#0e1a2b", border: "1px solid #24334a" }}>
+        <Typography sx={{ fontSize: 16, fontWeight: 600, mb: 1.5 }}>
           Your Answer
         </Typography>
 
@@ -435,43 +403,43 @@ const AIInterviewCoach = () => {
           sx={answerStyle}
         />
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            mt: 2,
-          }}
-        >
+        {error && (
+          <Typography sx={{ color: "#f87171", fontSize: 13, mt: 1.5 }}>
+            {error}
+          </Typography>
+        )}
+
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
           <Button
-            onClick={submitAnswer}
-            disabled={!answer.trim()}
-            endIcon={<SendRoundedIcon />}
+            onClick={submitCurrentAnswer}
+            disabled={!answer.trim() || loading}
+            endIcon={
+              loading ? (
+                <CircularProgress size={16} sx={{ color: "#fff" }} />
+              ) : (
+                <SendRoundedIcon />
+              )
+            }
             sx={{
               textTransform: "none",
               color: "#fff",
               px: 2.5,
               py: 1,
               borderRadius: 2,
-              background:
-                "linear-gradient(135deg,#6366f1,#8b5cf6)",
-              "&:hover": {
-                background:
-                  "linear-gradient(135deg,#5859e8,#7c3aed)",
-              },
-              "&.Mui-disabled": {
-                color: "#64748b",
-                background: "#1e293b",
-              },
+              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+              "&:hover": { background: "linear-gradient(135deg,#5859e8,#7c3aed)" },
+              "&.Mui-disabled": { color: "#64748b", background: "#1e293b" },
             }}
           >
-            {questionNumber === questions.length
+            {loading
+              ? "Submitting..."
+              : questionIndex === questions.length - 1
               ? "Finish Interview"
               : "Submit Answer"}
           </Button>
         </Box>
       </Box>
 
-      {/* Tip */}
       <Box
         sx={{
           mt: 3,
@@ -485,15 +453,8 @@ const AIInterviewCoach = () => {
         }}
       >
         <CheckCircleRoundedIcon sx={{ color: "#4ade80" }} />
-
-        <Typography
-          sx={{
-            color: "#94a3b8",
-            fontSize: 13,
-          }}
-        >
-          Take your time. Think clearly and answer as if you're in a real
-          interview.
+        <Typography sx={{ color: "#94a3b8", fontSize: 13 }}>
+          Take your time. Think clearly and answer as if you're in a real interview.
         </Typography>
       </Box>
     </Box>
@@ -505,27 +466,12 @@ const inputStyle = {
     color: "#e2e8f0",
     bgcolor: "#111c31",
     borderRadius: 2,
-
-    "& fieldset": {
-      borderColor: "#334155",
-    },
-
-    "&:hover fieldset": {
-      borderColor: "#475569",
-    },
-
-    "&.Mui-focused fieldset": {
-      borderColor: "#6366f1",
-    },
+    "& fieldset": { borderColor: "#334155" },
+    "&:hover fieldset": { borderColor: "#475569" },
+    "&.Mui-focused fieldset": { borderColor: "#6366f1" },
   },
-
-  "& .MuiInputLabel-root": {
-    color: "#94a3b8",
-  },
-
-  "& .MuiInputLabel-root.Mui-focused": {
-    color: "#a78bfa",
-  },
+  "& .MuiInputLabel-root": { color: "#94a3b8" },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#a78bfa" },
 };
 
 const answerStyle = {
@@ -533,24 +479,11 @@ const answerStyle = {
     color: "#e2e8f0",
     bgcolor: "#111c31",
     borderRadius: 2,
-
-    "& fieldset": {
-      borderColor: "#334155",
-    },
-
-    "&:hover fieldset": {
-      borderColor: "#475569",
-    },
-
-    "&.Mui-focused fieldset": {
-      borderColor: "#6366f1",
-    },
+    "& fieldset": { borderColor: "#334155" },
+    "&:hover fieldset": { borderColor: "#475569" },
+    "&.Mui-focused fieldset": { borderColor: "#6366f1" },
   },
-
-  "& textarea::placeholder": {
-    color: "#64748b",
-    opacity: 1,
-  },
+  "& textarea::placeholder": { color: "#64748b", opacity: 1 },
 };
 
 export default AIInterviewCoach;
