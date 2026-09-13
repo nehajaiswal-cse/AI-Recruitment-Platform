@@ -375,53 +375,6 @@ const updateApplicationStatus = async (req, res) => {
   }
 };
 
-// // ======================================================
-// // WITHDRAW APPLICATION
-// // ======================================================
-
-// const withdrawApplication = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     // Find application belonging to logged-in applicant
-//     const application = await Application.findOne({
-//       _id: id,
-//       applicantId: req.user.id,
-//     });
-
-//     if (!application) {
-//       return res.status(404).json({
-//         message: "Application not found",
-//       });
-//     }
-
-//     // Already withdrawn
-//     if (application.status === "withdrawn") {
-//       return res.status(400).json({
-//         message: "Application is already withdrawn",
-//       });
-//     }
-
-//     // Update application status
-//     application.status = "withdrawn";
-
-//     await application.save();
-
-//     return res.status(200).json({
-//       message: "Application withdrawn successfully",
-//       application,
-//     });
-
-//   } catch (error) {
-//     console.error("Withdraw application error:", error);
-
-//     return res.status(500).json({
-//       message: "Failed to withdraw application",
-//       error: error.message,
-//     });
-//   }
-// };
-
 
 // ======================================================
 // WITHDRAW APPLICATION (hard delete so user can reapply)
