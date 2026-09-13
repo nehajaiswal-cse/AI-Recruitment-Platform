@@ -34,6 +34,9 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+
+import { deleteCandidate } from "../../api/candidateApi";
 
 import RNavbar from "../../components/layout/recruiter/Navbar";
 import RSidebar from "../../components/layout/recruiter/Sidebar";
@@ -243,6 +246,30 @@ function Candidate() {
       setAnalyzingId(null);
     }
   };
+
+  /*
+   * ---------------------------------------------------------
+   * DELETE APPLICATION
+   * ---------------------------------------------------------
+   */
+
+  const handleDeleteCandidate = async (candidateId) => {
+  try {
+    await deleteCandidate(candidateId);
+
+    console.log("Candidate deleted successfully:", candidateId);
+
+    // Refresh candidates after deletion
+    await fetchCandidates();
+
+    // Clear selected candidate if it was deleted
+    if (selectedCandidate?._id === candidateId) {
+      setSelectedCandidate(null);
+    }
+  } catch (error) {
+    console.error("Delete candidate error:", error);
+  }
+};
 
   /*
    * ---------------------------------------------------------
@@ -777,7 +804,9 @@ function Candidate() {
                         onClick={() =>
                           setSelectedCandidate(candidate)
                         }
+                        onDelete={() => handleDeleteCandidate(candidate._id)}
                       />
+                      
                     ))
                 )}
 
@@ -807,6 +836,8 @@ function Candidate() {
                   <Typography sx={pageText}>
                     3
                   </Typography>
+
+                 
 
                   <IconButton sx={paginationButton}>
                     <ArrowForwardIosRoundedIcon
@@ -1485,6 +1516,7 @@ function CandidateRow({
   rank,
   selected,
   onClick,
+  onDelete
 }) {
   const applicant = candidate.applicantId;
   const job = candidate.jobId;
@@ -1740,12 +1772,30 @@ function CandidateRow({
           </Typography>
         </Box>
 
+        <IconButton
+  onClick={(e) => {
+    e.stopPropagation();
+    onDelete();
+  }}
+  sx={{
+    color: "#64748b",
+    p: 0.8,
+    "&:hover": {
+      color: "#ff5578",
+      backgroundColor: "rgba(255, 85, 120, 0.1)",
+    },
+  }}
+>
+  <DeleteOutlineRoundedIcon sx={{ fontSize: 20 }} />
+</IconButton>
+
         <ArrowForwardIosRoundedIcon
           sx={{
             fontSize: 13,
             color: "#64748b",
           }}
         />
+        
       </Box>
     </Card>
   );
