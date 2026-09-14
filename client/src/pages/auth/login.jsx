@@ -644,9 +644,25 @@ const LoginForm = ({ role = "applicant" }) => {
                   PASSWORD
                 </Typography>
 
-                <Link
+                {/* <Link
                   to="#"
                   onClick={(e) => e.preventDefault()}
+                  style={{
+                    color: theme.palette.warning.main,
+                    textDecoration: "none",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                  }}
+                >
+                  Forgot password?
+                </Link> */}
+
+                                <Link
+                  to={
+                    isRecruiter
+                      ? "/recruiter/forgot-password"
+                      : "/applicant/forgot-password"
+                  }
                   style={{
                     color: theme.palette.warning.main,
                     textDecoration: "none",

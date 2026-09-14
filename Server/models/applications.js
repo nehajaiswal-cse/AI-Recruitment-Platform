@@ -35,7 +35,8 @@ const applicationSchema = new mongoose.Schema(
         "applied",
         "shortlisted",
         "rejected",
-        "hired"
+        "hired",
+        "withdrawn"
       ],
       default: "applied"
     }
