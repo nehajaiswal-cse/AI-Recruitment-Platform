@@ -5,6 +5,10 @@ import { Routes, Route } from "react-router-dom";
 import ADashboard from "./pages/applicant/Dashboard";
 import ApplicantRegister from "./pages/applicant/ApplicantRegister";
 import ApplicantLogin from "./pages/applicant/ApplicantLogin";
+import ApplicantForgotPassword from "./pages/applicant/ApplicantForgotPassword";
+import RecruiterForgotPassword from "./pages/recruiter/RecruiterForgotPassword";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+
 import ApplicantProfile from "./pages/applicant/Profile";
 import SavedJob from "./pages/applicant/SavedJob.jsx";
 import FindJobs from "./pages/applicant/jobs/FindJobs.jsx";
@@ -53,6 +57,10 @@ export default function App() {
         <Route path="/recruiter/register" element={<RecruiterRegister />} />
 
         <Route path="/recruiter/login" element={<RecruiterLogin />} />
+
+        <Route path="/applicant/forgot-password" element={<ApplicantForgotPassword />} />
+        <Route path="/recruiter/forgot-password" element={<RecruiterForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
         {/* ================= APPLICANT ROUTES ================= */}
 
