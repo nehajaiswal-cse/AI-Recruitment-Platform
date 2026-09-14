@@ -8,7 +8,6 @@ import React, {
 import {
   getCandidates,
   getCandidateById,
-  createCandidate,
   updateCandidate,
   updateCandidateStatus,
   deleteCandidate,
