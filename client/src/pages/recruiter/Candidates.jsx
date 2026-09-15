@@ -1601,7 +1601,7 @@
 
 
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
   Box,
@@ -1631,18 +1631,16 @@ import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRound
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
-
-import { deleteCandidate } from "../../api/candidateApi";
 
 import RNavbar from "../../components/layout/recruiter/Navbar";
 import RSidebar from "../../components/layout/recruiter/Sidebar";
+import CandidateCopilot from "../../components/copilot/CandidateCopilto";
 
 import { useCandidate } from "../../hooks/useCandidate";
 import { getResumeUrl } from "../../api/resumeApi";
 
 /* ---------------------------------------------------------
- * STYLES
+ * STYLES & SUB-COMPONENTS
  * --------------------------------------------------------- */
 
 const selectStyle = {
@@ -1666,8 +1664,7 @@ const paginationButton = {
   color: "#8c97ab",
   border: "1px solid #263249",
   borderRadius: 1.5,
-  width: 34,
-  height: 34,
+  p: 0.8,
   "&:hover": {
     bgcolor: "#0b1425",
     color: "#fff",
@@ -1675,8 +1672,8 @@ const paginationButton = {
 };
 
 const pageNumber = {
-  width: 34,
-  height: 34,
+  width: 32,
+  height: 32,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -1688,8 +1685,8 @@ const pageNumber = {
 };
 
 const pageText = {
-  width: 34,
-  height: 34,
+  width: 32,
+  height: 32,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -1703,205 +1700,117 @@ const pageText = {
   },
 };
 
-/* ---------------------------------------------------------
- * DETAIL CARD
- * --------------------------------------------------------- */
+const DetailCard = ({ children, sx = {} }) => (
+  <Card
+    elevation={0}
+    sx={{
+      bgcolor: "#0b1425",
+      border: "1px solid #1e293b",
+      borderRadius: 2,
+      p: 2.5,
+      mb: 2,
+      ...sx,
+    }}
+  >
+    {children}
+  </Card>
+);
 
-function DetailCard({ children, sx = {} }) {
-  return (
-    <Card
-      elevation={0}
-      sx={{
-        mt: 1.5,
-        p: 2,
-        borderRadius: 1.5,
-        bgcolor: "#081221",
-        border: "1px solid #1b293d",
-        color: "#f8fafc",
-        boxShadow: "none",
-        ...sx,
-      }}
-    >
-      {children}
-    </Card>
-  );
-}
-
-/* ---------------------------------------------------------
- * CANDIDATE ROW
- * --------------------------------------------------------- */
-
-function CandidateRow({ candidate, rank, selected, onClick, onDelete }) {
+const CandidateRow = ({ candidate, rank, selected, onClick }) => {
   const applicant = candidate?.applicantId;
   const job = candidate?.jobId;
-
-  const name = applicant?.name || applicant?.fullName || "Unknown Candidate";
-  const email = applicant?.email || "No email";
   const score = Number(candidate?.aiScore || 0);
 
-  const skills = Array.isArray(candidate?.aiAnalysis?.matchingSkills)
-    ? candidate.aiAnalysis.matchingSkills
-    : [];
+  const getScoreColor = (val) => {
+    if (val >= 80) return "#70d84a";
+    if (val >= 60) return "#f4c542";
+    return "#ff5d7d";
+  };
 
   return (
     <Card
       elevation={0}
       onClick={onClick}
       sx={{
-        mb: 1.5,
-        p: 2,
-        cursor: "pointer",
-        borderRadius: 1.5,
-        bgcolor: selected ? "#0d172b" : "#091223",
+        bgcolor: selected ? "#0f172a" : "#060d1e",
         border: "1px solid",
-        borderColor: selected ? "#7448ff" : "#17253a",
-        boxShadow: selected ? "0 0 0 1px rgba(124,58,237,.2)" : "none",
-        transition: "all .2s",
+        borderColor: selected ? "#6366f1" : "#172236",
+        borderRadius: 2,
+        p: 2,
+        mb: 1.5,
+        cursor: "pointer",
+        transition: "all 0.2s ease-in-out",
         "&:hover": {
-          borderColor: "#5f4bd8",
-          transform: "translateY(-1px)",
+          borderColor: "#3b82f6",
+          bgcolor: "#0f172a",
         },
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-        {/* RANK */}
-        <Typography
-          sx={{ width: 20, color: "#65728a", fontSize: 12, fontWeight: 600 }}
-        >
-          #{rank}
-        </Typography>
-
-        {/* AVATAR */}
-        <Avatar
-          src={applicant?.profileImage || applicant?.avatar}
-          sx={{ width: 48, height: 48, bgcolor: "#1b2840" }}
-        >
-          {name.charAt(0).toUpperCase()}
-        </Avatar>
-
-        {/* BASIC INFO */}
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.7 }}>
-            <Typography
-              sx={{
-                fontSize: 14,
-                fontWeight: 700,
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {name}
-            </Typography>
-
-            {rank === 1 && (
-              <Chip
-                label="Top Match"
-                size="small"
-                sx={{
-                  height: 21,
-                  bgcolor: "#251c54",
-                  color: "#a78bfa",
-                  fontSize: 10,
-                }}
-              />
-            )}
-          </Box>
-
-          <Typography sx={{ fontSize: 11.5, color: "#a3aec0", mt: 0.3 }}>
-            {job?.title || "Full Stack Developer"}
-          </Typography>
-
-          <Typography sx={{ fontSize: 11, color: "#69768d", mt: 0.3 }}>
-            {email}
-          </Typography>
-        </Box>
-
-        {/* SKILLS */}
-        <Box sx={{ width: 190, display: { xs: "none", md: "block" } }}>
-          <Typography sx={{ fontSize: 10, color: "#68758c", mb: 0.7 }}>
-            Top Skills
-          </Typography>
-
-          <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
-            {skills.slice(0, 3).map((skill, index) => (
-              <Chip
-                key={`${skill}-${index}`}
-                label={skill}
-                size="small"
-                sx={{
-                  height: 22,
-                  bgcolor: "#172238",
-                  color: "#c7d1e0",
-                  fontSize: 10,
-                }}
-              />
-            ))}
-
-            {skills.length > 3 && (
-              <Chip
-                label={`+${skills.length - 3}`}
-                size="small"
-                sx={{
-                  height: 22,
-                  bgcolor: "#172238",
-                  color: "#94a3b8",
-                  fontSize: 10,
-                }}
-              />
-            )}
-          </Box>
-        </Box>
-
-        {/* SCORE */}
-        <Box sx={{ width: 60, textAlign: "center" }}>
-          <Box
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 2,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography
             sx={{
-              width: 48,
-              height: 48,
-              borderRadius: "50%",
-              border: `4px solid ${
-                score >= 80 ? "#70d84a" : score >= 60 ? "#f4c542" : "#ff5d7d"
-              }`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mx: "auto",
+              fontSize: 14,
+              fontWeight: 700,
+              color: "#64748b",
+              width: 24,
             }}
           >
-            <Typography sx={{ fontSize: 13, fontWeight: 800 }}>
-              {score}%
+            #{rank}
+          </Typography>
+
+          <Avatar
+            src={applicant?.profileImage || applicant?.avatar}
+            sx={{ width: 44, height: 44, bgcolor: "#1e293b" }}
+          >
+            {(applicant?.name || applicant?.fullName || "C").charAt(0).toUpperCase()}
+          </Avatar>
+
+          <Box>
+            <Typography sx={{ fontWeight: 600, fontSize: 15, color: "#f8fafc" }}>
+              {applicant?.name || applicant?.fullName || "Unknown Candidate"}
+            </Typography>
+            <Typography sx={{ fontSize: 13, color: "#94a3b8", mt: 0.2 }}>
+              {job?.title || "Role Not Specified"}
             </Typography>
           </Box>
-
-          <Typography sx={{ mt: 0.5, fontSize: 9, color: "#68758c" }}>
-            Match
-          </Typography>
         </Box>
 
-        {/* DELETE */}
-        <IconButton
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          sx={{
-            color: "#64748b",
-            p: 0.8,
-            "&:hover": {
-              color: "#ff5578",
-              backgroundColor: "rgba(255, 85, 120, 0.1)",
-            },
-          }}
-        >
-          <DeleteOutlineRoundedIcon sx={{ fontSize: 20 }} />
-        </IconButton>
+        <Box sx={{ textAlign: "right" }}>
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: 16,
+              color: getScoreColor(score),
+            }}
+          >
+            {score}%
+          </Typography>
 
-        <ArrowForwardIosRoundedIcon sx={{ fontSize: 13, color: "#64748b" }} />
+          <Chip
+            label={candidate?.status || "Applied"}
+            size="small"
+            sx={{
+              mt: 0.5,
+              height: 20,
+              fontSize: 11,
+              bgcolor: "#1e293b",
+              color: "#cbd5e1",
+              textTransform: "capitalize",
+            }}
+          />
+        </Box>
       </Box>
     </Card>
   );
-}
+};
 
 /* ---------------------------------------------------------
  * MAIN COMPONENT
@@ -1909,9 +1818,16 @@ function CandidateRow({ candidate, rank, selected, onClick, onDelete }) {
 
 function Candidate() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const { candidates, loading, error, fetchCandidates, analyzeResume } =
-    useCandidate();
+  const jobId = searchParams.get("jobId");
+  const {
+    candidates,
+    loading,
+    error,
+    fetchCandidates,
+    analyzeResume,
+  } = useCandidate();
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -1927,16 +1843,17 @@ function Candidate() {
     fetchCandidates();
   }, []);
 
-  /* ---------------------------------------------------------
-   * FILTER CANDIDATES
-   * --------------------------------------------------------- */
-
+  /* Filter Candidates Logic */
   const filteredCandidates = useMemo(() => {
     if (!candidates) return [];
 
     return candidates.filter((candidate) => {
-      const applicant = candidate?.applicantId;
-      const job = candidate?.jobId;
+      const applicant = candidate.applicantId;
+      const job = candidate.jobId;
+
+      if (jobId && job?._id !== jobId) {
+        return false;
+      }
 
       const name = applicant?.name || applicant?.fullName || "";
       const email = applicant?.email || "";
@@ -1950,32 +1867,15 @@ function Candidate() {
 
       const matchesStatus =
         statusFilter === "all" ||
-        candidate?.status?.toLowerCase() === statusFilter.toLowerCase();
+        candidate.status?.toLowerCase() === statusFilter.toLowerCase();
 
       const matchesJob = jobFilter === "all" || job?._id === jobFilter;
 
-      const score = Number(candidate?.aiScore || 0);
-
+      const score = Number(candidate.aiScore || 0);
       let matchesScore = true;
       if (scoreFilter === "70") matchesScore = score >= 70;
       if (scoreFilter === "80") matchesScore = score >= 80;
       if (scoreFilter === "90") matchesScore = score >= 90;
-
-      const candidateSkills = [
-        ...(Array.isArray(applicant?.skills) ? applicant.skills : []),
-        ...(Array.isArray(candidate?.aiAnalysis?.matchingSkills)
-          ? candidate.aiAnalysis.matchingSkills
-          : []),
-        ...(Array.isArray(candidate?.aiAnalysis?.skills)
-          ? candidate.aiAnalysis.skills
-          : []),
-      ];
-
-      const matchesSkill =
-        skillFilter === "all" ||
-        candidateSkills.some((skill) =>
-          String(skill).toLowerCase().includes(skillFilter.toLowerCase())
-        );
 
       let matchesExperience = true;
       const experience =
@@ -2008,19 +1908,16 @@ function Candidate() {
     scoreFilter,
     skillFilter,
     experienceFilter,
+    jobId,
   ]);
 
-  /* ---------------------------------------------------------
-   * UNIQUE JOBS
-   * --------------------------------------------------------- */
-
+  /* Unique Jobs for Filter */
   const jobs = useMemo(() => {
     if (!candidates) return [];
 
     const map = new Map();
-
     candidates.forEach((candidate) => {
-      const job = candidate?.jobId;
+      const job = candidate.jobId;
       if (job?._id && !map.has(job._id)) {
         map.set(job._id, job);
       }
@@ -2029,20 +1926,14 @@ function Candidate() {
     return Array.from(map.values());
   }, [candidates]);
 
-  /* ---------------------------------------------------------
-   * DEFAULT SELECT FIRST CANDIDATE
-   * --------------------------------------------------------- */
-
+  /* Default select first candidate */
   useEffect(() => {
     if (filteredCandidates.length > 0 && !selectedCandidate) {
       setSelectedCandidate(filteredCandidates[0]);
     }
   }, [filteredCandidates, selectedCandidate]);
 
-  /* ---------------------------------------------------------
-   * AI ANALYSIS
-   * --------------------------------------------------------- */
-
+  /* Handlers */
   const handleAIAnalysis = async (candidate) => {
     try {
       if (!candidate?.applicationId) {
@@ -2061,37 +1952,17 @@ function Candidate() {
       }
 
       setAnalyzingId(candidate._id);
-
       await analyzeResume(applicationId);
       await fetchCandidates();
     } catch (err) {
-      console.error("AI ANALYSIS ERROR:", err.response?.data || err.message);
+      console.error(
+        "AI ANALYSIS ERROR:",
+        err.response?.data || err.message
+      );
     } finally {
       setAnalyzingId(null);
     }
   };
-
-  /* ---------------------------------------------------------
-   * DELETE CANDIDATE
-   * --------------------------------------------------------- */
-
-  const handleDeleteCandidate = async (candidateId) => {
-    try {
-      await deleteCandidate(candidateId);
-
-      await fetchCandidates();
-
-      if (selectedCandidate?._id === candidateId) {
-        setSelectedCandidate(null);
-      }
-    } catch (error) {
-      console.error("Delete candidate error:", error);
-    }
-  };
-
-  /* ---------------------------------------------------------
-   * SCHEDULE INTERVIEW
-   * --------------------------------------------------------- */
 
   const handleScheduleInterview = (candidate) => {
     navigate("/recruiter/interviews", {
@@ -2099,16 +1970,12 @@ function Candidate() {
     });
   };
 
-  /* ---------------------------------------------------------
-   * VIEW RESUME
-   * --------------------------------------------------------- */
-
   const handleViewResume = async (candidate) => {
     try {
       const applicationId =
         typeof candidate?.applicationId === "object"
           ? candidate.applicationId._id
-          : candidate?.applicationId;
+          : candidate.applicationId;
 
       if (!applicationId) {
         alert("Application not found");
@@ -2129,10 +1996,7 @@ function Candidate() {
     }
   };
 
-  /* ---------------------------------------------------------
-   * SCORE HELPERS
-   * --------------------------------------------------------- */
-
+  /* Score Helpers */
   const getScoreColor = (score) => {
     if (score >= 80) return "#70d84a";
     if (score >= 60) return "#f4c542";
@@ -2147,14 +2011,20 @@ function Candidate() {
     return "Low Match";
   };
 
+  const getExperience = (candidate) => {
+    const applicant = candidate?.applicantId;
+    return (
+      applicant?.experience ||
+      candidate?.aiAnalysis?.experienceYears ||
+      candidate?.aiAnalysis?.experience ||
+      "N/A"
+    );
+  };
+
   const selectedApplicant = selectedCandidate?.applicantId;
   const selectedJob = selectedCandidate?.jobId;
   const selectedAnalysis = selectedCandidate?.aiAnalysis || {};
   const selectedScore = Number(selectedCandidate?.aiScore || 0);
-
-  /* ---------------------------------------------------------
-   * LOADING
-   * --------------------------------------------------------- */
 
   if (loading) {
     return (
@@ -2210,8 +2080,9 @@ function Candidate() {
                   >
                     Candidates
                   </Typography>
-
-                  <Typography sx={{ mt: 0.5, color: "#8c97ab", fontSize: 14 }}>
+                  <Typography
+                    sx={{ mt: 0.5, color: "#8c97ab", fontSize: 14 }}
+                  >
                     Review and rank candidates using AI-powered resume analysis
                   </Typography>
                 </Box>
@@ -2241,12 +2112,19 @@ function Candidate() {
                 <Typography sx={{ fontSize: 19, fontWeight: 600 }}>
                   Candidate Ranking
                 </Typography>
-
-                <AutoAwesomeRoundedIcon sx={{ fontSize: 19, color: "#8b5cf6" }} />
+                <AutoAwesomeRoundedIcon
+                  sx={{ fontSize: 19, color: "#8b5cf6" }}
+                />
               </Box>
 
               {/* FILTERS BAR */}
-              <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1.5,
+                  flexWrap: "wrap",
+                }}
+              >
                 <TextField
                   size="small"
                   placeholder="Search candidates..."
@@ -2278,7 +2156,6 @@ function Candidate() {
                     sx={selectStyle}
                   >
                     <MenuItem value="all">All Jobs</MenuItem>
-
                     {jobs.map((job) => (
                       <MenuItem key={job._id} value={job._id}>
                         {job.title}
@@ -2359,7 +2236,7 @@ function Candidate() {
                 borderTop: "1px solid #172236",
               }}
             >
-              {/* LEFT COLUMN */}
+              {/* LEFT COLUMN: CANDIDATE LIST */}
               <Box
                 sx={{
                   minWidth: 0,
@@ -2379,9 +2256,9 @@ function Candidate() {
                   <Typography sx={{ fontSize: 13, color: "#8c97ab" }}>
                     Total {filteredCandidates.length} candidates found
                   </Typography>
-
                   <Typography sx={{ fontSize: 13, color: "#8c97ab" }}>
-                    Sort by: <b style={{ color: "#e2e8f0" }}>Highest Match</b>
+                    Sort by:{" "}
+                    <b style={{ color: "#e2e8f0" }}>Highest Match</b>
                   </Typography>
                 </Box>
 
@@ -2396,16 +2273,20 @@ function Candidate() {
                     <Typography>No candidates found</Typography>
                   </Box>
                 ) : (
-                  [...filteredCandidates]
-                    .sort((a, b) => Number(b.aiScore || 0) - Number(a.aiScore || 0))
+                  filteredCandidates
+                    .sort(
+                      (a, b) =>
+                        Number(b.aiScore || 0) - Number(a.aiScore || 0)
+                    )
                     .map((candidate, index) => (
                       <CandidateRow
                         key={candidate._id}
                         candidate={candidate}
                         rank={index + 1}
-                        selected={selectedCandidate?._id === candidate._id}
+                        selected={
+                          selectedCandidate?._id === candidate._id
+                        }
                         onClick={() => setSelectedCandidate(candidate)}
-                        onDelete={() => handleDeleteCandidate(candidate._id)}
                       />
                     ))
                 )}
@@ -2423,18 +2304,16 @@ function Candidate() {
                   <IconButton sx={paginationButton}>
                     <ArrowBackIosNewRoundedIcon sx={{ fontSize: 14 }} />
                   </IconButton>
-
                   <Box sx={pageNumber}>1</Box>
                   <Typography sx={pageText}>2</Typography>
                   <Typography sx={pageText}>3</Typography>
-
                   <IconButton sx={paginationButton}>
                     <ArrowForwardIosRoundedIcon sx={{ fontSize: 14 }} />
                   </IconButton>
                 </Box>
               </Box>
 
-              {/* RIGHT COLUMN */}
+              {/* RIGHT COLUMN: CANDIDATE DETAIL & AI ANALYSIS */}
               {selectedCandidate && (
                 <Box
                   sx={{
@@ -2478,13 +2357,18 @@ function Candidate() {
                       </Avatar>
 
                       <Box>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                          }}
+                        >
                           <Typography sx={{ fontSize: 20, fontWeight: 700 }}>
                             {selectedApplicant?.name ||
                               selectedApplicant?.fullName ||
                               "Unknown Candidate"}
                           </Typography>
-
                           <Box
                             sx={{
                               width: 8,
@@ -2495,15 +2379,21 @@ function Candidate() {
                           />
                         </Box>
 
-                        <Typography sx={{ color: "#a1aabd", fontSize: 13, mt: 0.3 }}>
+                        <Typography
+                          sx={{ color: "#a1aabd", fontSize: 13, mt: 0.3 }}
+                        >
                           {selectedJob?.title || "Full Stack Developer"}
                         </Typography>
 
-                        <Typography sx={{ color: "#8c97ab", fontSize: 12, mt: 1 }}>
+                        <Typography
+                          sx={{ color: "#8c97ab", fontSize: 12, mt: 1 }}
+                        >
                           {selectedApplicant?.email || "No email available"}
                         </Typography>
 
-                        <Typography sx={{ color: "#8c97ab", fontSize: 12, mt: 0.4 }}>
+                        <Typography
+                          sx={{ color: "#8c97ab", fontSize: 12, mt: 0.4 }}
+                        >
                           <LocationOnOutlinedIcon
                             sx={{ fontSize: 14, verticalAlign: "middle", mr: 0.3 }}
                           />
@@ -2527,7 +2417,7 @@ function Candidate() {
                     </Button>
                   </Box>
 
-                  {/* AI SCORE OVERVIEW */}
+                  {/* AI SCORE OVERVIEW CARD */}
                   <DetailCard>
                     <Box
                       sx={{
@@ -2537,7 +2427,9 @@ function Candidate() {
                       }}
                     >
                       <Box>
-                        <Typography sx={{ color: "#dce3ef", fontSize: 13, mb: 1 }}>
+                        <Typography
+                          sx={{ color: "#dce3ef", fontSize: 13, mb: 1 }}
+                        >
                           AI Match Score
                         </Typography>
 
@@ -2552,7 +2444,9 @@ function Candidate() {
                           {selectedScore}%
                         </Typography>
 
-                        <Typography sx={{ mt: 1, fontSize: 13, color: "#dce3ef" }}>
+                        <Typography
+                          sx={{ mt: 1, fontSize: 13, color: "#dce3ef" }}
+                        >
                           {getScoreLabel(selectedScore)}
                         </Typography>
                       </Box>
@@ -2570,7 +2464,8 @@ function Candidate() {
                         onClick={() => handleAIAnalysis(selectedCandidate)}
                         sx={{
                           textTransform: "none",
-                          background: "linear-gradient(135deg, #8b5cf6, #6366f1)",
+                          background:
+                            "linear-gradient(135deg, #8b5cf6, #6366f1)",
                           px: 2,
                           py: 1,
                           borderRadius: 1.5,
@@ -2586,7 +2481,7 @@ function Candidate() {
                     <Box sx={{ mt: 2 }}>
                       <LinearProgress
                         variant="determinate"
-                        value={Math.min(100, Math.max(0, selectedScore))}
+                        value={selectedScore}
                         sx={{
                           height: 6,
                           borderRadius: 3,
@@ -2611,16 +2506,34 @@ function Candidate() {
                         gap: 1,
                       }}
                     >
-                      <AutoAwesomeRoundedIcon sx={{ fontSize: 16, color: "#8b5cf6" }} />
+                      <AutoAwesomeRoundedIcon
+                        sx={{ fontSize: 16, color: "#8b5cf6" }}
+                      />
                       AI Analysis Summary
                     </Typography>
 
-                    <Typography sx={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6 }}>
+                    <Typography
+                      sx={{
+                        fontSize: 13,
+                        color: "#94a3b8",
+                        lineHeight: 1.6,
+                      }}
+                    >
                       {selectedAnalysis?.summary ||
                         selectedCandidate?.aiSummary ||
                         "No analysis generated yet. Click 'Run AI Analysis' to extract candidate insights, key strengths, and matching parameters."}
                     </Typography>
                   </DetailCard>
+                  {/* AI CANDIDATE COPILOT */}
+{selectedCandidate?.applicationId && (
+  <CandidateCopilot
+    applicationId={
+      typeof selectedCandidate.applicationId === "object"
+        ? selectedCandidate.applicationId._id
+        : selectedCandidate.applicationId
+    }
+  />
+)}
 
                   {/* KEY STRENGTHS & WEAKNESSES */}
                   <Box
@@ -2714,7 +2627,9 @@ function Candidate() {
 
                   {/* SKILLS CHIPS */}
                   <DetailCard>
-                    <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 1.5 }}>
+                    <Typography
+                      sx={{ fontSize: 14, fontWeight: 600, mb: 1.5 }}
+                    >
                       Identified Skills
                     </Typography>
 
@@ -2746,12 +2661,20 @@ function Candidate() {
                   </DetailCard>
 
                   {/* ACTION BUTTONS */}
-                  <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      mt: 3,
+                    }}
+                  >
                     <Button
                       fullWidth
                       variant="contained"
                       startIcon={<EventRoundedIcon />}
-                      onClick={() => handleScheduleInterview(selectedCandidate)}
+                      onClick={() =>
+                        handleScheduleInterview(selectedCandidate)
+                      }
                       sx={{
                         py: 1.2,
                         textTransform: "none",
@@ -2762,6 +2685,7 @@ function Candidate() {
                     >
                       Schedule Interview
                     </Button>
+                    
                   </Box>
                 </Box>
               )}

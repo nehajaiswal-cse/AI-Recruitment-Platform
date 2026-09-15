@@ -5,3 +5,10 @@ export const getRecruiterAnalytics = async () => {
 
   return response.data;
 };
+
+export const copilotApi = (applicationId, data) => {
+  return api.post(
+    `/copilot/candidate/${applicationId}`,
+    data
+  );
+};
