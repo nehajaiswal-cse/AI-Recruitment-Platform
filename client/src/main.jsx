@@ -12,12 +12,15 @@ import { CandidateProvider } from './context/CandidateContext.jsx';
 import { InterviewProvider } from "./context/InterviewContext.jsx"
 //import { ApplicationProvider } from './context/ApplicationContext.jsx'; 
 import { ApplicationProvider } from "./context/ApplicationContext.jsx";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
 
 ReactDOM.createRoot(
   document.getElementById('root')
 ).render(
   <React.StrictMode>
-    <AuthContextProvider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <AuthContextProvider>
       <JobProvider>
         <CandidateProvider>
           <ApplicationProvider>
@@ -36,5 +39,6 @@ ReactDOM.createRoot(
         </CandidateProvider>
       </JobProvider>
     </AuthContextProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>
 )
