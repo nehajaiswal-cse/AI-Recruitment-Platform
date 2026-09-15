@@ -150,65 +150,115 @@ export const ApplicationProvider = ({ children }) => {
   // WITHDRAW APPLICATION
   // ==========================================
 
+
   const removeApplication = useCallback(
-    async (applicationId) => {
-      try {
-        setLoading(true);
-        setError("");
+  async (applicationId) => {
+    try {
+      setLoading(true);
+      setError("");
 
-        if (!applicationId) {
-          throw new Error(
-            "Application ID is required."
-          );
-        }
-
-        const data =
-          await withdrawApplication(
-            applicationId
-          );
-
-        setApplications((previous) =>
-          previous.map((application) =>
-            application._id === applicationId
-              ? {
-                  ...application,
-                  status: "withdrawn",
-                }
-              : application
-          )
-        );
-
-        setCurrentApplication((previous) =>
-          previous?._id === applicationId
-            ? {
-                ...previous,
-                status: "withdrawn",
-              }
-            : previous
-        );
-
-        return data;
-      } catch (err) {
-        console.error(
-          "Withdraw application error:",
-          err
-        );
-
-        const message =
-          err.response?.data?.message ||
-          err.response?.data?.error ||
-          err.message ||
-          "Failed to withdraw application.";
-
-        setError(message);
-
-        throw err;
-      } finally {
-        setLoading(false);
+      if (!applicationId) {
+        throw new Error("Application ID is required.");
       }
-    },
-    []
-  );
+
+      const data = await withdrawApplication(applicationId);
+
+      // Remove withdrawn application from the list
+      setApplications((previous) =>
+        previous.filter(
+          (application) =>
+            application._id !== applicationId
+        )
+      );
+
+      // Clear current application if it was withdrawn
+      setCurrentApplication((previous) =>
+        previous?._id === applicationId
+          ? null
+          : previous
+      );
+
+      return data;
+    } catch (err) {
+      console.error(
+        "Withdraw application error:",
+        err
+      );
+
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to withdraw application.";
+
+      setError(message);
+
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  },
+  []
+);
+  // const removeApplication = useCallback(
+  //   async (applicationId) => {
+  //     try {
+  //       setLoading(true);
+  //       setError("");
+
+  //       if (!applicationId) {
+  //         throw new Error(
+  //           "Application ID is required."
+  //         );
+  //       }
+
+  //       const data =
+  //         await withdrawApplication(
+  //           applicationId
+  //         );
+
+  //       setApplications((previous) =>
+  //         previous.map((application) =>
+  //           application._id === applicationId
+  //             ? {
+  //                 ...application,
+  //                 status: "withdrawn",
+  //               }
+  //             : application
+  //         )
+  //       );
+
+  //       setCurrentApplication((previous) =>
+  //         previous?._id === applicationId
+  //           ? {
+  //               ...previous,
+  //               status: "withdrawn",
+  //             }
+  //           : previous
+  //       );
+
+  //       return data;
+  //     } catch (err) {
+  //       console.error(
+  //         "Withdraw application error:",
+  //         err
+  //       );
+
+  //       const message =
+  //         err.response?.data?.message ||
+  //         err.response?.data?.error ||
+  //         err.message ||
+  //         "Failed to withdraw application.";
+
+  //       setError(message);
+
+  //       throw err;
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   },
+  //   []
+  // );
 
   // ==========================================
   // CLEAR ERROR

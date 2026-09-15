@@ -189,6 +189,7 @@ const getMyApplications = async (req, res) => {
 
     const applications = await Application.find({
       applicantId: req.user.id,
+      status: { $ne: "withdrawn" }
     })
       .populate(
         "jobId",
@@ -376,6 +377,51 @@ const updateApplicationStatus = async (req, res) => {
 
 
 // ======================================================
+// WITHDRAW APPLICATION (hard delete so user can reapply)
+// ======================================================
+
+const withdrawApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find application belonging to logged-in applicant
+    const application = await Application.findOne({
+      _id: id,
+      applicantId: req.user.id,
+    });
+
+    if (!application) {
+      return res.status(404).json({
+        message: "Application not found",
+      });
+    }
+
+    // Remove the linked Candidate record too, so no trace is left
+    // that could block re-applying or show stale data to the recruiter
+    await Candidate.deleteOne({
+      applicationId: application._id,
+    });
+
+    // Actually delete the application document from MongoDB
+    await Application.deleteOne({ _id: application._id });
+
+    return res.status(200).json({
+      message: "Application withdrawn successfully",
+    });
+
+  } catch (error) {
+    console.error("Withdraw application error:", error);
+
+    return res.status(500).json({
+      message: "Failed to withdraw application",
+      error: error.message,
+    });
+  }
+};
+
+
+
+// ======================================================
 // EXPORT
 // ======================================================
 
@@ -384,4 +430,5 @@ export {
   getMyApplications,
   getJobApplications,
   updateApplicationStatus,
+  withdrawApplication,
 };
