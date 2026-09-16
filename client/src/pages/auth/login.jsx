@@ -19,6 +19,8 @@ import { Box, Typography, useTheme } from "@mui/material";
 
 import useAuth from "../../hooks/UseAuth";
 
+//Login Form
+
 const LoginForm = ({ role = "applicant" }) => {
   const navigate = useNavigate();
   const { login, loginWithGoogle } = useAuth();
