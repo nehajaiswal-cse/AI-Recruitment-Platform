@@ -13,13 +13,17 @@ import {
   FiCpu,
 } from "react-icons/fi";
 
+import { GoogleLogin } from "@react-oauth/google";
+
 import { Box, Typography, useTheme } from "@mui/material";
 
 import useAuth from "../../hooks/useAuth";
 
+//Login Form
+
 const LoginForm = ({ role = "applicant" }) => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const theme = useTheme();
 
   const isRecruiter = role === "recruiter";
@@ -92,8 +96,38 @@ const LoginForm = ({ role = "applicant" }) => {
 
       setError(
         err?.message ||
-          "Invalid email or password. Please try again."
+        "Invalid email or password. Please try again."
       );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await loginWithGoogle({
+        credential: credentialResponse.credential,
+        role,
+      });
+
+      const loggedInRole = res?.user?.role;
+
+      if (loggedInRole && loggedInRole !== role) {
+        setError(`This account is registered as a ${loggedInRole}, not a ${role}.`);
+        return;
+      }
+
+      setSuccess("Login successful! Redirecting...");
+
+      setTimeout(() => {
+        navigate(role === "recruiter" ? "/recruiter" : "/applicant");
+      }, 500);
+    } catch (err) {
+      setError(err?.message || "Google sign-in failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -657,7 +691,7 @@ const LoginForm = ({ role = "applicant" }) => {
                   Forgot password?
                 </Link> */}
 
-                                <Link
+                <Link
                   to={
                     isRecruiter
                       ? "/recruiter/forgot-password"
@@ -847,7 +881,38 @@ const LoginForm = ({ role = "applicant" }) => {
                 </>
               )}
             </Box>
+
+            {/* GOOGLE SIGN-IN */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                my: 3,
+                borderRadius: "100px",
+                border: "1px solid",
+                borderColor: "divider",
+                p: 1.5,
+              }}
+            >
+              <Box sx={{ flex: 1, height: "1px", bgcolor: "divider" }} />
+
+              <Typography sx={{ fontSize: 12, color: "text.secondary" }}>
+                OR
+              </Typography>
+
+              <Box sx={{ flex: 1, height: "1px", bgcolor: "divider" }} />
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError("Google sign-in failed. Please try again.")}
+                width="100%"
+              />
+            </Box>
           </Box>
+
 
           {/* =====================================================
               REGISTER
