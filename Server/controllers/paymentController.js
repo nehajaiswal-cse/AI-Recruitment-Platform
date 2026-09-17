@@ -7,12 +7,10 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// ==========================================
-// CREATE RAZORPAY SUBSCRIPTION
-// ==========================================
-// ==========================================
+// =====================================================
 // CREATE / REUSE RAZORPAY SUBSCRIPTION
-// ==========================================
+// =====================================================
+
 export const createSubscription = async (req, res) => {
   try {
     console.log("\n=================================");
@@ -31,7 +29,9 @@ export const createSubscription = async (req, res) => {
     console.log("User:", user.email);
     console.log("Current plan:", user.plan);
 
-    // Already Pro
+    // ------------------------------------------
+    // ALREADY PRO
+    // ------------------------------------------
     if (user.plan === "pro") {
       return res.status(400).json({
         success: false,
@@ -42,10 +42,16 @@ export const createSubscription = async (req, res) => {
     // ------------------------------------------
     // CHECK RAZORPAY CONFIG
     // ------------------------------------------
+    const {
+      RAZORPAY_KEY_ID,
+      RAZORPAY_KEY_SECRET,
+      RAZORPAY_PLAN_ID,
+    } = process.env;
+
     if (
-      !process.env.RAZORPAY_KEY_ID ||
-      !process.env.RAZORPAY_KEY_SECRET ||
-      !process.env.RAZORPAY_PLAN_ID
+      !RAZORPAY_KEY_ID ||
+      !RAZORPAY_KEY_SECRET ||
+      !RAZORPAY_PLAN_ID
     ) {
       return res.status(500).json({
         success: false,
@@ -54,7 +60,7 @@ export const createSubscription = async (req, res) => {
     }
 
     // ------------------------------------------
-    // TRY TO REUSE EXISTING SUBSCRIPTION
+    // CHECK EXISTING SUBSCRIPTION
     // ------------------------------------------
     const existingSubscriptionId =
       user.subscription?.razorpaySubscriptionId;
@@ -82,18 +88,19 @@ export const createSubscription = async (req, res) => {
         );
 
         // ------------------------------------------
-        // REUSE CREATED SUBSCRIPTION
+        // REUSE ONLY VALID SUBSCRIPTION
         // ------------------------------------------
         if (
-          existingSubscription.status === "created" &&
           existingSubscription.plan_id ===
-            process.env.RAZORPAY_PLAN_ID
+            RAZORPAY_PLAN_ID &&
+          ["authenticated", "active"].includes(
+            existingSubscription.status
+          )
         ) {
           console.log(
             "♻️ Reusing existing Razorpay subscription"
           );
 
-          // Keep DB status synchronized
           user.subscription.status =
             existingSubscription.status;
 
@@ -108,49 +115,67 @@ export const createSubscription = async (req, res) => {
           return res.status(200).json({
             success: true,
             message: "Existing subscription reused",
-            subscriptionId: existingSubscription.id,
-            keyId: process.env.RAZORPAY_KEY_ID,
+            subscriptionId:
+              existingSubscription.id,
+            keyId: RAZORPAY_KEY_ID,
             planId: existingSubscription.plan_id,
           });
         }
 
+        // ------------------------------------------
+        // OLD CREATED / CANCELLED / EXPIRED
+        // SUBSCRIPTION WILL NOT BE REUSED
+        // ------------------------------------------
         console.log(
           "Existing subscription cannot be reused."
         );
+
         console.log(
-          "Creating a new subscription..."
+          "Existing status:",
+          existingSubscription.status
+        );
+
+        console.log(
+          "Creating a completely new subscription..."
         );
       } catch (fetchError) {
-        console.error(
+        console.warn(
           "Could not fetch existing subscription:",
           fetchError?.message
         );
 
         console.log(
-          "Creating a new subscription..."
+          "Creating a completely new subscription..."
         );
       }
     }
 
     // ------------------------------------------
-    // CREATE NEW RAZORPAY SUBSCRIPTION
+    // CREATE NEW SUBSCRIPTION
     // ------------------------------------------
+
     console.log(
       "Creating NEW Razorpay subscription..."
     );
 
+    const totalCount = Number(
+      process.env.RAZORPAY_TOTAL_COUNT || 12
+    );
+
     const subscription =
       await razorpay.subscriptions.create({
-        plan_id: process.env.RAZORPAY_PLAN_ID,
+        plan_id: RAZORPAY_PLAN_ID,
 
-        total_count: Number(
-          process.env.RAZORPAY_TOTAL_COUNT || 12
-        ),
+        total_count: totalCount,
 
         quantity: 1,
 
         customer_notify: true,
       });
+
+    // ------------------------------------------
+    // LOG RAZORPAY RESPONSE
+    // ------------------------------------------
 
     console.log(
       "\n========== NEW RAZORPAY RESPONSE =========="
@@ -172,8 +197,23 @@ export const createSubscription = async (req, res) => {
     );
 
     console.log(
+      "Start At:",
+      subscription.start_at
+    );
+
+    console.log(
+      "Charge At:",
+      subscription.charge_at
+    );
+
+    console.log(
       "Total Count:",
       subscription.total_count
+    );
+
+    console.log(
+      "Customer ID:",
+      subscription.customer_id
     );
 
     console.log(
@@ -181,8 +221,9 @@ export const createSubscription = async (req, res) => {
     );
 
     // ------------------------------------------
-    // SAVE NEW SUBSCRIPTION
+    // SAVE SUBSCRIPTION IN USER
     // ------------------------------------------
+
     user.subscription = {
       provider: "razorpay",
 
@@ -214,6 +255,7 @@ export const createSubscription = async (req, res) => {
     // ------------------------------------------
     // SEND DATA TO FRONTEND
     // ------------------------------------------
+
     return res.status(201).json({
       success: true,
 
@@ -224,14 +266,12 @@ export const createSubscription = async (req, res) => {
         subscription.id,
 
       keyId:
-        process.env.RAZORPAY_KEY_ID,
+        RAZORPAY_KEY_ID,
 
       planId:
         subscription.plan_id,
     });
-
   } catch (error) {
-
     console.error(
       "\n================================="
     );
@@ -403,9 +443,12 @@ export const verifySubscription = async (req, res) => {
     // COMPARE SIGNATURES
     // ------------------------------------------
 
+    const expectedBuffer = Buffer.from(generatedSignature, "utf8");
+    const receivedBuffer = Buffer.from(razorpay_signature, "utf8");
+
     if (
-      generatedSignature !==
-      razorpay_signature
+      expectedBuffer.length !== receivedBuffer.length ||
+      !crypto.timingSafeEqual(expectedBuffer, receivedBuffer)
     ) {
       console.error(
         "Invalid Razorpay payment signature"
@@ -423,8 +466,20 @@ export const verifySubscription = async (req, res) => {
     );
 
     // ------------------------------------------
-    // FETCH SUBSCRIPTION FROM RAZORPAY
+    // FETCH PAYMENT + SUBSCRIPTION
     // ------------------------------------------
+    // IMPORTANT:
+    // In Subscription Checkout, the payment_id returned to the
+    // frontend can represent the mandate/authentication entry
+    // and may be `authorized` (often ₹0), while the actual
+    // subscription charge is captured separately.
+    // Therefore, do not reject the whole subscription only
+    // because this particular payment_id is authorized.
+
+    const payment =
+      await razorpay.payments.fetch(
+        razorpay_payment_id
+      );
 
     const subscription =
       await razorpay.subscriptions.fetch(
@@ -432,36 +487,122 @@ export const verifySubscription = async (req, res) => {
       );
 
     console.log(
+      "Razorpay payment status:",
+      payment.status
+    );
+
+    console.log(
+      "Razorpay payment amount:",
+      payment.amount
+    );
+
+    console.log(
       "Razorpay subscription status:",
       subscription.status
     );
 
+    console.log(
+      "Razorpay subscription paid_count:",
+      subscription.paid_count
+    );
+
+    // A captured payment is immediately acceptable.
+    // If Checkout returned an authorized mandate payment, only
+    // continue when Razorpay also confirms that the subscription
+    // has at least one paid cycle. This avoids granting Pro just
+    // because a ₹0 mandate authorization exists.
     // ------------------------------------------
-    // VALID SUBSCRIPTION STATES
-    // ------------------------------------------
+// CHECK SUBSCRIPTION PAYMENT
+// ------------------------------------------
 
-    const validStatuses = [
-      "authenticated",
-      "active",
-    ];
 
-    if (
-      !validStatuses.includes(
-        subscription.status
-      )
-    ) {
-      console.error(
-        "Subscription is not active:",
-        subscription.status
-      );
+// ------------------------------------------
+// VERIFY ACTUAL SUBSCRIPTION INVOICE
+// ------------------------------------------
 
-      return res.status(400).json({
-        success: false,
+const invoices = await razorpay.invoices.all({
+  subscription_id: razorpay_subscription_id,
+});
 
-        message:
-          `Subscription is not active. Current status: ${subscription.status}`,
-      });
+console.log(
+  "Subscription invoices:",
+  invoices?.items?.map((invoice) => ({
+    id: invoice.id,
+    status: invoice.status,
+    paymentId: invoice.payment_id,
+    amount: invoice.amount,
+    amountPaid: invoice.amount_paid,
+  }))
+);
+
+const paidInvoice = invoices?.items?.find(
+  (invoice) =>
+    invoice.status === "paid" &&
+    Number(invoice.amount_paid || 0) > 0
+);
+
+const actualPaymentId = paidInvoice?.payment_id;
+
+let actualPayment = null;
+
+if (actualPaymentId) {
+  actualPayment =
+    await razorpay.payments.fetch(actualPaymentId);
+
+  console.log(
+    "Actual subscription payment:",
+    {
+      paymentId: actualPayment.id,
+      status: actualPayment.status,
+      amount: actualPayment.amount,
     }
+  );
+}
+
+// ------------------------------------------
+// CONFIRM REAL PAYMENT
+// ------------------------------------------
+
+const actualPaymentCaptured =
+  actualPayment?.status === "captured" &&
+  Number(actualPayment?.amount || 0) > 0;
+
+const subscriptionAlreadyPaid =
+  Number(subscription.paid_count || 0) > 0;
+
+const subscriptionConfirmed =
+  actualPaymentCaptured ||
+  subscriptionAlreadyPaid;
+
+console.log(
+  "Final subscription payment check:",
+  {
+    checkoutPaymentId: razorpay_payment_id,
+    checkoutPaymentStatus: payment.status,
+    checkoutPaymentAmount: payment.amount,
+
+    actualPaymentId,
+    actualPaymentCaptured,
+
+    subscriptionStatus: subscription.status,
+    paidCount: subscription.paid_count,
+
+    subscriptionConfirmed,
+  }
+);
+
+if (!subscriptionConfirmed) {
+  console.warn(
+    "Actual subscription payment is not confirmed yet."
+  );
+
+  return res.status(202).json({
+    success: false,
+    pending: true,
+    message:
+      "Subscription payment is being processed. Please wait for Razorpay confirmation.",
+  });
+}
 
     // ------------------------------------------
     // ACTIVATE PRO
@@ -473,7 +614,7 @@ export const verifySubscription = async (req, res) => {
       subscription.status;
 
     user.subscription.lastPaymentId =
-      razorpay_payment_id;
+                actualPaymentId || razorpay_payment_id;
 
     if (subscription.current_start) {
       user.subscription.startedAt =
@@ -559,10 +700,7 @@ export const verifySubscription = async (req, res) => {
 // ==========================================
 // RAZORPAY WEBHOOK
 // ==========================================
-export const razorpayWebhook = async (
-  req,
-  res
-) => {
+export const razorpayWebhook = async (req, res) => {
   try {
     console.log("\n=================================");
     console.log("RAZORPAY WEBHOOK RECEIVED");
@@ -582,19 +720,16 @@ export const razorpayWebhook = async (
 
       return res.status(500).json({
         success: false,
-        message:
-          "Webhook secret is not configured",
+        message: "Webhook secret is not configured",
       });
     }
 
     // ------------------------------------------
-    // GET RAZORPAY SIGNATURE
+    // GET SIGNATURE
     // ------------------------------------------
 
     const receivedSignature =
-      req.headers[
-        "x-razorpay-signature"
-      ];
+      req.headers["x-razorpay-signature"];
 
     if (!receivedSignature) {
       console.error(
@@ -603,30 +738,33 @@ export const razorpayWebhook = async (
 
       return res.status(400).json({
         success: false,
-        message:
-          "Webhook signature missing",
+        message: "Webhook signature missing",
       });
     }
 
     // ------------------------------------------
-    // GENERATE WEBHOOK SIGNATURE
+    // VERIFY SIGNATURE
+    // IMPORTANT: req.body MUST BE RAW BUFFER
     // ------------------------------------------
 
     const expectedSignature = crypto
-      .createHmac(
-        "sha256",
-        webhookSecret
-      )
+      .createHmac("sha256", webhookSecret)
       .update(req.body)
       .digest("hex");
 
-    // ------------------------------------------
-    // VERIFY WEBHOOK SIGNATURE
-    // ------------------------------------------
+    const expectedBuffer =
+      Buffer.from(expectedSignature, "utf8");
+
+    const receivedBuffer =
+      Buffer.from(receivedSignature, "utf8");
 
     if (
-      expectedSignature !==
-      receivedSignature
+      expectedBuffer.length !==
+        receivedBuffer.length ||
+      !crypto.timingSafeEqual(
+        expectedBuffer,
+        receivedBuffer
+      )
     ) {
       console.error(
         "Invalid Razorpay webhook signature"
@@ -634,8 +772,7 @@ export const razorpayWebhook = async (
 
       return res.status(400).json({
         success: false,
-        message:
-          "Invalid webhook signature",
+        message: "Invalid webhook signature",
       });
     }
 
@@ -644,7 +781,7 @@ export const razorpayWebhook = async (
     );
 
     // ------------------------------------------
-    // PARSE WEBHOOK BODY
+    // PARSE BODY AFTER SIGNATURE VERIFICATION
     // ------------------------------------------
 
     const payload = JSON.parse(
@@ -659,36 +796,41 @@ export const razorpayWebhook = async (
     );
 
     // ------------------------------------------
-    // SUBSCRIPTION ENTITY
+    // EVENT ID
+    // ------------------------------------------
+
+    const eventId =
+      req.headers["x-razorpay-event-id"];
+
+    console.log(
+      "Webhook Event ID:",
+      eventId
+    );
+
+    // ------------------------------------------
+    // ENTITIES
     // ------------------------------------------
 
     const subscriptionEntity =
       payload?.payload?.subscription?.entity;
 
-    // ------------------------------------------
-    // PAYMENT ENTITY
-    // ------------------------------------------
-
     const paymentEntity =
       payload?.payload?.payment?.entity;
 
+    const subscriptionId =
+      subscriptionEntity?.id;
+
     // ------------------------------------------
-    // LOG PAYMENT FAILURE
+    // PAYMENT FAILED
     // ------------------------------------------
 
-    if (
-      event === "payment.failed"
-    ) {
+    if (event === "payment.failed") {
       console.error(
         "\n================================="
       );
 
       console.error(
         "RAZORPAY PAYMENT FAILED"
-      );
-
-      console.error(
-        "================================="
       );
 
       console.error(
@@ -702,11 +844,6 @@ export const razorpayWebhook = async (
       );
 
       console.error(
-        "Method:",
-        paymentEntity?.method
-      );
-
-      console.error(
         "Error Code:",
         paymentEntity?.error_code
       );
@@ -717,27 +854,8 @@ export const razorpayWebhook = async (
       );
 
       console.error(
-        "Error Source:",
-        paymentEntity?.error_source
-      );
-
-      console.error(
-        "Error Step:",
-        paymentEntity?.error_step
-      );
-
-      console.error(
         "Error Reason:",
         paymentEntity?.error_reason
-      );
-
-      console.error(
-        "Full Payment Entity:",
-        JSON.stringify(
-          paymentEntity,
-          null,
-          2
-        )
       );
 
       console.error(
@@ -752,25 +870,19 @@ export const razorpayWebhook = async (
     }
 
     // ------------------------------------------
-    // CHECK SUBSCRIPTION ENTITY
+    // NO SUBSCRIPTION
     // ------------------------------------------
 
-    if (
-      !subscriptionEntity?.id
-    ) {
+    if (!subscriptionId) {
       console.log(
         "No subscription entity found"
       );
 
       return res.status(200).json({
         success: true,
-        message:
-          "Webhook received",
+        message: "Webhook received",
       });
     }
-
-    const subscriptionId =
-      subscriptionEntity.id;
 
     console.log(
       "Subscription ID:",
@@ -788,14 +900,13 @@ export const razorpayWebhook = async (
 
     if (!user) {
       console.log(
-        "Webhook received for unknown subscription:",
+        "Unknown subscription:",
         subscriptionId
       );
 
       return res.status(200).json({
         success: true,
-        message:
-          "Webhook received",
+        message: "Webhook received",
       });
     }
 
@@ -805,16 +916,29 @@ export const razorpayWebhook = async (
     );
 
     // ==========================================
-    // SUBSCRIPTION AUTHENTICATED / ACTIVATED
+    // SUBSCRIPTION AUTHENTICATED
     // ==========================================
 
     if (
       event ===
-        "subscription.authenticated" ||
+      "subscription.authenticated"
+    ) {
+      user.subscription.status =
+        subscriptionEntity.status;
+
+      console.log(
+        "Subscription authenticated:",
+        user.email
+      );
+    }
+
+    // ==========================================
+    // SUBSCRIPTION ACTIVATED
+    // ==========================================
+
+    if (
       event ===
-        "subscription.activated" ||
-      event ===
-        "subscription.charged"
+      "subscription.activated"
     ) {
       user.plan = "pro";
 
@@ -841,8 +965,44 @@ export const razorpayWebhook = async (
           );
       }
 
-      // Payment entity may be present
-      // for subscription.charged
+      console.log(
+        "Subscription activated:",
+        user.email
+      );
+    }
+
+    // ==========================================
+    // SUBSCRIPTION CHARGED
+    // ==========================================
+
+    if (
+      event ===
+      "subscription.charged"
+    ) {
+      user.plan = "pro";
+
+      user.subscription.status =
+        subscriptionEntity.status;
+
+      if (
+        subscriptionEntity.current_start
+      ) {
+        user.subscription.startedAt =
+          new Date(
+            subscriptionEntity.current_start *
+              1000
+          );
+      }
+
+      if (
+        subscriptionEntity.current_end
+      ) {
+        user.subscription.currentPeriodEnd =
+          new Date(
+            subscriptionEntity.current_end *
+              1000
+          );
+      }
 
       if (paymentEntity?.id) {
         user.subscription.lastPaymentId =
@@ -850,22 +1010,54 @@ export const razorpayWebhook = async (
       }
 
       console.log(
-        "Subscription activated for:",
+        "Subscription payment charged:",
         user.email
       );
     }
 
     // ==========================================
-    // SUBSCRIPTION ENDED / STOPPED
+    // SUBSCRIPTION PENDING
     // ==========================================
 
     if (
       event ===
-        "subscription.cancelled" ||
+      "subscription.pending"
+    ) {
+      user.subscription.status =
+        subscriptionEntity.status;
+
+      console.log(
+        "Subscription pending:",
+        user.email
+      );
+    }
+
+    // ==========================================
+    // SUBSCRIPTION HALTED
+    // ==========================================
+
+    if (
       event ===
-        "subscription.completed" ||
+      "subscription.halted"
+    ) {
+      user.plan = "free";
+
+      user.subscription.status =
+        subscriptionEntity.status;
+
+      console.log(
+        "Subscription halted:",
+        user.email
+      );
+    }
+
+    // ==========================================
+    // SUBSCRIPTION CANCELLED
+    // ==========================================
+
+    if (
       event ===
-        "subscription.halted"
+      "subscription.cancelled"
     ) {
       user.plan = "free";
 
@@ -883,7 +1075,36 @@ export const razorpayWebhook = async (
       }
 
       console.log(
-        "Subscription ended for:",
+        "Subscription cancelled:",
+        user.email
+      );
+    }
+
+    // ==========================================
+    // SUBSCRIPTION COMPLETED
+    // ==========================================
+
+    if (
+      event ===
+      "subscription.completed"
+    ) {
+      user.plan = "free";
+
+      user.subscription.status =
+        subscriptionEntity.status;
+
+      if (
+        subscriptionEntity.ended_at
+      ) {
+        user.subscription.cancelledAt =
+          new Date(
+            subscriptionEntity.ended_at *
+              1000
+          );
+      }
+
+      console.log(
+        "Subscription completed:",
         user.email
       );
     }
@@ -936,14 +1157,17 @@ export const razorpayWebhook = async (
 
     return res.status(200).json({
       success: true,
-      message:
-        "Webhook processed",
+      message: "Webhook processed",
     });
 
   } catch (error) {
-    console.error("\n=================================");
-    console.error("RAZORPAY WEBHOOK ERROR");
-    console.error("=================================");
+    console.error(
+      "\n================================="
+    );
+
+    console.error(
+      "RAZORPAY WEBHOOK ERROR"
+    );
 
     console.error(
       "Message:",
@@ -965,9 +1189,7 @@ export const razorpayWebhook = async (
 
     return res.status(500).json({
       success: false,
-
-      message:
-        "Webhook processing failed",
+      message: "Webhook processing failed",
     });
   }
 };

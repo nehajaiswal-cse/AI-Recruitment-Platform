@@ -53,7 +53,7 @@ import {
   deleteAccount,
 } from "../../api/settingsApi";
 
-import { createSubscription, verifySubscription } from "../../api/paymentApi" ;
+import { createSubscription, verifySubscription } from "../../api/paymentApi";
 
 const SectionHeader = ({ icon, iconColor, iconBg, title }) => (
   <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
@@ -366,7 +366,7 @@ const Settings = () => {
           try {
             setPaymentLoading(true);
 
-            await verifySubscription({
+            const verification = await verifySubscription({
               razorpay_payment_id: response.razorpay_payment_id,
 
               razorpay_subscription_id: response.razorpay_subscription_id,
@@ -374,12 +374,29 @@ const Settings = () => {
               razorpay_signature: response.razorpay_signature,
             });
 
-            showSnackbar("Payment successful! Talvyn Pro activated.");
+            // Update UI immediately. The backend has already
+            // verified the Razorpay signature and captured payment.
+            if (!verification?.success || verification?.plan !== "pro") {
+              throw new Error(
+                verification?.message ||
+                  "Subscription payment is still being processed.",
+              );
+            }
 
-            // Reload user data so plan becomes Pro everywhere
+            setPlan(verification.plan);
+            setSubscription(verification.subscription);
+            setSubscription(verification?.subscription || null);
+
+            showSnackbar(
+              "Payment successful! Talvyn Pro activated.",
+              "success",
+            );
+
+            // Reload once so the authenticated user state is
+            // refreshed everywhere in the application.
             setTimeout(() => {
               window.location.reload();
-            }, 1200);
+            }, 1000);
           } catch (error) {
             console.error("Payment verification error:", error);
 
@@ -402,43 +419,43 @@ const Settings = () => {
       const razorpay = new window.Razorpay(options);
 
       razorpay.on("payment.failed", function (response) {
-  console.error("\n=================================");
-  console.error("RAZORPAY PAYMENT FAILED");
-  console.error("=================================");
+        console.error("\n=================================");
+        console.error("RAZORPAY PAYMENT FAILED");
+        console.error("=================================");
 
-  console.error("FULL RESPONSE:");
-  console.error(response);
+        console.error("FULL RESPONSE:");
+        console.error(response);
 
-  console.error("\nERROR OBJECT:");
-  console.error(response?.error);
+        console.error("\nERROR OBJECT:");
+        console.error(response?.error);
 
-  console.error("\nERROR DETAILS:");
-  console.error("Code:", response?.error?.code);
-  console.error("Description:", response?.error?.description);
-  console.error("Source:", response?.error?.source);
-  console.error("Step:", response?.error?.step);
-  console.error("Reason:", response?.error?.reason);
+        console.error("\nERROR DETAILS:");
+        console.error("Code:", response?.error?.code);
+        console.error("Description:", response?.error?.description);
+        console.error("Source:", response?.error?.source);
+        console.error("Step:", response?.error?.step);
+        console.error("Reason:", response?.error?.reason);
 
-  console.error("\nMETADATA:");
-  console.error(response?.error?.metadata);
+        console.error("\nMETADATA:");
+        console.error(response?.error?.metadata);
 
-  console.error("\nPAYMENT ID:");
-  console.error(response?.error?.metadata?.payment_id);
+        console.error("\nPAYMENT ID:");
+        console.error(response?.error?.metadata?.payment_id);
 
-  console.error("\nSUBSCRIPTION ID:");
-  console.error(response?.error?.metadata?.subscription_id);
+        console.error("\nSUBSCRIPTION ID:");
+        console.error(response?.error?.metadata?.subscription_id);
 
-  console.error("=================================\n");
+        console.error("=================================\n");
 
-  const errorDescription =
-    response?.error?.description ||
-    response?.error?.reason ||
-    "Payment failed. Please try again.";
+        const errorDescription =
+          response?.error?.description ||
+          response?.error?.reason ||
+          "Payment failed. Please try again.";
 
-  showSnackbar(errorDescription, "error");
+        showSnackbar(errorDescription, "error");
 
-  setPaymentLoading(false);
-});
+        setPaymentLoading(false);
+      });
 
       razorpay.open();
     } catch (error) {

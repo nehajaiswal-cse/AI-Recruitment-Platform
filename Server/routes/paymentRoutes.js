@@ -13,9 +13,9 @@ const router = express.Router();
 
 // ==========================================
 // RAZORPAY WEBHOOK
-// IMPORTANT:
-// app.js applies express.raw() before this route
 // ==========================================
+// No auth middleware here. Razorpay calls this endpoint directly.
+// app.js applies express.raw() to this exact endpoint BEFORE express.json().
 router.post("/webhook", razorpayWebhook);
 
 // ==========================================
