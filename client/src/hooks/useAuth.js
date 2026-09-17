@@ -7,6 +7,7 @@ import {
   logoutUser,
    forgotPassword as forgotPasswordApi,
   resetPassword as resetPasswordApi,
+   googleLoginUser,
 } from "../api/authApi";
 
 const useAuth = () => {
@@ -32,6 +33,20 @@ const useAuth = () => {
       data.user ||
       data.data?.user;
 
+    setUser(loggedInUser);
+
+    return data;
+  };
+
+   const loginWithGoogle = async ({ credential, role }) => {
+    const data = await googleLoginUser({ credential, role });
+
+    const token = data.token || data.data?.token;
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+
+    const loggedInUser = data.user || data.data?.user;
     setUser(loggedInUser);
 
     return data;
@@ -101,6 +116,7 @@ const useAuth = () => {
     logout,
     forgotPassword,
     resetPassword,
+    loginWithGoogle,
   };
 
 };
