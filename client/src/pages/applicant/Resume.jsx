@@ -1,5 +1,9 @@
+const FREE_LIMIT = 5;
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import LockRoundedIcon from "@mui/icons-material/LockRounded";
 
 import {
   Alert,
@@ -99,6 +103,11 @@ const builderSections = [
 ];
 
 const Resume = () => {
+  const { user } = useContext(AuthContext);
+  const isPro = user?.plan === "pro";
+  const usedCount = user?.freeUsage?.aiResumeOptimizationCount || 0;
+  const remaining = Math.max(0, FREE_LIMIT - usedCount);
+  const hasAccess = isPro || remaining > 0;
   const navigate = useNavigate();
   const {
     resumes,
@@ -251,23 +260,22 @@ const Resume = () => {
         throw new Error("You are not logged in. Please log in again.");
       }
 
-      const apiBaseUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-      const response = await fetch("http://localhost:5000/api/ats/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        "http://localhost:5000/api/resume-optimizer/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            resumeId: selectedResumeId,
+            jobDescription,
+          }),
         },
-        body: JSON.stringify({
-          resumeId: selectedResumeId,
-          jobDescription,
-        }),
-      });
+      );
 
       const text = await response.text();
-
       let data;
 
       try {
@@ -278,13 +286,20 @@ const Resume = () => {
         );
       }
 
+      if (response.status === 403 && data.code === "PREMIUM_FEATURE_REQUIRED") {
+        setAtsError(
+          "AI Resume Optimization is a Pro feature. Upgrade to unlock it.",
+        );
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(data.message || "Failed to analyze resume");
       }
 
       setAtsResult(data);
     } catch (error) {
-      console.error("ATS analysis failed:", error);
+      console.error("Resume optimization failed:", error);
       setAtsError(error.message);
     } finally {
       setAtsLoading(false);
@@ -792,9 +807,41 @@ const Resume = () => {
 
             {/* AI ATS ANALYZER */}
             <Paper elevation={0} sx={cardSx}>
-              <Typography sx={{ fontSize: 16, fontWeight: 600, mb: 0.5 }}>
-                AI ATS resume analyzer
-              </Typography>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
+              >
+                <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                  AI ATS resume analyzer
+                </Typography>
+                <Chip
+                  icon={
+                    !isPro ? (
+                      <LockRoundedIcon sx={{ fontSize: 14 }} />
+                    ) : undefined
+                  }
+                  label="PREMIUM"
+                  size="small"
+                  sx={{
+                    bgcolor: "rgba(139,92,246,0.15)",
+                    color: "#a78bfa",
+                    fontWeight: 600,
+                    fontSize: 11,
+                  }}
+                />
+                {!isPro && hasAccess && (
+                  <Chip
+                    label={`${remaining} free left`}
+                    size="small"
+                    sx={{
+                      bgcolor: "rgba(34,197,94,0.15)",
+                      color: "#4ade80",
+                      fontWeight: 600,
+                      fontSize: 11,
+                    }}
+                  />
+                )}
+              </Box>
+
               <Typography
                 sx={{ fontSize: 12, color: "text.secondary", mb: 2.5 }}
               >
@@ -807,71 +854,106 @@ const Resume = () => {
                 </Alert>
               )}
 
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                  gap: 2,
-                  mb: 2.5,
-                }}
-              >
-                <TextField
-                  select
-                  label="Select resume"
-                  value={selectedResumeId}
-                  onChange={(e) => setSelectedResumeId(e.target.value)}
-                  size="small"
-                  fullWidth
-                  disabled={resumes.length === 0}
+              {!hasAccess ? (
+                <Box
                   sx={{
-                    "& .MuiOutlinedInput-root": {
-                      bgcolor: "background.default",
-                    },
+                    p: 3,
+                    borderRadius: 2,
+                    bgcolor: "rgba(139,92,246,0.06)",
+                    border: "1px dashed",
+                    borderColor: "rgba(139,92,246,0.3)",
+                    textAlign: "center",
                   }}
                 >
-                  {resumes.map((r) => (
-                    <MenuItem key={r._id} value={r._id}>
-                      {r.fileName}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                  <LockRoundedIcon
+                    sx={{ color: "#a78bfa", fontSize: 28, mb: 1 }}
+                  />
+                  <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 0.5 }}>
+                    Upgrade to Pro to unlock AI Resume Optimization
+                  </Typography>
+                  <Typography
+                    sx={{ fontSize: 12, color: "text.secondary", mb: 2 }}
+                  >
+                    You've used all {FREE_LIMIT} free resume analyses. Upgrade
+                    to Pro for unlimited AI-powered ATS scoring and optimization
+                    tips.
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate("/applicant/settings")}
+                  >
+                    Upgrade to Pro
+                  </Button>
+                </Box>
+              ) : (
+                <>
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                      gap: 2,
+                      mb: 2.5,
+                    }}
+                  >
+                    <TextField
+                      select
+                      label="Select resume"
+                      value={selectedResumeId}
+                      onChange={(e) => setSelectedResumeId(e.target.value)}
+                      size="small"
+                      fullWidth
+                      disabled={resumes.length === 0}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          bgcolor: "background.default",
+                        },
+                      }}
+                    >
+                      {resumes.map((r) => (
+                        <MenuItem key={r._id} value={r._id}>
+                          {r.fileName}
+                        </MenuItem>
+                      ))}
+                    </TextField>
 
-                <TextField
-                  label="Job description"
-                  placeholder="Paste the job description here..."
-                  value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                  size="small"
-                  fullWidth
-                  multiline
-                  minRows={1}
-                  maxRows={4}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      bgcolor: "background.default",
-                    },
-                  }}
-                />
-              </Box>
+                    <TextField
+                      label="Job description"
+                      placeholder="Paste the job description here..."
+                      value={jobDescription}
+                      onChange={(e) => setJobDescription(e.target.value)}
+                      size="small"
+                      fullWidth
+                      multiline
+                      minRows={1}
+                      maxRows={4}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          bgcolor: "background.default",
+                        },
+                      }}
+                    />
+                  </Box>
 
-              <Button
-                variant="contained"
-                fullWidth
-                sx={{ width: { xs: "100%", sm: "auto" } }}
-                startIcon={
-                  atsLoading ? (
-                    <CircularProgress size={16} color="inherit" />
-                  ) : (
-                    <AutoAwesomeRoundedIcon />
-                  )
-                }
-                onClick={handleAnalyzeResume}
-                disabled={
-                  !selectedResumeId || !jobDescription.trim() || atsLoading
-                }
-              >
-                {atsLoading ? "Analyzing..." : "Analyze resume"}
-              </Button>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    sx={{ width: { xs: "100%", sm: "auto" } }}
+                    startIcon={
+                      atsLoading ? (
+                        <CircularProgress size={16} color="inherit" />
+                      ) : (
+                        <AutoAwesomeRoundedIcon />
+                      )
+                    }
+                    onClick={handleAnalyzeResume}
+                    disabled={
+                      !selectedResumeId || !jobDescription.trim() || atsLoading
+                    }
+                  >
+                    {atsLoading ? "Analyzing..." : "Analyze resume"}
+                  </Button>
+                </>
+              )}
             </Paper>
 
             {/* RESUME BUILDER CHECKLIST */}

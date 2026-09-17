@@ -20,6 +20,8 @@ import Settings from "./pages/applicant/Settings";
 import Resume from "./pages/applicant/Resume";
 import ResumeBuilder from "./pages/applicant/ResumeBuilder";
 import ResumePreviewPage from "./pages/applicant/ResumePreviewPage";
+import AIInterviewCoach from "./pages/applicant/Interview/AIInterviewCoach.jsx";
+import InterviewFeedback from "./pages/applicant/Interview/InterviewFeedback.jsx";
 
 // Recruiter pages
 import RDashboard from "./pages/recruiter/Dashboard";
@@ -75,11 +77,18 @@ export default function App() {
 
           <Route path="/applicant/interviews" element={<AInterview />} />
 
+          <Route path="/applicant/interviews/coach" element={<AIInterviewCoach />} />
+
+          <Route path="/applicant/interviews/feedback" element={<InterviewFeedback />} />
+
+          <Route path="/applicant/interviews/feedback/:id" element={<InterviewFeedback />} />
+
           <Route path="/applicant/settings" element={<Settings />} />
 
           <Route path="/applicant/resume" element={<Resume />} />
 
           <Route path="/applicant/resume-builder" element={<ResumeBuilder />} />
+
 
           <Route
             path="/applicant/resume-builder/preview"
