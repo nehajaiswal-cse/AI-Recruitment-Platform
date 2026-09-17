@@ -15,7 +15,7 @@ import {
 
 import { Box, Typography, useTheme } from "@mui/material";
 
-import useAuth from "../../hooks/UseAuth";
+import useAuth from "../../hooks/useAuth";
 
 const LoginForm = ({ role = "applicant" }) => {
   const navigate = useNavigate();

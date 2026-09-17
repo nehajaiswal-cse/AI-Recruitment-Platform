@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FiMail, FiAlertCircle, FiCheckCircle, FiArrowLeft } from "react-icons/fi";
 import { Box, Typography, useTheme } from "@mui/material";
 
-import useAuth from "../../hooks/UseAuth";
+import useAuth from "../../hooks/useAuth";
 
 const ForgotPasswordForm = ({ role = "applicant" }) => {
   const theme = useTheme();
