@@ -14,14 +14,23 @@ import {
 
 const router = express.Router();
 
-// Every route below: must be logged in, must be an applicant,
-// must have the "ai_interview" premium entitlement.
-router.use(authMiddleware, roleMiddleware("applicant"), requireFeature("ai_interview"));
+// Every route: logged in + applicant
+router.use(authMiddleware, roleMiddleware("applicant"));
 
-router.post("/start", startAiInterview);
+// Only starting a NEW AI interview requires the free-limit / Pro check
+router.post(
+  "/start",
+  requireFeature("ai_interview"),
+  startAiInterview
+);
+
+// Existing interview actions remain accessible
 router.post("/:id/answer", submitAnswer);
+
 router.post("/:id/complete", completeAiInterview);
+
 router.get("/history", getAiInterviewHistory);
+
 router.get("/:id", getAiInterviewById);
 
 export default router;

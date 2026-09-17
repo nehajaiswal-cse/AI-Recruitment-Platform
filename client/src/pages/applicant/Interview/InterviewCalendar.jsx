@@ -105,8 +105,8 @@ const InterviewCalendar = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#07111f",
-        color: "#f8fafc",
+        bgcolor: colors.page,
+        color: colors.text,
         p: {
           xs: 2,
           sm: 3,
@@ -516,7 +516,7 @@ const InterviewCalendar = () => {
                 sx={{
                   p: 2.5,
                   borderRadius: 3,
-                  bgcolor: "#111c31",
+                  bgcolor: colors.cardSoft,
                   border: "1px solid #293752",
                 }}
               >
@@ -685,7 +685,7 @@ const InterviewCalendar = () => {
               sx={{
                 p: 2,
                 borderRadius: 2,
-                bgcolor: "#111c31",
+                bgcolor: colors.cardSoft,
                 border: "1px solid #24334a",
               }}
             >

@@ -1,3 +1,4 @@
+import User from "../models/user.js";
 import AiInterview from "../models/aiInterview.js";
 import {
   generateInterviewQuestions,
@@ -28,10 +29,35 @@ export const startAiInterview = async (req, res) => {
       questions: questions.map((q) => ({ question: q, answer: "" })),
     });
 
+    // Increment free usage counter (only for free-plan users)
+    let featureUsage = req.featureUsage || null;
+
+    if (req.user.plan !== "pro") {
+      const updatedUser = await User.findByIdAndUpdate(
+        req.user.id,
+        {
+          $inc: { "freeUsage.aiInterviewCount": 1 },
+        },
+        {
+          new: true,
+        },
+      ).select("freeUsage");
+
+      const used = updatedUser.freeUsage.aiInterviewCount;
+
+      featureUsage = {
+        usageKey: "aiInterviewCount",
+        used,
+        remaining: Math.max(0, 5 - used),
+        limit: 5,
+      };
+    }
+
     return res.status(201).json({
       success: true,
       message: "AI interview started",
       interview: aiInterview,
+      featureUsage,
     });
   } catch (error) {
     console.error("startAiInterview error:", error);

@@ -61,8 +61,7 @@ const AIInterviewCoach = () => {
       ? "linear-gradient(135deg,#6366f1,#8b5cf6)"
       : "linear-gradient(135deg,#6366f1,#8b5cf6)",
 
-    buttonHover:
-      "linear-gradient(135deg,#5859e8,#7c3aed)",
+    buttonHover: "linear-gradient(135deg,#5859e8,#7c3aed)",
   };
 
   // =========================================================
@@ -71,7 +70,9 @@ const AIInterviewCoach = () => {
 
   const isPro = user?.plan === "pro";
 
-  const usedCount = user?.freeUsage?.aiInterviewCount || 0;
+  const [usedCount, setUsedCount] = useState(
+    user?.freeUsage?.aiInterviewCount || 0,
+  );
   const remaining = Math.max(0, FREE_LIMIT - usedCount);
 
   const hasAccess = isPro || remaining > 0;
@@ -220,9 +221,7 @@ const AIInterviewCoach = () => {
               : "0 20px 60px rgba(15,23,42,0.08)",
           }}
         >
-          <Typography sx={{ fontSize: 42, mb: 1 }}>
-            🔒
-          </Typography>
+          <Typography sx={{ fontSize: 42, mb: 1 }}>🔒</Typography>
 
           <Typography
             sx={{
@@ -243,9 +242,9 @@ const AIInterviewCoach = () => {
               fontSize: 14,
             }}
           >
-            You've used all {FREE_LIMIT} free AI interview practices.
-            Upgrade to Pro for unlimited access to a personalized AI
-            interviewer tailored to your resume and target role.
+            You've used all {FREE_LIMIT} free AI interview practices. Upgrade to
+            Pro for unlimited access to a personalized AI interviewer tailored
+            to your resume and target role.
           </Typography>
 
           <Button
@@ -293,16 +292,29 @@ const AIInterviewCoach = () => {
         throw new Error("Interview questions could not be generated");
       }
 
+      // Update free usage count from backend
+      if (data?.featureUsage) {
+        setUsedCount(data.featureUsage.used);
+      }
+
       setInterviewId(interview._id);
       setQuestions(generatedQuestions.map((q) => q.question));
       setQuestionIndex(0);
       setAnswer("");
       setStarted(true);
     } catch (err) {
+      // Backend says free limit is reached
+      if (
+        err.response?.status === 403 &&
+        err.response?.data?.code === "PREMIUM_FEATURE_REQUIRED"
+      ) {
+        setUsedCount(FREE_LIMIT);
+      }
+
       setError(
         err.response?.data?.message ||
           err.message ||
-          "Failed to start interview"
+          "Failed to start interview",
       );
     } finally {
       setLoading(false);
@@ -320,11 +332,7 @@ const AIInterviewCoach = () => {
       setLoading(true);
       setError("");
 
-      await submitAiAnswer(
-        interviewId,
-        questionIndex,
-        answer.trim()
-      );
+      await submitAiAnswer(interviewId, questionIndex, answer.trim());
 
       // Last question
       if (questionIndex === questions.length - 1) {
@@ -342,10 +350,7 @@ const AIInterviewCoach = () => {
       setAnswer("");
       setQuestionIndex((prev) => prev + 1);
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Failed to submit answer"
-      );
+      setError(err.response?.data?.message || "Failed to submit answer");
     } finally {
       setLoading(false);
     }
@@ -396,9 +401,7 @@ const AIInterviewCoach = () => {
           {/* Header */}
           <Box sx={{ mb: 4 }}>
             <Button
-              onClick={() =>
-                navigate("/applicant/interviews")
-              }
+              onClick={() => navigate("/applicant/interviews")}
               sx={{
                 mb: 2,
                 px: 0,
@@ -459,8 +462,8 @@ const AIInterviewCoach = () => {
                 maxWidth: 650,
               }}
             >
-              Practice with an AI interviewer and build confidence
-              before your real interview.
+              Practice with an AI interviewer and build confidence before your
+              real interview.
             </Typography>
           </Box>
 
@@ -496,51 +499,83 @@ const AIInterviewCoach = () => {
                 : "0 20px 60px rgba(15,23,42,0.07)",
             }}
           >
-            {/* AI Icon */}
             <Box
               sx={{
-                width: 76,
-                height: 76,
-                borderRadius: 3,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-
-                background:
-                  "linear-gradient(135deg,#312e81,#4c1d95)",
-
-                color: "#c4b5fd",
-                mb: 2.5,
-
-                boxShadow:
-                  "0 12px 30px rgba(124,58,237,0.22)",
+                textAlign: "center",
+                mb: 4,
               }}
             >
-              <SmartToyRoundedIcon sx={{ fontSize: 38 }} />
+              {/* AI ICON */}
+              <Box
+                sx={{
+                  width: 76,
+                  height: 76,
+                  mx: "auto",
+                  mb: 2,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: isDark
+                    ? "linear-gradient(135deg, #4c1d95, #6d28d9)"
+                    : "linear-gradient(135deg, #ede9fe, #ddd6fe)",
+                  border: "1px solid rgba(124,58,237,0.45)",
+                  boxShadow: isDark
+                    ? "0 0 28px rgba(124,58,237,0.35)"
+                    : "0 8px 25px rgba(124,58,237,0.15)",
+                }}
+              >
+                <Typography sx={{ fontSize: 34 }}>🤖</Typography>
+              </Box>
+
+              {/* TITLE */}
+              <Typography
+                sx={{
+                  fontSize: { xs: 25, md: 28 },
+                  fontWeight: 800,
+                  color: colors.text,
+                  mb: 0.8,
+                }}
+              >
+                Start Your AI Interview
+              </Typography>
+
+              {/* REAL FREE COUNT */}
+              <Typography
+                sx={{
+                  fontSize: { xs: 14, md: 16 },
+                  fontWeight: 500,
+                  color: colors.muted,
+                  mb: 1.2,
+                }}
+              >
+                You have{" "}
+                <Box
+                  component="span"
+                  sx={{
+                    color: "#8b5cf6",
+                    fontWeight: 800,
+                  }}
+                >
+                  {remaining} of {FREE_LIMIT}
+                </Box>{" "}
+                free AI interview practices remaining.
+              </Typography>
+
+              {/* DESCRIPTION */}
+              <Typography
+                sx={{
+                  color: colors.muted,
+                  fontSize: 14,
+                  lineHeight: 1.6,
+                  maxWidth: 700,
+                  mx: "auto",
+                }}
+              >
+                Choose your target role and interview type. Our AI interviewer
+                will generate questions for your practice.
+              </Typography>
             </Box>
-
-            <Typography
-              sx={{
-                fontSize: { xs: 23, md: 28 },
-                fontWeight: 800,
-                color: colors.text,
-              }}
-            >
-              Start Your AI Interview
-            </Typography>
-
-            <Typography
-              sx={{
-                mt: 0.7,
-                color: colors.muted,
-                fontSize: 14,
-                maxWidth: 650,
-              }}
-            >
-              Choose your target role and interview type. Our AI
-              interviewer will generate questions for your practice.
-            </Typography>
-
             {/* Features */}
             <Box
               sx={{
@@ -555,18 +590,9 @@ const AIInterviewCoach = () => {
               }}
             >
               {[
-                [
-                  "Real-time Questions",
-                  "AI-generated questions",
-                ],
-                [
-                  "Instant Feedback",
-                  "Review your performance",
-                ],
-                [
-                  "Skill Improvement",
-                  "Practice with confidence",
-                ],
+                ["Real-time Questions", "AI-generated questions"],
+                ["Instant Feedback", "Review your performance"],
+                ["Skill Improvement", "Practice with confidence"],
               ].map(([title, subtitle]) => (
                 <Box
                   key={title}
@@ -624,17 +650,13 @@ const AIInterviewCoach = () => {
                   Frontend Developer
                 </MenuItem>
 
-                <MenuItem value="Backend Developer">
-                  Backend Developer
-                </MenuItem>
+                <MenuItem value="Backend Developer">Backend Developer</MenuItem>
 
                 <MenuItem value="Full Stack Developer">
                   Full Stack Developer
                 </MenuItem>
 
-                <MenuItem value="Software Engineer">
-                  Software Engineer
-                </MenuItem>
+                <MenuItem value="Software Engineer">Software Engineer</MenuItem>
               </TextField>
 
               <TextField
@@ -645,17 +667,11 @@ const AIInterviewCoach = () => {
                 onChange={(e) => setType(e.target.value)}
                 sx={inputStyle}
               >
-                <MenuItem value="Technical">
-                  Technical
-                </MenuItem>
+                <MenuItem value="Technical">Technical</MenuItem>
 
-                <MenuItem value="Behavioral">
-                  Behavioral
-                </MenuItem>
+                <MenuItem value="Behavioral">Behavioral</MenuItem>
 
-                <MenuItem value="Mixed">
-                  Mixed
-                </MenuItem>
+                <MenuItem value="Mixed">Mixed</MenuItem>
               </TextField>
             </Box>
 
@@ -666,9 +682,7 @@ const AIInterviewCoach = () => {
                   mt: 2,
                   p: 1.5,
                   borderRadius: 2,
-                  bgcolor: isDark
-                    ? "rgba(239,68,68,0.10)"
-                    : "#fef2f2",
+                  bgcolor: isDark ? "rgba(239,68,68,0.10)" : "#fef2f2",
                   border: "1px solid",
                   borderColor: "error.main",
                 }}
@@ -691,10 +705,7 @@ const AIInterviewCoach = () => {
               disabled={loading}
               endIcon={
                 loading ? (
-                  <CircularProgress
-                    size={17}
-                    sx={{ color: "#fff" }}
-                  />
+                  <CircularProgress size={17} sx={{ color: "#fff" }} />
                 ) : (
                   <ArrowForwardRoundedIcon />
                 )
@@ -708,8 +719,7 @@ const AIInterviewCoach = () => {
                 fontSize: 15,
                 color: "#fff",
                 background: colors.button,
-                boxShadow:
-                  "0 10px 28px rgba(99,102,241,0.22)",
+                boxShadow: "0 10px 28px rgba(99,102,241,0.22)",
 
                 "&:hover": {
                   background: colors.buttonHover,
@@ -721,9 +731,7 @@ const AIInterviewCoach = () => {
                 },
               }}
             >
-              {loading
-                ? "Preparing Interview..."
-                : "Start Practice"}
+              {loading ? "Preparing Interview..." : "Start Practice"}
             </Button>
           </Box>
         </Box>
@@ -736,9 +744,7 @@ const AIInterviewCoach = () => {
   // =========================================================
 
   const progress =
-    questions.length > 0
-      ? ((questionIndex + 1) / questions.length) * 100
-      : 0;
+    questions.length > 0 ? ((questionIndex + 1) / questions.length) * 100 : 0;
 
   return (
     <Box
@@ -818,8 +824,7 @@ const AIInterviewCoach = () => {
               bgcolor: colors.progressTrack,
 
               "& .MuiLinearProgress-bar": {
-                background:
-                  "linear-gradient(90deg,#6366f1,#8b5cf6)",
+                background: "linear-gradient(90deg,#6366f1,#8b5cf6)",
               },
             }}
           />
@@ -832,9 +837,7 @@ const AIInterviewCoach = () => {
             mb: 3,
             borderRadius: 3,
             border: "1px solid",
-            borderColor: isDark
-              ? "rgba(139,92,246,0.30)"
-              : "#ddd6fe",
+            borderColor: isDark ? "rgba(139,92,246,0.30)" : "#ddd6fe",
 
             background: isDark
               ? "linear-gradient(110deg,#171938,#11162d)"
@@ -858,12 +861,8 @@ const AIInterviewCoach = () => {
                 width: 45,
                 height: 45,
                 borderRadius: "50%",
-                bgcolor: isDark
-                  ? "#312e81"
-                  : "#ede9fe",
-                color: isDark
-                  ? "#a78bfa"
-                  : "#6d28d9",
+                bgcolor: isDark ? "#312e81" : "#ede9fe",
+                color: isDark ? "#a78bfa" : "#6d28d9",
 
                 display: "flex",
                 alignItems: "center",
@@ -962,10 +961,7 @@ const AIInterviewCoach = () => {
               disabled={!answer.trim() || loading}
               endIcon={
                 loading ? (
-                  <CircularProgress
-                    size={16}
-                    sx={{ color: "#fff" }}
-                  />
+                  <CircularProgress size={16} sx={{ color: "#fff" }} />
                 ) : (
                   <SendRoundedIcon />
                 )
@@ -1024,8 +1020,8 @@ const AIInterviewCoach = () => {
               fontSize: 13,
             }}
           >
-            Take your time. Think clearly and answer as if
-            you're in a real interview.
+            Take your time. Think clearly and answer as if you're in a real
+            interview.
           </Typography>
         </Box>
       </Box>

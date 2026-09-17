@@ -17,7 +17,7 @@ const authMiddleware = async (req, res, next) => {
 
     // Fetch fresh user so plan/role are always accurate
     const user = await User.findById(decoded.id).select(
-      "_id role plan email name"
+      "_id role plan email name freeUsage",
     );
 
     if (!user) {
@@ -30,6 +30,7 @@ const authMiddleware = async (req, res, next) => {
       id: user._id,
       role: user.role,
       plan: user.plan,
+      freeUsage: user.freeUsage,
     };
 
     next();

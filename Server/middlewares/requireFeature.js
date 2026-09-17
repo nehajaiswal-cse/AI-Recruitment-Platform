@@ -1,11 +1,8 @@
-// Feature-access / entitlement gate.
-// Usage: requireFeature("ai_interview")
-// Must run AFTER authMiddleware (needs req.user).
+const FEATURE_FREE_LIMIT = 5;
 
-const FEATURE_PLAN_MAP = {
-  ai_interview: ["pro"],
-  // future features can be added here, e.g.:
-  // ai_resume_optimization: ["pro"],
+const FEATURE_USAGE_KEY = {
+  ai_interview: "aiInterviewCount",
+  ai_resume_optimization: "aiResumeOptimizationCount",
 };
 
 const requireFeature = (featureKey) => {
@@ -17,25 +14,40 @@ const requireFeature = (featureKey) => {
       });
     }
 
-    const allowedPlans = FEATURE_PLAN_MAP[featureKey];
+    const usageKey = FEATURE_USAGE_KEY[featureKey];
 
-    if (!allowedPlans) {
-      // Unknown feature key — fail safe, deny access
+    if (!usageKey) {
       return res.status(500).json({
         success: false,
         message: "Feature configuration error",
       });
     }
 
-    const userPlan = req.user.plan || "free";
+    // Pro users — unlimited access
+    if (req.user.plan === "pro") {
+      return next();
+    }
 
-    if (!allowedPlans.includes(userPlan)) {
+    // Free users — check lifetime usage count
+    const usedCount = req.user.freeUsage?.[usageKey] || 0;
+
+    if (usedCount >= FEATURE_FREE_LIMIT) {
       return res.status(403).json({
         success: false,
         code: "PREMIUM_FEATURE_REQUIRED",
-        message: "This feature requires a Pro subscription.",
+        message: `You've used all ${FEATURE_FREE_LIMIT} free tries. Upgrade to Pro for unlimited access.`,
+        limit: FEATURE_FREE_LIMIT,
+        used: usedCount,
       });
     }
+
+    // Attach remaining count for controller/response use
+    req.featureUsage = {
+      usageKey,
+      used: usedCount,
+      remaining: FEATURE_FREE_LIMIT - usedCount,
+      limit: FEATURE_FREE_LIMIT,
+    };
 
     next();
   };

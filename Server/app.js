@@ -13,6 +13,8 @@ import settingsRoutes from "./routes/settingsRoutes.js";
 import recruiterSettingsRoutes from "./routes/recruiterSettingsRoutes.js";
 import resumeBuilderRoutes from "./routes/resumeBuilderRoutes.js";
 import aiInterviewRoutes from "./routes/aiInterviewRoutes.js";
+import resumeOptimizerRoutes from "./routes/resumeOptimizerRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 
 
@@ -23,7 +25,14 @@ app.use(cors({
   credentials: true 
 }))
 
+// Razorpay webhook must receive the raw request body
+app.use(
+  "/api/payments/webhook",
+  express.raw({ type: "application/json" })
+);
+
 app.use(express.json());
+
 app.use("/api", protectedRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
@@ -37,6 +46,8 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/recruiter/settings", recruiterSettingsRoutes);
 app.use("/api/resume-builder", resumeBuilderRoutes);
 app.use("/api/ai-interviews", aiInterviewRoutes);
+app.use("/api/resume-optimizer", resumeOptimizerRoutes);
+app.use("/api/payments", paymentRoutes);
 
 app.get("/", (req, res) => {
   res.json({

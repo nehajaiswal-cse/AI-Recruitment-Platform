@@ -700,112 +700,216 @@ const Interviews = () => {
         </Box>
       )}
 
-      {/* =====================================================
-          AI INTERVIEW COACH
-      ===================================================== */}
+   {/* =====================================================
+    AI INTERVIEW COACH
+===================================================== */}
 
+<Box
+  sx={{
+    position: "relative",
+    overflow: "hidden",
+    mb: 3,
+    borderRadius: 4,
+    border: "1px solid",
+    borderColor: isDark
+      ? "rgba(139,92,246,0.30)"
+      : "rgba(124,58,237,0.20)",
+    background: isDark
+      ? `
+        radial-gradient(circle at 85% 20%, rgba(124,58,237,0.24), transparent 32%),
+        radial-gradient(circle at 15% 100%, rgba(99,102,241,0.12), transparent 35%),
+        linear-gradient(135deg,#12182b,#0c1424)
+      `
+      : `
+        radial-gradient(circle at 85% 20%, rgba(139,92,246,0.14), transparent 32%),
+        linear-gradient(135deg,#f7f5ff,#ffffff)
+      `,
+    p: { xs: 2.5, md: 3.5 },
+  }}
+>
+  {/* Glow */}
+  <Box
+    sx={{
+      position: "absolute",
+      width: 180,
+      height: 180,
+      borderRadius: "50%",
+      right: -70,
+      top: -70,
+      background: isDark
+        ? "rgba(124,58,237,0.12)"
+        : "rgba(124,58,237,0.06)",
+      filter: "blur(4px)",
+      pointerEvents: "none",
+    }}
+  />
+
+  <Box
+    sx={{
+      position: "relative",
+      zIndex: 1,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 3,
+      flexDirection: { xs: "column", sm: "row" },
+    }}
+  >
+    {/* LEFT */}
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        minWidth: 0,
+      }}
+    >
       <Box
         sx={{
-          position: "relative",
-          overflow: "hidden",
+          width: 62,
+          height: 62,
+          borderRadius: 3,
+          flexShrink: 0,
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          gap: 2,
-          p: {
-            xs: 2,
-            md: 2.5,
-          },
-          mb: 3,
-          borderRadius: 3,
-          border: "1px solid",
-          borderColor: isDark ? "#2d285e" : "#ddd6fe",
-
+          justifyContent: "center",
           background: isDark
-            ? "linear-gradient(110deg,#171938,#11162d)"
-            : "linear-gradient(110deg,#f5f3ff,#fafafa)",
-
-          flexDirection: {
-            xs: "column",
-            sm: "row",
-          },
+            ? "linear-gradient(135deg,#312e81,#4c1d95)"
+            : "linear-gradient(135deg,#ede9fe,#ddd6fe)",
+          color: isDark ? "#c4b5fd" : "#6d28d9",
+          boxShadow: isDark
+            ? "0 10px 30px rgba(124,58,237,0.20)"
+            : "0 10px 30px rgba(124,58,237,0.12)",
         }}
       >
+        <SmartToyRoundedIcon sx={{ fontSize: 32 }} />
+      </Box>
+
+      <Box>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 1.8,
+            gap: 1,
+            flexWrap: "wrap",
           }}
         >
-          <Box
+          <Typography
             sx={{
-              width: 48,
-              height: 48,
-              borderRadius: "50%",
-              bgcolor: isDark ? "#312e81" : "#ede9fe",
-              color: isDark ? "#a78bfa" : "#7c3aed",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
+              fontSize: { xs: 18, md: 20 },
+              fontWeight: 750,
+              color: "text.primary",
             }}
           >
-            <SmartToyRoundedIcon />
-          </Box>
+            AI Interview Coach
+          </Typography>
 
-          <Box>
-            <Typography
-              sx={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: "text.primary",
-              }}
-            >
-              AI Interview Coach
-            </Typography>
-
-            <Typography
-              sx={{
-                mt: 0.4,
-                color: "text.secondary",
-                fontSize: 13,
-              }}
-            >
-              Practice before your real interview
-              with an AI interviewer.
-            </Typography>
+          <Box
+            sx={{
+              px: 1,
+              py: 0.3,
+              borderRadius: 5,
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: 0.5,
+              color: isDark ? "#c4b5fd" : "#6d28d9",
+              backgroundColor: isDark
+                ? "rgba(124,58,237,0.16)"
+                : "#ede9fe",
+              border: "1px solid",
+              borderColor: isDark
+                ? "rgba(167,139,250,0.30)"
+                : "#ddd6fe",
+            }}
+          >
+            PREMIUM
           </Box>
         </Box>
 
-        <Button
-          onClick={() =>
-            navigate(
-              "/applicant/interviews/coach"
-            )
-          }
-          endIcon={
-            <ArrowForwardRoundedIcon />
-          }
+        <Typography
           sx={{
-            bgcolor: "primary.main",
-            color: "#fff",
-            textTransform: "none",
-            borderRadius: 2,
-            px: 2.2,
-            py: 1,
-            fontWeight: 600,
-            flexShrink: 0,
-
-            "&:hover": {
-              bgcolor: "primary.dark",
-            },
+            mt: 0.5,
+            color: "text.secondary",
+            fontSize: 13,
+            maxWidth: 570,
           }}
         >
-          Start Practicing
-        </Button>
-      </Box>
+          Practice with an AI interviewer and improve your interview
+          performance before the real interview.
+        </Typography>
 
+        {/* FEATURES */}
+        <Box
+          sx={{
+            display: "flex",
+            gap: { xs: 1.5, md: 2.5 },
+            mt: 1.5,
+            flexWrap: "wrap",
+          }}
+        >
+          {[
+            "Real-time Questions",
+            "Instant Feedback",
+            "Improve Skills",
+          ].map((item) => (
+            <Box
+              key={item}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.6,
+              }}
+            >
+              <CheckCircleRoundedIcon
+                sx={{
+                  fontSize: 15,
+                  color: isDark ? "#a78bfa" : "#7c3aed",
+                }}
+              />
+
+              <Typography
+                sx={{
+                  fontSize: 11.5,
+                  color: "text.secondary",
+                  fontWeight: 500,
+                }}
+              >
+                {item}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </Box>
+
+    {/* CTA */}
+    <Button
+      onClick={() =>
+        navigate("/applicant/interviews/coach")
+      }
+      endIcon={<ArrowForwardRoundedIcon />}
+      variant="contained"
+      sx={{
+        flexShrink: 0,
+        textTransform: "none",
+        fontWeight: 700,
+        borderRadius: 2.5,
+        px: 2.6,
+        py: 1.2,
+        color: "#fff",
+        background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+        boxShadow: "0 8px 22px rgba(99,102,241,0.25)",
+
+        "&:hover": {
+          background: "linear-gradient(135deg,#5859e8,#7c3aed)",
+          boxShadow: "0 10px 28px rgba(99,102,241,0.32)",
+        },
+      }}
+    >
+      Start Practicing
+    </Button>
+  </Box>
+</Box>
 
 {/* =====================================================
           AI PRACTICE HISTORY 
