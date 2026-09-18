@@ -92,7 +92,15 @@ const userSchema = new mongoose.Schema(
       default: true
     },
     // ---- Subscription / Premium plan ----
-
+    resetPasswordToken: {
+      type: String,
+      select: false
+    },
+    resetPasswordExpires: {
+      type: Date,
+      select: false
+    }
+  },
     plan: {
       type: String,
       enum: ["free", "pro"],
