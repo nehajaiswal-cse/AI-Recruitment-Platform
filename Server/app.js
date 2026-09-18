@@ -13,7 +13,8 @@ import atsRoutes from "./routes/atsRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import recruiterSettingsRoutes from "./routes/recruiterSettingsRoutes.js";
 import resumeBuilderRoutes from "./routes/resumeBuilderRoutes.js";
-import copilotRoutes from "./routes/copilotRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import copilotRoutes from "./routes/copilotRoutes.js"
 import aiInterviewRoutes from "./routes/aiInterviewRoutes.js";
 import resumeOptimizerRoutes from "./routes/resumeOptimizerRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
@@ -73,7 +74,8 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/recruiter/settings", recruiterSettingsRoutes);
 
 app.use("/api/resume-builder", resumeBuilderRoutes);
-app.use("/api/copilot", copilotRoutes);
+app.use("/api/copilot",copilotRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/ai-interviews", aiInterviewRoutes);
 app.use("/api/resume-optimizer", resumeOptimizerRoutes);
 
