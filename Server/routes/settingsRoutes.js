@@ -12,7 +12,7 @@ import {
   deactivateAccount,
   reactivateAccount,
   deleteAccount,
-} from "../controllers/SettingsController.js";
+} from "../controllers/settingsController.js";
 
 const router = express.Router();
 

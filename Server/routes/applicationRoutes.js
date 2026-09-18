@@ -1,5 +1,5 @@
 import express from "express";
-import { applyForJob , getMyApplications, getJobApplications, updateApplicationStatus} from "../controllers/applicationController.js";
+import { applyForJob , getMyApplications, getJobApplications, updateApplicationStatus, withdrawApplication} from "../controllers/applicationController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/upload.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
@@ -35,6 +35,13 @@ router.put(
   authMiddleware,
   roleMiddleware("recruiter"),
   updateApplicationStatus
+);
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware("applicant"),
+  withdrawApplication
 );
 
 export default router;

@@ -22,15 +22,17 @@ const app = express();
 // ==========================================
 // CORS
 // ==========================================
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-    ],
-    credentials: true,
-  })
-);
+
+
+import copilotRoutes from "./routes/copilotRoutes.js"
+
+
+const app = express();
+
+app.use(cors({ 
+  origin: ["http://localhost:5173", "http://localhost:5174",process.env.CLIENT_URL],
+  credentials: true 
+}))
 
 // ==========================================
 // RAZORPAY WEBHOOK RAW BODY
@@ -62,10 +64,7 @@ app.use("/api/ats", atsRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/recruiter/settings", recruiterSettingsRoutes);
 app.use("/api/resume-builder", resumeBuilderRoutes);
-app.use("/api/ai-interviews", aiInterviewRoutes);
-app.use("/api/resume-optimizer", resumeOptimizerRoutes);
-app.use("/api/payments", paymentRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/api/copilot",copilotRoutes);
 
 // ==========================================
 // HEALTH CHECK
@@ -83,5 +82,7 @@ app.get("/home", (req, res) => {
     message: "AI Recruitment Platform API is running",
   });
 });
+
+app.use("/api/auth", authRoutes);
 
 export default app;

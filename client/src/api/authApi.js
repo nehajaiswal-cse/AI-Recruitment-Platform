@@ -16,6 +16,22 @@ export const loginUser = async (formData) => {
   }
 };
 
+export const googleLoginUser = async ({ credential, role }) => {
+  try {
+    const response = await api.post("/auth/google", { credential, role });
+    return response.data;
+  } catch (error) {
+    console.error("Google login error:", error);
+
+    throw new Error(
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Google sign-in failed. Please try again.",
+      { cause: error }
+    );
+  }
+};
+
 export const registerUser = async (formData) => {
   try {
     const response = await api.post("/auth/register", formData);
@@ -43,6 +59,40 @@ export const logoutUser = async () => {
       error.response?.data?.message ||
         error.response?.data?.error ||
         "Logout failed. Please try again.",
+      { cause: error }
+    );
+  }
+};
+
+export const forgotPassword = async ({ email, role }) => {
+  try {
+    const response = await api.post("/auth/forgot-password", { email, role });
+    return response.data;
+  } catch (error) {
+    console.error("Forgot password error:", error);
+
+    throw new Error(
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Could not process request. Please try again.",
+      { cause: error }
+    );
+  }
+};
+
+export const resetPassword = async ({ token, password }) => {
+  try {
+    const response = await api.post(`/auth/reset-password/${token}`, {
+      password,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Reset password error:", error);
+
+    throw new Error(
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Could not reset password. Please try again.",
       { cause: error }
     );
   }
