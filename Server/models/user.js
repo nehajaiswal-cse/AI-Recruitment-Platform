@@ -91,6 +91,59 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    // ---- Subscription / Premium plan ----
+
+    plan: {
+      type: String,
+      enum: ["free", "pro"],
+      default: "free"
+    },
+    freeUsage: {
+  aiInterviewCount: { type: Number, default: 0 },
+  aiResumeOptimizationCount: { type: Number, default: 0 },
+},
+
+subscription: {
+  provider: {
+    type: String,
+    default: null,
+  },
+
+  razorpaySubscriptionId: {
+    type: String,
+    default: null,
+  },
+
+  razorpayPlanId: {
+    type: String,
+    default: null,
+  },
+
+  status: {
+    type: String,
+    default: null,
+  },
+
+  currentPeriodEnd: {
+    type: Date,
+    default: null,
+  },
+
+  startedAt: {
+    type: Date,
+    default: null,
+  },
+
+  cancelledAt: {
+    type: Date,
+    default: null,
+  },
+
+  lastPaymentId: {
+    type: String,
+    default: null,
+  },
+}
     resetPasswordToken: {
       type: String,
       select: false
