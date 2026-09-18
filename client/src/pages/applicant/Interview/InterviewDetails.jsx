@@ -165,7 +165,7 @@ const InterviewDetails = () => {
       <Box
         sx={{
           minHeight: "100vh",
-          bgcolor: "#07111f",
+          bgcolor: colors.page,
           color: "#f8fafc",
           display: "flex",
           alignItems: "center",
@@ -249,7 +249,7 @@ const role =
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#07111f",
+        bgcolor: colors.page,
         color: "#f8fafc",
         p: {
           xs: 2,

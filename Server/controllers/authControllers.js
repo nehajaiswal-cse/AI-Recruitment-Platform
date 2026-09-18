@@ -3,6 +3,9 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import transporter from "../config/mailer.js";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // REGISTER
 export const register = async (req, res) => {
@@ -261,6 +264,76 @@ export const resetPassword = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+// GOOGLE LOGIN / SIGNUP
+export const googleLogin = async (req, res) => {
+  try {
+    const { credential, role } = req.body;
+
+    if (!credential || !role) {
+      return res.status(400).json({
+        message: "Missing Google credential or role",
+      });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email.toLowerCase();
+    const name = payload.name;
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // Existing account — make sure they're using the right role's login
+      if (user.role !== role) {
+        return res.status(400).json({
+          message: `This account is registered as a ${user.role}, not a ${role}.`,
+        });
+      }
+    } else {
+      // New account — create one. Google users get a random unusable
+      // password since our schema requires one; they can set a real
+      // password later via "Forgot password" if they ever want to.
+      const randomPassword = crypto.randomBytes(20).toString("hex");
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      user = await User.create({
+        name: name || email.split("@")[0],
+        email,
+        password: hashedPassword,
+        role,
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: "Google login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({
+      message: "Google sign-in failed. Please try again.",
       error: error.message,
     });
   }

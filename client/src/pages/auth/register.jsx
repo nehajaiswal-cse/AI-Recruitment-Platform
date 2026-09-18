@@ -28,7 +28,7 @@ import {
   FiCheck,
 } from "react-icons/fi";
 
-import useAuth from "../../hooks/UseAuth";
+import useAuth from "../../hooks/useAuth";
 
 import { brandGradient } from "../../theme";
 

@@ -17,7 +17,7 @@ import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import {
   exportBuilderResume,
   getMyBuilderResume,
-} from "../../api/resumeBuilderApi";
+} from "../../api/resumebuilderApi";
 
 import { ResumePreview, TEMPLATES } from "./ResumeBuilder";
 

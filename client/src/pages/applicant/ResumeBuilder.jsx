@@ -36,7 +36,7 @@ import {
   getMyBuilderResume,
   saveBuilderResume,
   exportBuilderResume,
-} from "../../api/resumeBuilderApi";
+} from "../../api/resumebuilderApi";
 
 import ANavbar from "../../components/layout/applicant/Navbar";
 

@@ -16,6 +16,22 @@ export const loginUser = async (formData) => {
   }
 };
 
+export const googleLoginUser = async ({ credential, role }) => {
+  try {
+    const response = await api.post("/auth/google", { credential, role });
+    return response.data;
+  } catch (error) {
+    console.error("Google login error:", error);
+
+    throw new Error(
+      error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Google sign-in failed. Please try again.",
+      { cause: error }
+    );
+  }
+};
+
 export const registerUser = async (formData) => {
   try {
     const response = await api.post("/auth/register", formData);
