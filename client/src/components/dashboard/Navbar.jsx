@@ -15,6 +15,7 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 
 import Logo from '../common/Logo.jsx'
 import ThemeToggle from '../common/ThemeToggle.jsx'
+import NotificationBell from '../notifications/NotificationsBell.jsx' 
 
 const Navbar = ({
   links = [],
@@ -224,19 +225,37 @@ const Navbar = ({
         )}
 
 
-        {/* ========================= */}
-        {/* THEME TOGGLE */}
-        {/* ========================= */}
+      
+{/* NOTIFICATIONS */}
 
-        <Box
-          sx={{
-            flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <ThemeToggle />
-        </Box>
+{showLogout && (
+  <Box
+    sx={{ 
+      flexShrink: 0,
+      display: 'flex',
+      alignItems: 'center',   
+  }}
+  >
+    <NotificationBell />
+  </Box>
+)}    
+
+
+
+
+{/* ========================= */}
+{/* THEME TOGGLE */}
+{/* ========================= */}
+
+<Box
+  sx={{
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+  }}
+>
+  <ThemeToggle />
+</Box>
 
 
         {/* ========================= */}

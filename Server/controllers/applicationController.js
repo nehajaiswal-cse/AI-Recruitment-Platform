@@ -2,6 +2,7 @@
 import Application from "../models/applications.js";
 import Job from "../models/job.js";
 import Candidate from "../models/candidate.js";
+import { createNotification } from "../utils/createNotification.js";
 
 import {
   S3Client,
@@ -137,6 +138,21 @@ const applyForJob = async (req, res) => {
       status: "applied",
     });
 
+    console.log("🔔 ABOUT TO CREATE NOTIFICATION");
+console.log("Recruiter ID:", job.recruiterId);
+console.log("Job ID:", job._id);
+console.log("Job title:", job.title);
+console.log("Application ID:", application._id);
+
+    const noti = await createNotification({
+      recipientId: job.recruiterId,
+      type: "application",
+      title: "New Application",
+      message: `A new candidate has applied for ${job.title}.`,
+      link: `/recruiter/applications/${application._id}`,
+    });
+
+    console.log(noti)
 
     // =================================================
     // CREATE CANDIDATE
@@ -350,6 +366,22 @@ const updateApplicationStatus = async (req, res) => {
     application.status = status;
 
     await application.save();
+
+    console.log("🔔 ABOUT TO CREATE NOTIFICATION");
+console.log("Recruiter ID:", job.recruiterId);
+console.log("Job ID:", job._id);
+console.log("Job title:", job.title);
+console.log("Application ID:", application._id);
+
+const noti = await createNotification({
+  recipientId: job.recruiterId,
+  type: "application",
+  title: "New Application",
+  message: `A new candidate has applied for ${job.title}.`,
+  link: `/recruiter/applications/${application._id}`,
+});
+
+console.log("🔔 NOTIFICATION RESULT:", noti);
 
 
     return res.status(200).json({
