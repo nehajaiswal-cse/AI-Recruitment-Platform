@@ -17,7 +17,7 @@ import { GoogleLogin } from "@react-oauth/google";
 
 import { Box, Typography, useTheme } from "@mui/material";
 
-import useAuth from "../../hooks/UseAuth";
+import useAuth from "../../hooks/useAuth";
 
 //Login Form
 
