@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -5,7 +6,7 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     email: {
@@ -13,22 +14,22 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
-      trim: true
+      trim: true,
     },
 
     password: {
       type: String,
-      required: true
+      required: true,
     },
 
     role: {
       type: String,
       enum: ["recruiter", "applicant"],
-      required: true
+      required: true,
     },
 
     phone: {
-      type: String
+      type: String,
     },
 
     profile: {
@@ -38,125 +39,176 @@ const userSchema = new mongoose.Schema(
       location: String,
       companyName: String,
       companyWebsite: String,
-      companyDescription: String
+      companyDescription: String,
     },
 
-    // ---- Settings page fields (new) ----
+    // ---- Settings page fields ----
     jobPreferences: {
-      preferredRole: { type: String, default: "" },
-      preferredLocation: { type: String, default: "" },
+      preferredRole: {
+        type: String,
+        default: "",
+      },
+
+      preferredLocation: {
+        type: String,
+        default: "",
+      },
+
       workMode: {
         type: String,
         enum: ["Remote", "Hybrid", "On-site"],
-        default: "Hybrid"
+        default: "Hybrid",
       },
-      expectedSalary: { type: String, default: "" },
+
+      expectedSalary: {
+        type: String,
+        default: "",
+      },
+
       experienceLevel: {
         type: String,
         enum: ["Fresher", "Mid level (2-4 yrs)", "Senior (5+ yrs)"],
-        default: "Fresher"
+        default: "Fresher",
       },
+
       employmentType: {
         type: String,
         enum: ["Full-time", "Part-time", "Internship"],
-        default: "Full-time"
-      }
+        default: "Full-time",
+      },
     },
 
     notifications: {
-      jobRecommendations: { type: Boolean, default: true },
-      newJobAlerts: { type: Boolean, default: true },
-      applicationUpdates: { type: Boolean, default: true },
-      recruiterMessages: { type: Boolean, default: true },
-      emailNotifications: { type: Boolean, default: true },
-      pushNotifications: { type: Boolean, default: false }
+      jobRecommendations: {
+        type: Boolean,
+        default: true,
+      },
+
+      newJobAlerts: {
+        type: Boolean,
+        default: true,
+      },
+
+      applicationUpdates: {
+        type: Boolean,
+        default: true,
+      },
+
+      recruiterMessages: {
+        type: Boolean,
+        default: true,
+      },
+
+      emailNotifications: {
+        type: Boolean,
+        default: true,
+      },
+
+      pushNotifications: {
+        type: Boolean,
+        default: false,
+      },
     },
 
     privacy: {
       profileVisibility: {
         type: String,
         enum: ["Public", "Recruiters only", "Private"],
-        default: "Public"
+        default: "Public",
       },
+
       resumeVisibility: {
         type: String,
         enum: ["Everyone", "Recruiters only", "No one"],
-        default: "Recruiters only"
+        default: "Recruiters only",
       },
-      twoFactorEnabled: { type: Boolean, default: false }
-    },
-    // ---- end settings fields ----
 
+      twoFactorEnabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
+
+    // ---- Account status ----
     isActive: {
       type: Boolean,
-      default: true
-    },
-    resetPasswordToken: {
-      type: String,
-      select: false
-    },
-    resetPasswordExpires: {
-      type: Date,
-      select: false
+      default: true,
     },
 
-    // ---- Subscription / Premium plan ----//
-
+    // ---- Subscription / Premium plan ----
     plan: {
       type: String,
       enum: ["free", "pro"],
-      default: "free"
+      default: "free",
     },
+
     freeUsage: {
-  aiInterviewCount: { type: Number, default: 0 },
-  aiResumeOptimizationCount: { type: Number, default: 0 },
-},
+      aiInterviewCount: {
+        type: Number,
+        default: 0,
+      },
 
-subscription: {
-  provider: {
-    type: String,
-    default: null,
-  },
+      aiResumeOptimizationCount: {
+        type: Number,
+        default: 0,
+      },
+    },
 
-  razorpaySubscriptionId: {
-    type: String,
-    default: null,
-  },
+    subscription: {
+      provider: {
+        type: String,
+        default: null,
+      },
 
-  razorpayPlanId: {
-    type: String,
-    default: null,
-  },
+      razorpaySubscriptionId: {
+        type: String,
+        default: null,
+      },
 
-  status: {
-    type: String,
-    default: null,
-  },
+      razorpayPlanId: {
+        type: String,
+        default: null,
+      },
 
-  currentPeriodEnd: {
-    type: Date,
-    default: null,
-  },
+      status: {
+        type: String,
+        default: null,
+      },
 
-  startedAt: {
-    type: Date,
-    default: null,
-  },
+      currentPeriodEnd: {
+        type: Date,
+        default: null,
+      },
 
-  cancelledAt: {
-    type: Date,
-    default: null,
-  },
+      startedAt: {
+        type: Date,
+        default: null,
+      },
 
-  lastPaymentId: {
-    type: String,
-    default: null,
-  },
-}
+      cancelledAt: {
+        type: Date,
+        default: null,
+      },
 
+      lastPaymentId: {
+        type: String,
+        default: null,
+      },
+    },
+
+    // ---- Forgot password ----
+    resetPasswordToken: {
+      type: String,
+      default: null,
+    },
+
+    resetPasswordExpires: {
+      type: Date,
+      default: null,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
