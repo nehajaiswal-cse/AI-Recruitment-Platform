@@ -5,7 +5,7 @@ import '../../../index.css';
 const applicantLinks = [
   {
     label: "Dashboard",
-    path: "/applicant/dashboard",
+    path: "/applicant",
   },
   {
     label: "Find Jobs",
@@ -13,7 +13,7 @@ const applicantLinks = [
   },
   {
     label: "Saved Jobs",
-    path: "/applicant/candidates",
+    path: "/applicant/saved-jobs",
   },
   {
     label: "Applications",

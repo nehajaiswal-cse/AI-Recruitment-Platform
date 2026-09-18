@@ -1,9 +1,13 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import transporter from "../config/mailer.js";
+import { OAuth2Client } from "google-auth-library";
 
-//  REGISTER 
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// REGISTER
 export const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -15,7 +19,7 @@ export const register = async (req, res) => {
       });
     }
 
-    // 2. Check if user already exists
+    // 2. Check existing user
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -35,9 +39,24 @@ export const register = async (req, res) => {
       role,
     });
 
-    // 5. Send response
+    // 5. Generate JWT token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    // 6. Send response
     res.status(201).json({
       message: "User registered successfully",
+
+      token,
+
       user: {
         id: user._id,
         name: user.name,
@@ -53,8 +72,8 @@ export const register = async (req, res) => {
   }
 };
 
-//  LOGIN 
 
+// LOGIN
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -87,22 +106,24 @@ export const login = async (req, res) => {
       });
     }
 
-    // 5. Generate JWT token
+    // 4. Generate JWT
     const token = jwt.sign(
       {
         id: user._id,
-        role: user.role
+        role: user.role,
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "7d"
+        expiresIn: "7d",
       }
     );
 
-    // 6. Send response
+    // 5. Send response
     res.status(200).json({
       message: "Login successful",
+
       token,
+
       user: {
         id: user._id,
         name: user.name,
@@ -117,6 +138,9 @@ export const login = async (req, res) => {
     });
   }
 };
+
+
+// LOGOUT
 export const logout = async (req, res) => {
   try {
     res.status(200).json({
@@ -125,6 +149,191 @@ export const logout = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+// FORGOT PASSWORD - request a reset link
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email, role } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        message: "Email is required",
+      });
+    }
+
+    const genericResponse = {
+      message:
+        "If an account with that email exists, a password reset link has been sent.",
+    };
+
+    const query = { email: email.toLowerCase() };
+    if (role) query.role = role;
+
+    const user = await User.findOne(query);
+
+    if (!user) {
+      return res.status(200).json(genericResponse);
+    }
+
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 30 * 60 * 1000;
+    await user.save();
+
+    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${rawToken}`;
+
+    try {
+      await transporter.sendMail({
+        from: `"Talvyn Recruitment" <${process.env.EMAIL_USER}>`,
+        to: user.email,
+        subject: "Reset your Talvyn password",
+        html: `
+          <p>Hi ${user.name || "there"},</p>
+          <p>We received a request to reset your password. This link will expire in 30 minutes.</p>
+          <p><a href="${resetUrl}" target="_blank" rel="noopener noreferrer">Reset your password</a></p>
+          <p>If you didn't request this, you can safely ignore this email.</p>
+        `,
+      });
+    } catch (emailError) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+
+      console.error("Failed to send reset email:", emailError);
+      return res.status(500).json({
+        message: "Could not send reset email. Please try again later.",
+      });
+    }
+
+    return res.status(200).json(genericResponse);
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+// RESET PASSWORD - use the token from the email to set a new password
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password || password.length < 8) {
+      return res.status(400).json({
+        message: "Password must be at least 8 characters",
+      });
+    }
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    }).select("+resetPasswordToken +resetPasswordExpires +password");
+
+    if (!user) {
+      return res.status(400).json({
+        message: "This reset link is invalid or has expired",
+      });
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    return res.status(200).json({
+      message: "Your password has been reset. You can now sign in.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+// GOOGLE LOGIN / SIGNUP
+export const googleLogin = async (req, res) => {
+  try {
+    const { credential, role } = req.body;
+
+    if (!credential || !role) {
+      return res.status(400).json({
+        message: "Missing Google credential or role",
+      });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const email = payload.email.toLowerCase();
+    const name = payload.name;
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // Existing account — make sure they're using the right role's login
+      if (user.role !== role) {
+        return res.status(400).json({
+          message: `This account is registered as a ${user.role}, not a ${role}.`,
+        });
+      }
+    } else {
+      // New account — create one. Google users get a random unusable
+      // password since our schema requires one; they can set a real
+      // password later via "Forgot password" if they ever want to.
+      const randomPassword = crypto.randomBytes(20).toString("hex");
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      user = await User.create({
+        name: name || email.split("@")[0],
+        email,
+        password: hashedPassword,
+        role,
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: "Google login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({
+      message: "Google sign-in failed. Please try again.",
       error: error.message,
     });
   }

@@ -1,44 +1,108 @@
-
-import Navbar from '../../components/layout/applicant/Navbar';
+import Box from '@mui/material/Box'
+import ANavbar from '../../components/layout/applicant/Navbar';
 import ASidebar from '../../components/layout/applicant/Sidebar';
-//import Topbar from '../../components/layout/applicant/Topbar';
+import Topbar from '../../components/layout/applicant/Topbar';
+import Greeting from '../../components/layout/applicant/WelcomeHeader';
+import StatsRow from '../../components/sections/applicant/StatsRow';
+import RecommendedJobs from '../../components/sections/applicant/RecommendedJobs'
+import UpcomingInterviews from '../../components/sections/applicant/UpcomingInterviews'
+import RecentApplications from '../../components/sections/applicant/RecentApplications'
 
+
+
+import {
+  recommendedJobs,
+  upcomingInterviews,
+} from '../../data/dashboardData';
 
 const ADashboard = () => {
   return (
-    
+    <Box
+      sx={{
+        minHeight: '100vh',
+        bgcolor: 'background.default',
+        color: 'text.primary',
+      }}
+    >
+      {/* Navbar */}
+      <Box
+        component="header"
+        sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+        }}
+      >
+        <ANavbar />
+      </Box>
 
-    <div className="min-h-screen bg-gray-700">
-        <header className="sticky top-0 z-50">
-          <Navbar />
-        </header> 
-
-      <div className="flex">
-  
+      {/* Sidebar + Main */}
+      <Box
+        sx={{
+          display: 'flex',
+          minWidth: 0,
+        }}
+      >
+        {/* Sidebar */}
         <ASidebar />
-      
 
-   
-       {/* <main className="w-full lg:ml-64 lg:w-[calc(100%-16rem)]">
-         <Topbar />
+        {/* Main */}
+        <Box
+          component="main"
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            bgcolor: 'background.default',
+            color: 'text.primary',
+            pt:5
+          }}
+        >
 
-        {/* <div className="p-4 sm:p-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">
-           👋 Hi Applicant
-          </h1>
-
-          <p className="text-gray-300 mt-2">
-            Welcome to your dashboard
-           </p>
-
+           {/* Greeting */}
+     <Greeting role="applicant" sx={{ml:4}} />
           
-        </div> 
-      </main> */}
+          <Topbar />
 
-      </div>
-    </div>
-    
-  );
-};
+          <Box
+            sx={{
+              p: {
+                xs: 2,
+                sm: 3,
+                md: 4,
+              },
+            }}
+          >
+           
+            
 
-export default ADashboard;
+     <StatsRow/>
+
+      <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          md: 'minmax(0, 1.65fr) minmax(320px, 1fr)',
+        },
+        gap: 3,
+        pt:5,
+        mb:5
+        
+      }}
+    >
+      <RecommendedJobs jobs={recommendedJobs} />
+
+      <UpcomingInterviews interviews={upcomingInterviews} />
+    </Box>
+
+    <RecentApplications/>
+
+            
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+
+export default ADashboard

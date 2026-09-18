@@ -1,0 +1,48 @@
+const mockApplications = [
+  {
+    id: 1,
+    jobTitle: "Frontend Developer",
+    company: "Tech Solutions",
+    location: "Mumbai",
+    jobType: "Full-time",
+    appliedDate: "2026-08-18",
+    status: "Under Review",
+    matchScore: 87,
+    resume: "resume.pdf",
+  },
+  {
+    id: 2,
+    jobTitle: "React Developer",
+    company: "Innovate Labs",
+    location: "Pune",
+    jobType: "Full-time",
+    appliedDate: "2026-08-15",
+    status: "Shortlisted",
+    matchScore: 92,
+    resume: "resume.pdf",
+  },
+  {
+    id: 3,
+    jobTitle: "Full Stack Developer",
+    company: "ABC Technologies",
+    location: "Remote",
+    jobType: "Full-time",
+    appliedDate: "2026-08-10",
+    status: "Applied",
+    matchScore: 78,
+    resume: "resume.pdf",
+  },
+  {
+    id: 4,
+    jobTitle: "UI Developer",
+    company: "Digital Works",
+    location: "Mumbai",
+    jobType: "Part-time",
+    appliedDate: "2026-08-05",
+    status: "Rejected",
+    matchScore: 65,
+    resume: "resume.pdf",
+  },
+];
+
+export default mockApplications;

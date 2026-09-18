@@ -9,7 +9,7 @@ const modePalettes = {
     background: {
       default: '#0f172a', // page canvas / navbar / sidebar
       paper: '#1e293b', // cards / panels
-      surface:"#314057"
+      surface: '#314057',
     },
     text: {
       primary: '#f1f5f9',
@@ -20,15 +20,15 @@ const modePalettes = {
   light: {
     mode: 'light',
     background: {
-      default: '#f8fafc', // page canvas / navbar / sidebar
-      paper: '#f2f6fa', // cards / panels
-      surface:"#ffffff"
+      default: '#eef1f6', // page canvas / navbar / sidebar (slightly grey)
+      paper: '#f8fafc', // cards / panels (mid tone)
+      surface: '#ffffff', // topbar / most-elevated surfaces (pure white)
     },
     text: {
       primary: '#0f172a',
       secondary: '#64748b',
     },
-    divider: 'rgba(15, 23, 42, 0.08)',
+    divider: 'rgba(15, 23, 42, 0.12)',
   },
 }
 

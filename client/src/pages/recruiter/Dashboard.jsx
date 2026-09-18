@@ -1,14 +1,15 @@
 import Box from '@mui/material/Box'
 
-import RNavbar from '../../components/layout/recuriter/Navbar'
-import RSidebar from '../../components/layout/recuriter/Sidebar'
-import Topbar from '../../components/layout/recuriter/Topbar'
+import RNavbar from '../../components/layout/recruiter/Navbar'
+import RSidebar from '../../components/layout/recruiter/Sidebar'
+import Topbar from '../../components/layout/recruiter/Topbar'
 
-import StatsCards from '../../components/sections/StatsCards'
-import ApplicationTrend from '../../components/sections/ApplicationTrend'
-import HiringPipelines from '../../components/sections/HiringPipelines'
-import RecentApplications from '../../components/sections/RecentApplication'
-import UpcomingInterviews from '../../components/sections/UpcomingInterviews'
+import StatsCards from '../../components/sections/recruiter/StatsCards'
+import ApplicationTrend from '../../components/sections/recruiter/ApplicationTrend'
+import HiringPipelines from '../../components/sections/recruiter/HiringPipelines'
+import RecentApplications from '../../components/sections/recruiter/RecentApplication'
+import UpcomingInterviews from '../../components/sections/recruiter/UpcomingInterviews'
+import Greeting from '../../components/layout/recruiter/WelcomeHeader';
 
 const RDashboard = () => {
   return (
@@ -49,8 +50,11 @@ const RDashboard = () => {
             minWidth: 0,
             bgcolor: 'background.default',
             color: 'text.primary',
+            pt: 5
           }}
         >
+          {/* Greeting */}
+          <Greeting role="recruiter" sx={{ ml: 4 }} />
           <Topbar />
 
           <Box
@@ -62,34 +66,9 @@ const RDashboard = () => {
               },
             }}
           >
-            {/* Welcome */}
-            <Box sx={{ mb: 3 }}>
-              <Box
-                component="h1"
-                sx={{
-                  m: 0,
-                  fontSize: {
-                    xs: '1.5rem',
-                    sm: '1.875rem',
-                  },
-                  fontWeight: 700,
-                  color: 'text.primary',
-                }}
-              >
-                👋 Hi Recruiter
-              </Box>
+          
 
-              <Box
-                component="p"
-                sx={{
-                  mt: 1,
-                  mb: 0,
-                  color: 'text.secondary',
-                }}
-              >
-                Welcome to your dashboard
-              </Box>
-            </Box>
+
 
             {/* Dashboard sections */}
             <Box

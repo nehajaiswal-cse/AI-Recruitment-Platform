@@ -4,7 +4,7 @@ import Tooltip from '@mui/material/Tooltip'
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded'
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded'
 
-import { useThemeMode } from '../../context/useThemeMode.js'
+import { useThemeMode } from '../../hooks/useThemeMode'
 
 const ThemeToggle = () => {
   const { mode, toggleMode } = useThemeMode()
