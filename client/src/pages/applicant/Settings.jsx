@@ -350,7 +350,7 @@ const Settings = () => {
         subscription_id: data.subscriptionId,
 
         name: "Talvyn",
-        description: "Talvyn Pro - ₹299/month",
+        description: "Talvyn Pro - ₹100/month",
 
         prefill: {
           name: account.name || "",
@@ -812,7 +812,7 @@ const Settings = () => {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      ₹299
+                      ₹100
                       <Box
                         component="span"
                         sx={{
@@ -945,7 +945,7 @@ const Settings = () => {
                               lineHeight: 1,
                             }}
                           >
-                            ₹299
+                            ₹100
                           </Typography>
 
                           <Typography

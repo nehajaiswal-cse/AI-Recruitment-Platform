@@ -1,341 +1,739 @@
-import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import Divider from '@mui/material/Divider'
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
 
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded";
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 
-import Logo from '../common/Logo.jsx'
-import ThemeToggle from '../common/ThemeToggle.jsx'
+import Logo from "../common/Logo.jsx";
+import ThemeToggle from "../common/ThemeToggle.jsx";
+import NotificationBell from "../notifications/NotificationsBell.jsx";
 
 const Navbar = ({
   links = [],
   showLogout = false,
 }) => {
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedRole, setSelectedRole] = useState(null);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const menuOpen = Boolean(anchorEl)
+  const menuOpen = Boolean(anchorEl);
 
   const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-    handleMenuClose()
-    navigate('/')
-  }
+    handleMenuClose();
+    navigate("/");
+  };
+
+  const handleRoleSelect = (role) => {
+    setSelectedRole(role);
+
+    if (role === "applicant") {
+      navigate("/applicant/login");
+    }
+
+    if (role === "recruiter") {
+      navigate("/recruiter/login");
+    }
+  };
 
   return (
     <AppBar
       position="sticky"
       elevation={0}
       sx={{
-        bgcolor: 'background.default',
-        color: 'text.primary',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        width: '100%',
+        bgcolor: "#081A3A",
+        color: "#fff",
+        borderBottom: "1px solid rgba(255,255,255,0.10)",
+        width: "100%",
       }}
     >
       <Toolbar
         sx={{
           height: {
-            xs: 60,
-            sm: 64,
-            md: 68,
-            lg: 72,
+            xs: 64,
+            sm: 72,
+            md: 84,
           },
 
-          minHeight: 'unset',
+          minHeight: "unset",
 
           px: {
-            xs: 1,
-            sm: 2,
-            md: 3,
-            lg: 4,
+            xs: 2,
+            sm: 3,
+            md: 4,
+            lg: 6,
           },
 
-          gap: {
-            xs: 0.5,
-            sm: 1,
-            md: 1.5,
-          },
+          gap: 2,
 
-          width: '100%',
-          boxSizing: 'border-box',
+          width: "100%",
+          boxSizing: "border-box",
         }}
       >
 
-        {/* ========================= */}
-        {/* LOGO */}
-        {/* ========================= */}
+        {/* ================================================= */}
+        {/* LOGO + BRAND */}
+        {/* ================================================= */}
 
         <Box
           sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: {
+              xs: 1,
+              sm: 1.5,
+            },
+
             flexShrink: 0,
-            minWidth: 0,
-            display: 'flex',
-            alignItems: 'center',
 
-            '& img': {
-              maxWidth: {
+            "& img": {
+              width: {
                 xs: 42,
-                sm: 46,
-                md: 50,
+                sm: 48,
+                md: 52,
               },
-
-              width: 'auto',
+              height: "auto",
             },
           }}
         >
           <Logo />
+
+         
         </Box>
 
 
-        {/* ========================= */}
-        {/* SPACE */}
-        {/* ========================= */}
+
+
+        {/* ================================================= */}
+        {/* FLEX SPACE */}
+        {/* ================================================= */}
 
         <Box sx={{ flex: 1 }} />
 
 
-        {/* ========================= */}
-        {/* DESKTOP NAVIGATION */}
-        {/* ========================= */}
+        {/* ================================================= */}
+        {/* DESKTOP ROLE SWITCHER */}
+        {/* ================================================= */}
+
+        {!showLogout && (
+          <Box
+            sx={{
+              display: {
+                xs: "none",
+                sm: "flex",
+              },
+
+              alignItems: "center",
+
+              p: "3px",
+
+              borderRadius: "20px",
+
+              background:
+                "linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.035))",
+
+              border: "1px solid rgba(255,255,255,0.08)",
+
+              boxShadow:
+                "0 8px 30px rgba(0,0,0,0.20)",
+
+              backdropFilter: "blur(12px)",
+            }}
+          >
+
+            {/* Applicant */}
+
+            <Button
+              onClick={() => handleRoleSelect("applicant")}
+              startIcon={
+                <PersonRoundedIcon
+                  sx={{
+                    fontSize: {
+                      sm: 21,
+                      md: 23,
+                    },
+                  }}
+                />
+              }
+              sx={{
+                minWidth: {
+                  sm: 135,
+                  md: 160,
+                },
+
+                height: {
+                  sm: 48,
+                  md: 52,
+                },
+
+                px: {
+                  sm: 2,
+                  md: 2.5,
+                },
+
+                borderRadius: "26px",
+
+                textTransform: "none",
+
+                color: "#fff",
+
+                fontSize: {
+                  sm: 13,
+                  md: 14,
+                },
+
+                fontWeight: 600,
+
+                lineHeight: 1.15,
+
+                background:
+                  selectedRole === "applicant"
+                    ? "linear-gradient(135deg, #486DB9, #4168B5)"
+                    : "transparent",
+
+                boxShadow:
+                  selectedRole === "applicant"
+                    ? "0 5px 18px rgba(66,103,181,0.28)"
+                    : "none",
+
+                transition: "all 0.25s ease",
+
+                "&:hover": {
+                  background:
+                    selectedRole === "applicant"
+                      ? "linear-gradient(135deg, #5278C7, #456FC0)"
+                      : "rgba(255,255,255,0.07)",
+                },
+
+                "& .MuiButton-startIcon": {
+                  marginRight: 1,
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: 11,
+                    color: "rgba(255,255,255,0.62)",
+                    lineHeight: 1,
+                    mb: 0.3,
+                  }}
+                >
+                  I'm a
+                </Typography>
+
+                <Typography
+                  sx={{
+                    fontSize: {
+                      sm: 14,
+                      md: 15,
+                    },
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    color: "#fff",
+                  }}
+                >
+                  Applicant
+                </Typography>
+              </Box>
+            </Button>
+
+
+            {/* Recruiter */}
+
+            <Button
+              onClick={() => handleRoleSelect("recruiter")}
+              startIcon={
+                <BusinessCenterRoundedIcon
+                  sx={{
+                    fontSize: {
+                      sm: 21,
+                      md: 23,
+                    },
+                  }}
+                />
+              }
+              sx={{
+                minWidth: {
+                  sm: 135,
+                  md: 160,
+                },
+
+                height: {
+                  sm: 48,
+                  md: 52,
+                },
+
+                px: {
+                  sm: 2,
+                  md: 2.5,
+                },
+
+                borderRadius: "26px",
+
+                textTransform: "none",
+
+                color: "#fff",
+
+                fontSize: {
+                  sm: 13,
+                  md: 14,
+                },
+
+                fontWeight: 600,
+
+                background:
+                  selectedRole === "recruiter"
+                    ? "linear-gradient(135deg, #486DB9, #4168B5)"
+                    : "transparent",
+
+                boxShadow:
+                  selectedRole === "recruiter"
+                    ? "0 5px 18px rgba(66,103,181,0.28)"
+                    : "none",
+
+                transition: "all 0.25s ease",
+
+                "&:hover": {
+                  background:
+                    selectedRole === "recruiter"
+                      ? "linear-gradient(135deg, #5278C7, #456FC0)"
+                      : "rgba(255,255,255,0.07)",
+                },
+
+                "& .MuiButton-startIcon": {
+                  marginRight: 1,
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: 11,
+                    color: "rgba(255,255,255,0.62)",
+                    lineHeight: 1,
+                    mb: 0.3,
+                  }}
+                >
+                  I'm a
+                </Typography>
+
+                <Typography
+                  sx={{
+                    fontSize: {
+                      sm: 14,
+                      md: 15,
+                    },
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    color: "#fff",
+                  }}
+                >
+                  Recruiter
+                </Typography>
+              </Box>
+            </Button>
+
+          </Box>
+        )}
+
+
+        {/* ================================================= */}
+        {/* DESKTOP LINKS - LOGGED IN */}
+        {/* ================================================= */}
+
+        {showLogout && (
+          <Box
+            sx={{
+              display: {
+                xs: "none",
+                md: "flex",
+              },
+
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
+            {links.map((link) => (
+              <Button
+                key={link.path}
+                component={NavLink}
+                to={link.path}
+                end
+                sx={{
+                  color: "#B8C7E4",
+                  fontSize: 14,
+                  px: 1.5,
+                  textTransform: "none",
+
+                  "&.active": {
+                    color: "#fff",
+                    fontWeight: 700,
+                  },
+
+                  "&:hover": {
+                    color: "#fff",
+                    bgcolor: "rgba(255,255,255,0.06)",
+                  },
+                }}
+              >
+                {link.label}
+              </Button>
+            ))}
+
+            <Button
+              onClick={handleLogout}
+              startIcon={<LogoutRoundedIcon />}
+              sx={{
+                color: "#ff8e8e",
+                ml: 1,
+                textTransform: "none",
+
+                "&:hover": {
+                  bgcolor: "rgba(255,80,80,0.10)",
+                },
+              }}
+            >
+              Logout
+            </Button>
+          </Box>
+        )}
+
+
+        {/* ================================================= */}
+        {/* NOTIFICATIONS */}
+        {/* ================================================= */}
+
+        {showLogout && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              ml: 0.5,
+            }}
+          >
+            <NotificationBell />
+          </Box>
+        )}
+
+
+        {/* ================================================= */}
+        {/* DIVIDER BEFORE THEME */}
+        {/* ================================================= */}
 
         <Box
           sx={{
             display: {
-              xs: 'none',
-              md: 'flex',
+              xs: "none",
+              sm: "block",
             },
 
-            alignItems: 'center',
+            width: "1px",
+            height: 32,
 
-            gap: {
-              md: 0,
-              lg: 0.5,
-              xl: 1,
-            },
+            bgcolor: "rgba(255,255,255,0.16)",
 
-            mr: {
-              md: 1,
-              lg: 2,
+            mx: {
+              sm: 1,
+              md: 1.5,
             },
           }}
-        >
-          {links.map((link) => (
-            <Button
-              key={link.path}
-              component={NavLink}
-              to={link.path}
-              end
-              sx={{
-                color: 'text.secondary',
-
-                fontSize: {
-                  md: '0.8rem',
-                  lg: '0.875rem',
-                  xl: '0.95rem',
-                },
-
-                px: {
-                  md: 1,
-                  lg: 1.25,
-                  xl: 1.5,
-                },
-
-                minWidth: 'auto',
-
-                '&.active': {
-                  color: 'text.primary',
-                  fontWeight: 700,
-                },
-
-                '&:hover': {
-                  color: 'text.primary',
-                  bgcolor: 'action.hover',
-                },
-              }}
-            >
-              {link.label}
-            </Button>
-          ))}
-        </Box>
+        />
 
 
-        {/* ========================= */}
-        {/* DESKTOP LOGOUT */}
-        {/* ========================= */}
-
-        {showLogout && (
-          <Button
-            onClick={handleLogout}
-            startIcon={<LogoutRoundedIcon />}
-            sx={{
-              display: {
-                xs: 'none',
-                md: 'flex',
-              },
-
-              color: 'error.main',
-
-              fontSize: {
-                md: '0.8rem',
-                lg: '0.875rem',
-                xl: '0.95rem',
-              },
-
-              px: {
-                md: 1,
-                lg: 1.25,
-                xl: 1.5,
-              },
-
-              minWidth: 'auto',
-
-              borderRadius: 1.5,
-
-              '&:hover': {
-                bgcolor: 'error.main',
-                color: '#fff',
-              },
-            }}
-          >
-            Logout
-          </Button>
-        )}
-
-
-        {/* ========================= */}
-        {/* THEME TOGGLE */}
-        {/* ========================= */}
+        {/* ================================================= */}
+        {/* THEME */}
+        {/* ================================================= */}
 
         <Box
           sx={{
+            display: "flex",
+            alignItems: "center",
             flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
+
+            "& button": {
+              color: "#fff",
+            },
           }}
         >
           <ThemeToggle />
         </Box>
 
 
-        {/* ========================= */}
-        {/* RIGHT HAMBURGER */}
-        {/* ========================= */}
+        {/* ================================================= */}
+        {/* MOBILE HAMBURGER */}
+        {/* ================================================= */}
 
         <IconButton
           onClick={handleMenuOpen}
           aria-label="Open navigation menu"
           sx={{
             display: {
-              xs: 'inline-flex',
-              md: 'none',
+              xs: "inline-flex",
+              sm: "none",
             },
 
-            color: 'text.primary',
-            flexShrink: 0,
+            color: "#fff",
+
+            width: 42,
+            height: 42,
+
+            borderRadius: "12px",
+
+            border: "1px solid rgba(255,255,255,0.10)",
+
+            bgcolor: "rgba(255,255,255,0.05)",
+
+            "&:hover": {
+              bgcolor: "rgba(255,255,255,0.10)",
+            },
           }}
         >
           <MenuRoundedIcon />
         </IconButton>
 
 
-        {/* ========================= */}
-        {/* MOBILE NAVIGATION MENU */}
-        {/* ========================= */}
+        {/* ================================================= */}
+        {/* MOBILE MENU */}
+        {/* ================================================= */}
 
         <Menu
           anchorEl={anchorEl}
           open={menuOpen}
           onClose={handleMenuClose}
           anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
+            vertical: "bottom",
+            horizontal: "right",
           }}
           transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            vertical: "top",
+            horizontal: "right",
           }}
           slotProps={{
             paper: {
               sx: {
-                mt: 1,
+                mt: 1.2,
 
-                minWidth: {
-                  xs: 210,
-                  sm: 240,
-                },
+                minWidth: 250,
 
-                maxWidth: 'calc(100vw - 24px)',
+                borderRadius: "16px",
 
-                bgcolor: 'background.paper',
-                color: 'text.primary',
+                bgcolor: "#0F2347",
 
-                border: '1px solid',
-                borderColor: 'divider',
+                color: "#fff",
+
+                border:
+                  "1px solid rgba(255,255,255,0.10)",
+
+                boxShadow:
+                  "0 20px 50px rgba(0,0,0,0.35)",
+
+                overflow: "hidden",
               },
             },
           }}
         >
 
-          {/* Mobile Links */}
-          {links.map((link) => (
-            <MenuItem
-              key={link.path}
-              component={NavLink}
-              to={link.path}
-              end
-              onClick={handleMenuClose}
-              sx={{
-                py: 1.25,
+          {/* Mobile Role Selection */}
 
-                '&.active': {
-                  color: 'primary.main',
+          {!showLogout && (
+            <>
+              <Box
+                sx={{
+                  px: 2,
+                  pt: 1.5,
+                  pb: 1,
+
+                  color: "#9DB4DF",
+
+                  fontSize: 12,
                   fontWeight: 700,
-                  bgcolor: 'action.selected',
-                },
-              }}
-            >
-              {link.label}
-            </MenuItem>
-          ))}
+                  letterSpacing: "0.8px",
+                }}
+              >
+                CONTINUE AS
+              </Box>
+
+              <MenuItem
+                onClick={() => {
+                  handleMenuClose();
+                  handleRoleSelect("applicant");
+                }}
+                sx={{
+                  py: 1.4,
+
+                  borderRadius: 1,
+
+                  "&:hover": {
+                    bgcolor: "rgba(255,255,255,0.07)",
+                  },
+                }}
+              >
+                <PersonRoundedIcon
+                  sx={{
+                    mr: 1.5,
+                    color: "#8FAAFF",
+                  }}
+                />
+
+                <Box>
+                  <Typography
+                    sx={{
+                      fontSize: 11,
+                      color: "#91A5C7",
+                    }}
+                  >
+                    I'm a
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: "#fff",
+                    }}
+                  >
+                    Applicant
+                  </Typography>
+                </Box>
+              </MenuItem>
+
+              <MenuItem
+                onClick={() => {
+                  handleMenuClose();
+                  handleRoleSelect("recruiter");
+                }}
+                sx={{
+                  py: 1.4,
+
+                  "&:hover": {
+                    bgcolor: "rgba(255,255,255,0.07)",
+                  },
+                }}
+              >
+                <BusinessCenterRoundedIcon
+                  sx={{
+                    mr: 1.5,
+                    color: "#8FAAFF",
+                  }}
+                />
+
+                <Box>
+                  <Typography
+                    sx={{
+                      fontSize: 11,
+                      color: "#91A5C7",
+                    }}
+                  >
+                    I'm a
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: "#fff",
+                    }}
+                  >
+                    Recruiter
+                  </Typography>
+                </Box>
+              </MenuItem>
+
+              <Divider
+                sx={{
+                  borderColor:
+                    "rgba(255,255,255,0.08)",
+                }}
+              />
+            </>
+          )}
 
 
-          {/* Mobile Logout */}
+          {/* Logged-in links */}
+
+          {showLogout &&
+            links.map((link) => (
+              <MenuItem
+                key={link.path}
+                component={NavLink}
+                to={link.path}
+                end
+                onClick={handleMenuClose}
+                sx={{
+                  py: 1.3,
+
+                  color: "#D8E2F5",
+
+                  "&.active": {
+                    color: "#fff",
+                    bgcolor:
+                      "rgba(255,255,255,0.08)",
+                    fontWeight: 700,
+                  },
+                }}
+              >
+                {link.label}
+              </MenuItem>
+            ))}
+
+
+          {/* Logout */}
+
           {showLogout && (
             <>
-              <Divider />
+              <Divider
+                sx={{
+                  borderColor:
+                    "rgba(255,255,255,0.08)",
+                }}
+              />
 
               <MenuItem
                 onClick={handleLogout}
                 sx={{
-                  py: 1.25,
+                  py: 1.3,
 
-                  color: 'error.main',
+                  color: "#ff9090",
 
-                  '&:hover': {
-                    bgcolor: 'error.main',
-                    color: '#fff',
+                  "&:hover": {
+                    bgcolor:
+                      "rgba(255,70,70,0.10)",
                   },
                 }}
               >
@@ -350,29 +748,33 @@ const Navbar = ({
           )}
 
 
-          <Divider />
+          {/* Theme */}
 
+          <Divider
+            sx={{
+              borderColor:
+                "rgba(255,255,255,0.08)",
+            }}
+          />
 
-          {/* Mobile Theme */}
           <Box
             sx={{
               px: 2,
               py: 1.5,
 
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            <Box
-              component="span"
+            <Typography
               sx={{
-                fontSize: '0.9rem',
-                color: 'text.secondary',
+                fontSize: 13,
+                color: "#9DB4DF",
               }}
             >
               Theme
-            </Box>
+            </Typography>
 
             <ThemeToggle />
           </Box>
@@ -381,7 +783,7 @@ const Navbar = ({
 
       </Toolbar>
     </AppBar>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
