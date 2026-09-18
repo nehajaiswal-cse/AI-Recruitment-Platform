@@ -17,6 +17,7 @@ import {
   Avatar,
   LinearProgress,
 } from "@mui/material";
+import { useTheme, alpha } from "@mui/material/styles";
 
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
@@ -39,90 +40,99 @@ import { getResumeUrl } from "../../api/resumeApi";
 
 /* ---------------------------------------------------------
  * STYLES & SUB-COMPONENTS
+ * These take `theme` as an argument so they stay reactive to
+ * light/dark mode instead of hardcoding a palette.
  * --------------------------------------------------------- */
 
-const selectStyle = {
-  bgcolor: "#0b1425",
+const brandGradient = (theme) =>
+  `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`;
+
+const selectStyle = (theme) => ({
+  bgcolor: theme.palette.background.paper,
   borderRadius: 1.5,
-  color: "white",
+  color: theme.palette.text.primary,
   height: 40,
   minWidth: 130,
   "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#263249",
+    borderColor: theme.palette.divider,
   },
   "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#3b82f6",
+    borderColor: theme.palette.primary.main,
   },
   "& .MuiSvgIcon-root": {
-    color: "#738096",
+    color: theme.palette.text.secondary,
   },
-};
+});
 
-const paginationButton = {
-  color: "#8c97ab",
-  border: "1px solid #263249",
+const paginationButton = (theme) => ({
+  color: theme.palette.text.secondary,
+  border: `1px solid ${theme.palette.divider}`,
   borderRadius: 1.5,
   p: 0.8,
   "&:hover": {
-    bgcolor: "#0b1425",
-    color: "#fff",
+    bgcolor: theme.palette.action.hover,
+    color: theme.palette.text.primary,
   },
-};
+});
 
-const pageNumber = {
+const pageNumber = (theme) => ({
   width: 32,
   height: 32,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   borderRadius: 1.5,
-  bgcolor: "#6366f1",
-  color: "#fff",
+  bgcolor: theme.palette.primary.main,
+  color: theme.palette.getContrastText(theme.palette.primary.main),
   fontSize: 13,
   fontWeight: 600,
-};
+});
 
-const pageText = {
+const pageText = (theme) => ({
   width: 32,
   height: 32,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   borderRadius: 1.5,
-  color: "#8c97ab",
+  color: theme.palette.text.secondary,
   fontSize: 13,
   cursor: "pointer",
   "&:hover": {
-    color: "#fff",
-    bgcolor: "#0b1425",
+    color: theme.palette.text.primary,
+    bgcolor: theme.palette.action.hover,
   },
+});
+
+const DetailCard = ({ children, sx = {} }) => {
+  const theme = useTheme();
+  return (
+    <Card
+      elevation={0}
+      sx={{
+        bgcolor: theme.palette.background.paper,
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 2,
+        p: 2.5,
+        mb: 2,
+        ...sx,
+      }}
+    >
+      {children}
+    </Card>
+  );
 };
 
-const DetailCard = ({ children, sx = {} }) => (
-  <Card
-    elevation={0}
-    sx={{
-      bgcolor: "#0b1425",
-      border: "1px solid #1e293b",
-      borderRadius: 2,
-      p: 2.5,
-      mb: 2,
-      ...sx,
-    }}
-  >
-    {children}
-  </Card>
-);
-
 const CandidateRow = ({ candidate, rank, selected, onClick }) => {
+  const theme = useTheme();
   const applicant = candidate?.applicantId;
   const job = candidate?.jobId;
   const score = Number(candidate?.aiScore || 0);
 
   const getScoreColor = (val) => {
-    if (val >= 80) return "#70d84a";
-    if (val >= 60) return "#f4c542";
-    return "#ff5d7d";
+    if (val >= 80) return theme.palette.success.main;
+    if (val >= 60) return theme.palette.warning.main;
+    return theme.palette.error.main;
   };
 
   return (
@@ -130,17 +140,19 @@ const CandidateRow = ({ candidate, rank, selected, onClick }) => {
       elevation={0}
       onClick={onClick}
       sx={{
-        bgcolor: selected ? "#0f172a" : "#060d1e",
+        bgcolor: selected
+          ? alpha(theme.palette.primary.main, 0.08)
+          : theme.palette.background.paper,
         border: "1px solid",
-        borderColor: selected ? "#6366f1" : "#172236",
+        borderColor: selected ? theme.palette.primary.main : theme.palette.divider,
         borderRadius: 2,
         p: 2,
         mb: 1.5,
         cursor: "pointer",
         transition: "all 0.2s ease-in-out",
         "&:hover": {
-          borderColor: "#3b82f6",
-          bgcolor: "#0f172a",
+          borderColor: theme.palette.primary.main,
+          bgcolor: alpha(theme.palette.primary.main, 0.06),
         },
       }}
     >
@@ -157,7 +169,7 @@ const CandidateRow = ({ candidate, rank, selected, onClick }) => {
             sx={{
               fontSize: 14,
               fontWeight: 700,
-              color: "#64748b",
+              color: theme.palette.text.secondary,
               width: 24,
             }}
           >
@@ -166,16 +178,22 @@ const CandidateRow = ({ candidate, rank, selected, onClick }) => {
 
           <Avatar
             src={applicant?.profileImage || applicant?.avatar}
-            sx={{ width: 44, height: 44, bgcolor: "#1e293b" }}
+            sx={{
+              width: 44,
+              height: 44,
+              bgcolor: alpha(theme.palette.primary.main, 0.16),
+              color: theme.palette.primary.main,
+              fontWeight: 700,
+            }}
           >
             {(applicant?.name || applicant?.fullName || "C").charAt(0).toUpperCase()}
           </Avatar>
 
           <Box>
-            <Typography sx={{ fontWeight: 600, fontSize: 15, color: "#f8fafc" }}>
+            <Typography sx={{ fontWeight: 600, fontSize: 15, color: theme.palette.text.primary }}>
               {applicant?.name || applicant?.fullName || "Unknown Candidate"}
             </Typography>
-            <Typography sx={{ fontSize: 13, color: "#94a3b8", mt: 0.2 }}>
+            <Typography sx={{ fontSize: 13, color: theme.palette.text.secondary, mt: 0.2 }}>
               {job?.title || "Role Not Specified"}
             </Typography>
           </Box>
@@ -199,8 +217,8 @@ const CandidateRow = ({ candidate, rank, selected, onClick }) => {
               mt: 0.5,
               height: 20,
               fontSize: 11,
-              bgcolor: "#1e293b",
-              color: "#cbd5e1",
+              bgcolor: theme.palette.action.selected,
+              color: theme.palette.text.primary,
               textTransform: "capitalize",
             }}
           />
@@ -216,6 +234,7 @@ const CandidateRow = ({ candidate, rank, selected, onClick }) => {
  * --------------------------------------------------------- */
 
 function Candidate() {
+  const theme = useTheme();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -407,9 +426,9 @@ function Candidate() {
 
   /* Score Helpers */
   const getScoreColor = (score) => {
-    if (score >= 80) return "#70d84a";
-    if (score >= 60) return "#f4c542";
-    return "#ff5d7d";
+    if (score >= 80) return theme.palette.success.main;
+    if (score >= 60) return theme.palette.warning.main;
+    return theme.palette.error.main;
   };
 
   const getScoreLabel = (score) => {
@@ -440,7 +459,7 @@ function Candidate() {
       <Box
         sx={{
           minHeight: "100vh",
-          bgcolor: "#020817",
+          bgcolor: theme.palette.background.default,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -452,7 +471,7 @@ function Candidate() {
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#020817", color: "#f8fafc" }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: theme.palette.background.default, color: theme.palette.text.primary }}>
       {/* NAVBAR */}
       <Box component="header" sx={{ position: "sticky", top: 0, zIndex: 100 }}>
         <RNavbar />
@@ -470,7 +489,7 @@ function Candidate() {
             minWidth: 0,
             height: "calc(100vh - 68px)",
             overflow: "hidden",
-            bgcolor: "#020817",
+            bgcolor: theme.palette.background.default,
           }}
         >
           <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -490,7 +509,7 @@ function Candidate() {
                     Candidates
                   </Typography>
                   <Typography
-                    sx={{ mt: 0.5, color: "#8c97ab", fontSize: 14 }}
+                    sx={{ mt: 0.5, color: theme.palette.text.secondary, fontSize: 14 }}
                   >
                     Review and rank candidates using AI-powered resume analysis
                   </Typography>
@@ -501,13 +520,14 @@ function Candidate() {
                   sx={{
                     display: { xs: "none", md: "flex" },
                     textTransform: "none",
-                    color: "white",
+                    color: theme.palette.getContrastText(theme.palette.primary.main),
                     px: 2.5,
                     py: 1.1,
                     borderRadius: 1.5,
-                    background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                    background: brandGradient(theme),
                     "&:hover": {
-                      background: "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                      background: brandGradient(theme),
+                      filter: "brightness(0.92)",
                     },
                   }}
                 >
@@ -522,7 +542,7 @@ function Candidate() {
                   Candidate Ranking
                 </Typography>
                 <AutoAwesomeRoundedIcon
-                  sx={{ fontSize: 19, color: "#8b5cf6" }}
+                  sx={{ fontSize: 19, color: theme.palette.secondary.main }}
                 />
               </Box>
 
@@ -542,17 +562,17 @@ function Candidate() {
                   InputProps={{
                     startAdornment: (
                       <SearchRoundedIcon
-                        sx={{ mr: 1, color: "#738096", fontSize: 20 }}
+                        sx={{ mr: 1, color: theme.palette.text.secondary, fontSize: 20 }}
                       />
                     ),
                   }}
                   sx={{
                     width: { xs: "100%", md: 260 },
                     "& .MuiOutlinedInput-root": {
-                      bgcolor: "#0b1425",
+                      bgcolor: theme.palette.background.paper,
                       borderRadius: 1.5,
-                      color: "white",
-                      "& fieldset": { borderColor: "#263249" },
+                      color: theme.palette.text.primary,
+                      "& fieldset": { borderColor: theme.palette.divider },
                     },
                   }}
                 />
@@ -562,7 +582,7 @@ function Candidate() {
                     value={jobFilter}
                     onChange={(e) => setJobFilter(e.target.value)}
                     displayEmpty
-                    sx={selectStyle}
+                    sx={selectStyle(theme)}
                   >
                     <MenuItem value="all">All Jobs</MenuItem>
                     {jobs.map((job) => (
@@ -578,7 +598,7 @@ function Candidate() {
                     value={scoreFilter}
                     onChange={(e) => setScoreFilter(e.target.value)}
                     displayEmpty
-                    sx={selectStyle}
+                    sx={selectStyle(theme)}
                   >
                     <MenuItem value="all">Match Score</MenuItem>
                     <MenuItem value="90">90 - 100</MenuItem>
@@ -592,7 +612,7 @@ function Candidate() {
                     value={skillFilter}
                     onChange={(e) => setSkillFilter(e.target.value)}
                     displayEmpty
-                    sx={selectStyle}
+                    sx={selectStyle(theme)}
                   >
                     <MenuItem value="all">Skills</MenuItem>
                     <MenuItem value="react">React</MenuItem>
@@ -606,7 +626,7 @@ function Candidate() {
                     value={experienceFilter}
                     onChange={(e) => setExperienceFilter(e.target.value)}
                     displayEmpty
-                    sx={selectStyle}
+                    sx={selectStyle(theme)}
                   >
                     <MenuItem value="all">Experience</MenuItem>
                     <MenuItem value="0-2">0 - 2 years</MenuItem>
@@ -620,8 +640,8 @@ function Candidate() {
                   variant="outlined"
                   sx={{
                     textTransform: "none",
-                    color: "#d4dbea",
-                    borderColor: "#263249",
+                    color: theme.palette.text.primary,
+                    borderColor: theme.palette.divider,
                     borderRadius: 1.5,
                     px: 2,
                   }}
@@ -642,7 +662,7 @@ function Candidate() {
                   lg: "minmax(500px, 1.1fr) minmax(420px, .9fr)",
                 },
                 gap: 0,
-                borderTop: "1px solid #172236",
+                borderTop: `1px solid ${theme.palette.divider}`,
               }}
             >
               {/* LEFT COLUMN: CANDIDATE LIST */}
@@ -652,7 +672,7 @@ function Candidate() {
                   overflowY: "auto",
                   px: { xs: 2, md: 3 },
                   py: 2,
-                  borderRight: { lg: "1px solid #172236" },
+                  borderRight: { lg: `1px solid ${theme.palette.divider}` },
                   display: {
                     xs: selectedCandidate ? "none" : "block",
                     lg: "block",
@@ -662,12 +682,12 @@ function Candidate() {
                 <Box
                   sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}
                 >
-                  <Typography sx={{ fontSize: 13, color: "#8c97ab" }}>
+                  <Typography sx={{ fontSize: 13, color: theme.palette.text.secondary }}>
                     Total {filteredCandidates.length} candidates found
                   </Typography>
-                  <Typography sx={{ fontSize: 13, color: "#8c97ab" }}>
+                  <Typography sx={{ fontSize: 13, color: theme.palette.text.secondary }}>
                     Sort by:{" "}
-                    <b style={{ color: "#e2e8f0" }}>Highest Match</b>
+                    <b style={{ color: theme.palette.text.primary }}>Highest Match</b>
                   </Typography>
                 </Box>
 
@@ -710,13 +730,13 @@ function Candidate() {
                     py: 3,
                   }}
                 >
-                  <IconButton sx={paginationButton}>
+                  <IconButton sx={paginationButton(theme)}>
                     <ArrowBackIosNewRoundedIcon sx={{ fontSize: 14 }} />
                   </IconButton>
-                  <Box sx={pageNumber}>1</Box>
-                  <Typography sx={pageText}>2</Typography>
-                  <Typography sx={pageText}>3</Typography>
-                  <IconButton sx={paginationButton}>
+                  <Box sx={pageNumber(theme)}>1</Box>
+                  <Typography sx={pageText(theme)}>2</Typography>
+                  <Typography sx={pageText(theme)}>3</Typography>
+                  <IconButton sx={paginationButton(theme)}>
                     <ArrowForwardIosRoundedIcon sx={{ fontSize: 14 }} />
                   </IconButton>
                 </Box>
@@ -738,7 +758,7 @@ function Candidate() {
                     onClick={() => setSelectedCandidate(null)}
                     sx={{
                       display: { xs: "flex", lg: "none" },
-                      color: "#b7c0d1",
+                      color: theme.palette.text.secondary,
                       textTransform: "none",
                       mb: 2,
                     }}
@@ -758,7 +778,14 @@ function Candidate() {
                     <Box sx={{ display: "flex", gap: 2 }}>
                       <Avatar
                         src={selectedApplicant?.profileImage || selectedApplicant?.avatar}
-                        sx={{ width: 64, height: 64, bgcolor: "#1e293b" }}
+                        sx={{
+                          width: 64,
+                          height: 64,
+                          bgcolor: alpha(theme.palette.primary.main, 0.16),
+                          color: theme.palette.primary.main,
+                          fontWeight: 700,
+                          fontSize: 24,
+                        }}
                       >
                         {(selectedApplicant?.name || selectedApplicant?.fullName || "C")
                           .charAt(0)
@@ -783,25 +810,25 @@ function Candidate() {
                               width: 8,
                               height: 8,
                               borderRadius: "50%",
-                              bgcolor: "#70d84a",
+                              bgcolor: theme.palette.success.main,
                             }}
                           />
                         </Box>
 
                         <Typography
-                          sx={{ color: "#a1aabd", fontSize: 13, mt: 0.3 }}
+                          sx={{ color: theme.palette.text.secondary, fontSize: 13, mt: 0.3 }}
                         >
                           {selectedJob?.title || "Full Stack Developer"}
                         </Typography>
 
                         <Typography
-                          sx={{ color: "#8c97ab", fontSize: 12, mt: 1 }}
+                          sx={{ color: theme.palette.text.secondary, fontSize: 12, mt: 1 }}
                         >
                           {selectedApplicant?.email || "No email available"}
                         </Typography>
 
                         <Typography
-                          sx={{ color: "#8c97ab", fontSize: 12, mt: 0.4 }}
+                          sx={{ color: theme.palette.text.secondary, fontSize: 12, mt: 0.4 }}
                         >
                           <LocationOnOutlinedIcon
                             sx={{ fontSize: 14, verticalAlign: "middle", mr: 0.3 }}
@@ -817,8 +844,8 @@ function Candidate() {
                       onClick={() => handleViewResume(selectedCandidate)}
                       sx={{
                         textTransform: "none",
-                        borderColor: "#263249",
-                        color: "#dbe3f0",
+                        borderColor: theme.palette.divider,
+                        color: theme.palette.text.primary,
                         height: 38,
                       }}
                     >
@@ -837,7 +864,7 @@ function Candidate() {
                     >
                       <Box>
                         <Typography
-                          sx={{ color: "#dce3ef", fontSize: 13, mb: 1 }}
+                          sx={{ color: theme.palette.text.primary, fontSize: 13, mb: 1 }}
                         >
                           AI Match Score
                         </Typography>
@@ -854,7 +881,7 @@ function Candidate() {
                         </Typography>
 
                         <Typography
-                          sx={{ mt: 1, fontSize: 13, color: "#dce3ef" }}
+                          sx={{ mt: 1, fontSize: 13, color: theme.palette.text.primary }}
                         >
                           {getScoreLabel(selectedScore)}
                         </Typography>
@@ -873,8 +900,11 @@ function Candidate() {
                         onClick={() => handleAIAnalysis(selectedCandidate)}
                         sx={{
                           textTransform: "none",
-                          background:
-                            "linear-gradient(135deg, #8b5cf6, #6366f1)",
+                          background: brandGradient(theme),
+                          "&:hover": {
+                            background: brandGradient(theme),
+                            filter: "brightness(0.92)",
+                          },
                           px: 2,
                           py: 1,
                           borderRadius: 1.5,
@@ -894,7 +924,7 @@ function Candidate() {
                         sx={{
                           height: 6,
                           borderRadius: 3,
-                          bgcolor: "#172236",
+                          bgcolor: theme.palette.divider,
                           "& .MuiLinearProgress-bar": {
                             bgcolor: getScoreColor(selectedScore),
                           },
@@ -916,7 +946,7 @@ function Candidate() {
                       }}
                     >
                       <AutoAwesomeRoundedIcon
-                        sx={{ fontSize: 16, color: "#8b5cf6" }}
+                        sx={{ fontSize: 16, color: theme.palette.secondary.main }}
                       />
                       AI Analysis Summary
                     </Typography>
@@ -924,7 +954,7 @@ function Candidate() {
                     <Typography
                       sx={{
                         fontSize: 13,
-                        color: "#94a3b8",
+                        color: theme.palette.text.secondary,
                         lineHeight: 1.6,
                       }}
                     >
@@ -959,7 +989,7 @@ function Candidate() {
                         sx={{
                           fontSize: 14,
                           fontWeight: 600,
-                          color: "#70d84a",
+                          color: theme.palette.success.main,
                           mb: 1.5,
                           display: "flex",
                           alignItems: "center",
@@ -981,7 +1011,7 @@ function Candidate() {
                           key={i}
                           sx={{
                             fontSize: 12,
-                            color: "#cbd5e1",
+                            color: theme.palette.text.secondary,
                             mb: 0.8,
                             display: "flex",
                             alignItems: "center",
@@ -999,7 +1029,7 @@ function Candidate() {
                         sx={{
                           fontSize: 14,
                           fontWeight: 600,
-                          color: "#ff5d7d",
+                          color: theme.palette.error.main,
                           mb: 1.5,
                           display: "flex",
                           alignItems: "center",
@@ -1021,7 +1051,7 @@ function Candidate() {
                           key={i}
                           sx={{
                             fontSize: 12,
-                            color: "#cbd5e1",
+                            color: theme.palette.text.secondary,
                             mb: 0.8,
                             display: "flex",
                             alignItems: "center",
@@ -1059,10 +1089,10 @@ function Candidate() {
                           label={skill}
                           size="small"
                           sx={{
-                            bgcolor: "#172236",
-                            color: "#e2e8f0",
+                            bgcolor: theme.palette.action.selected,
+                            color: theme.palette.text.primary,
                             fontSize: 12,
-                            border: "1px solid #263249",
+                            border: `1px solid ${theme.palette.divider}`,
                           }}
                         />
                       ))}
@@ -1080,6 +1110,7 @@ function Candidate() {
                     <Button
                       fullWidth
                       variant="contained"
+                      color="primary"
                       startIcon={<EventRoundedIcon />}
                       onClick={() =>
                         handleScheduleInterview(selectedCandidate)
@@ -1088,8 +1119,6 @@ function Candidate() {
                         py: 1.2,
                         textTransform: "none",
                         fontWeight: 600,
-                        bgcolor: "#6366f1",
-                        "&:hover": { bgcolor: "#4f46e5" },
                       }}
                     >
                       Schedule Interview
