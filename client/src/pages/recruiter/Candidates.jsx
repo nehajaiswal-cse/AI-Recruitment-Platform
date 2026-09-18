@@ -3,34 +3,22 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
   Box,
-  Typography,
-  TextField,
-  MenuItem,
-  Menu,
-  Select,
-  FormControl,
-  Card,
   Button,
   Chip,
-  CircularProgress,
-  Alert,
+  Divider,
+  FormControl,
   IconButton,
-  Avatar,
-  LinearProgress,
+  Menu,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
 
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
-import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
-import EventRoundedIcon from "@mui/icons-material/EventRounded";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
-import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
-import ArrowForwardIosRoundedIcon from "@mui/icons-material/ArrowForwardIosRounded";
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
-import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
-import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
+import SearchIcon from "@mui/icons-material/Search";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import RNavbar from "../../components/layout/recruiter/Navbar";
 import RSidebar from "../../components/layout/recruiter/Sidebar";
@@ -39,232 +27,8 @@ import CandidateCopilot from "../../components/copilot/CandidateCopilto";
 import { useCandidate } from "../../hooks/useCandidate";
 import { getResumeUrl } from "../../api/resumeApi";
 
-/* ---------------------------------------------------------
- * STYLES
- * --------------------------------------------------------- */
 
-const selectStyle = {
-  bgcolor: "#0b1425",
-  borderRadius: 1.5,
-  color: "white",
-  height: 40,
-  minWidth: 130,
-
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#263249",
-  },
-
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#3b82f6",
-  },
-
-  "& .MuiSvgIcon-root": {
-    color: "#738096",
-  },
-};
-
-const paginationButton = {
-  color: "#8c97ab",
-  border: "1px solid #263249",
-  borderRadius: 1.5,
-  p: 0.8,
-
-  "&:hover": {
-    bgcolor: "#0b1425",
-    color: "#fff",
-  },
-};
-
-const pageNumber = {
-  width: 32,
-  height: 32,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  borderRadius: 1.5,
-  bgcolor: "#6366f1",
-  color: "#fff",
-  fontSize: 13,
-  fontWeight: 600,
-};
-
-const pageText = {
-  width: 32,
-  height: 32,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  borderRadius: 1.5,
-  color: "#8c97ab",
-  fontSize: 13,
-  cursor: "pointer",
-
-  "&:hover": {
-    color: "#fff",
-    bgcolor: "#0b1425",
-  },
-};
-
-const DetailCard = ({ children, sx = {} }) => (
-  <Card
-    elevation={0}
-    sx={{
-      bgcolor: "#0b1425",
-      border: "1px solid #1e293b",
-      borderRadius: 2,
-      p: 2.5,
-      mb: 2,
-      ...sx,
-    }}
-  >
-    {children}
-  </Card>
-);
-
-/* ---------------------------------------------------------
- * CANDIDATE ROW
- * --------------------------------------------------------- */
-
-const CandidateRow = ({
-  candidate,
-  rank,
-  selected,
-  onClick,
-}) => {
-  const applicant = candidate?.applicantId;
-  const job = candidate?.jobId;
-
-  const score = Number(candidate?.aiScore || 0);
-
-  const getScoreColor = (val) => {
-    if (val >= 80) return "#70d84a";
-    if (val >= 60) return "#f4c542";
-    return "#ff5d7d";
-  };
-
-  return (
-    <Card
-      elevation={0}
-      onClick={onClick}
-      sx={{
-        bgcolor: selected ? "#0f172a" : "#060d1e",
-        border: "1px solid",
-        borderColor: selected ? "#6366f1" : "#172236",
-        borderRadius: 2,
-        p: 2,
-        mb: 1.5,
-        cursor: "pointer",
-        transition: "all 0.2s ease-in-out",
-
-        "&:hover": {
-          borderColor: "#3b82f6",
-          bgcolor: "#0f172a",
-        },
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 2,
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-          }}
-        >
-          <Typography
-            sx={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: "#64748b",
-              width: 24,
-            }}
-          >
-            #{rank}
-          </Typography>
-
-          <Avatar
-            src={applicant?.profileImage || applicant?.avatar}
-            sx={{
-              width: 44,
-              height: 44,
-              bgcolor: "#1e293b",
-            }}
-          >
-            {(
-              applicant?.name ||
-              applicant?.fullName ||
-              "C"
-            )
-              .charAt(0)
-              .toUpperCase()}
-          </Avatar>
-
-          <Box>
-            <Typography
-              sx={{
-                fontWeight: 600,
-                fontSize: 15,
-                color: "#f8fafc",
-              }}
-            >
-              {applicant?.name ||
-                applicant?.fullName ||
-                "Unknown Candidate"}
-            </Typography>
-
-            <Typography
-              sx={{
-                fontSize: 13,
-                color: "#94a3b8",
-                mt: 0.2,
-              }}
-            >
-              {job?.title || "Role Not Specified"}
-            </Typography>
-          </Box>
-        </Box>
-
-        <Box sx={{ textAlign: "right" }}>
-          <Typography
-            sx={{
-              fontWeight: 700,
-              fontSize: 16,
-              color: getScoreColor(score),
-            }}
-          >
-            {score}%
-          </Typography>
-
-          <Chip
-            label={candidate?.status || "Applied"}
-            size="small"
-            sx={{
-              mt: 0.5,
-              height: 20,
-              fontSize: 11,
-              bgcolor: "#1e293b",
-              color: "#cbd5e1",
-              textTransform: "capitalize",
-            }}
-          />
-        </Box>
-      </Box>
-    </Card>
-  );
-};
-
-
-/* ---------------------------------------------------------
- * MAIN COMPONENT
- * --------------------------------------------------------- */
-
-function Candidate() {
+export default function Candidates() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -272,23 +36,27 @@ function Candidate() {
 
   const {
     candidates,
-    loading,
-    error,
     fetchCandidates,
     analyzeResume,
-    removeCandidate,
     changeCandidateStatus,
+    removeCandidate,
   } = useCandidate();
 
+
   /* -------------------------------------------------------
-   * STATES
+   * STATE
    * ------------------------------------------------------- */
 
   const [search, setSearch] = useState("");
+
   const [statusFilter, setStatusFilter] = useState("all");
+
   const [jobFilter, setJobFilter] = useState("all");
+
   const [scoreFilter, setScoreFilter] = useState("all");
+
   const [skillFilter, setSkillFilter] = useState("all");
+
   const [experienceFilter, setExperienceFilter] =
     useState("all");
 
@@ -300,6 +68,7 @@ function Candidate() {
   const [actionMenuAnchor, setActionMenuAnchor] =
     useState(null);
 
+
   /* -------------------------------------------------------
    * FETCH CANDIDATES
    * ------------------------------------------------------- */
@@ -307,6 +76,7 @@ function Candidate() {
   useEffect(() => {
     fetchCandidates();
   }, []);
+
 
   /* -------------------------------------------------------
    * FILTER CANDIDATES
@@ -319,10 +89,18 @@ function Candidate() {
       const applicant = candidate?.applicantId;
       const job = candidate?.jobId;
 
-      /* Job from URL */
+      /* ---------------------------------------------------
+       * JOB FROM URL
+       * --------------------------------------------------- */
+
       if (jobId && job?._id !== jobId) {
         return false;
       }
+
+
+      /* ---------------------------------------------------
+       * BASIC DATA
+       * --------------------------------------------------- */
 
       const name =
         applicant?.name ||
@@ -335,101 +113,174 @@ function Candidate() {
 
       const searchText = search.toLowerCase();
 
-      /* Search */
+
+      /* ---------------------------------------------------
+       * SEARCH
+       * --------------------------------------------------- */
+
       const matchesSearch =
         name.toLowerCase().includes(searchText) ||
         email.toLowerCase().includes(searchText) ||
         jobTitle.toLowerCase().includes(searchText);
 
-      /* Status */
+
+      /* ---------------------------------------------------
+       * STATUS
+       * --------------------------------------------------- */
+
       const matchesStatus =
         statusFilter === "all" ||
         candidate?.status?.toLowerCase() ===
           statusFilter.toLowerCase();
 
-      /* Job */
+
+      /* ---------------------------------------------------
+       * JOB FILTER
+       * --------------------------------------------------- */
+
       const matchesJob =
         jobFilter === "all" ||
         job?._id === jobFilter;
 
-      /* Score */
-      const score = Number(candidate?.aiScore || 0);
+
+      /* ---------------------------------------------------
+       * SCORE FILTER
+       * --------------------------------------------------- */
+
+      const score = Number(
+        candidate?.aiScore || 0
+      );
 
       let matchesScore = true;
 
+      if (scoreFilter === "90") {
+        matchesScore = score >= 90;
+      }
 
-      const skills =
-        candidate?.aiAnalysis?.matchingSkills ||
-        applicant?.skills ||
-        [];
-
-      const matchesSkill =
-        skillFilter === "all" ||
-        skills.some((s) => s.toLowerCase().includes(skillFilter.toLowerCase()));
-
-      let matchesExperience = true;
-
-      const experience =
-        Number(
-          applicant?.experience ||
-          candidate?.aiAnalysis?.experienceYears ||
-
-const filteredCandidates = useMemo(() => {
-  if (!candidates) return [];
-
-  return candidates.filter((candidate) => {
-    const applicant = candidate?.applicantId;
-    const job = candidate?.jobId;
-
-    /* Job from URL */
-    if (jobId && job?._id !== jobId) {
-      return false;
-    }
-
-    const name =
-      applicant?.name ||
-      applicant?.fullName ||
-      "";
-
-    const email = applicant?.email || "";
-    const jobTitle = job?.title || "";
-
-    const searchText = search.toLowerCase();
-
-    /* Search */
-    const matchesSearch =
-      name.toLowerCase().includes(searchText) ||
-      email.toLowerCase().includes(searchText) ||
-      jobTitle.toLowerCase().includes(searchText);
-
-    /* Status */
-    const matchesStatus =
-      statusFilter === "all" ||
-      candidate?.status?.toLowerCase() ===
-        statusFilter.toLowerCase();
-
-    /* Job */
-    const matchesJob =
-      jobFilter === "all" ||
-      job?._id === jobFilter;
-
-    /* Score */
-    const score = Number(candidate?.aiScore || 0);
-
-    let matchesScore = true;
-
-    if (scoreFilter !== "all") {
-      if (scoreFilter === "80+") {
+      if (scoreFilter === "80") {
         matchesScore = score >= 80;
       }
 
-      if (scoreFilter === "60-79") {
-        matchesScore = s
+      if (scoreFilter === "70") {
+        matchesScore = score >= 70;
+      }
 
+
+      /* ---------------------------------------------------
+       * EXPERIENCE FILTER
+       * --------------------------------------------------- */
+
+      const experience =
+        Number(
+          applicant?.experience ??
+            candidate?.aiAnalysis?.experienceYears ??
+            candidate?.aiAnalysis?.experience ??
+            0
+        ) || 0;
+
+      let matchesExperience = true;
+
+      if (experienceFilter === "0-2") {
+        matchesExperience = experience <= 2;
+      }
+
+      if (experienceFilter === "2-5") {
+        matchesExperience =
+          experience > 2 && experience <= 5;
+      }
+
+      if (experienceFilter === "5+") {
+        matchesExperience = experience > 5;
+      }
+
+
+      /* ---------------------------------------------------
+       * SKILLS FILTER
+       * --------------------------------------------------- */
+
+      let matchesSkill = true;
+
+      if (skillFilter !== "all") {
+        const skills = [
+          ...(Array.isArray(applicant?.skills)
+            ? applicant.skills
+            : []),
+
+          ...(Array.isArray(candidate?.skills)
+            ? candidate.skills
+            : []),
+
+          ...(Array.isArray(
+            candidate?.aiAnalysis?.skills
+          )
+            ? candidate.aiAnalysis.skills
+            : []),
+
+          ...(Array.isArray(
+            candidate?.aiAnalysis?.matchingSkills
+          )
+            ? candidate.aiAnalysis.matchingSkills
+            : []),
+        ].map((skill) =>
+          String(skill).toLowerCase()
+        );
+
+        matchesSkill = skills.some((skill) =>
+          skill.includes(
+            skillFilter.toLowerCase()
+          )
+        );
+      }
+
+
+      /* ---------------------------------------------------
+       * FINAL RESULT
+       * --------------------------------------------------- */
+
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesJob &&
+        matchesScore &&
+        matchesSkill &&
+        matchesExperience
+      );
+    });
+  }, [
+    candidates,
+    search,
+    statusFilter,
+    jobFilter,
+    scoreFilter,
+    skillFilter,
+    experienceFilter,
+    jobId,
+  ]);
 
 
   /* -------------------------------------------------------
-   * DEFAULT SELECT
+   * UNIQUE JOBS
+   * ------------------------------------------------------- */
+
+  const jobs = useMemo(() => {
+    if (!candidates) return [];
+
+    const map = new Map();
+
+    candidates.forEach((candidate) => {
+      const job = candidate?.jobId;
+
+      if (job?._id && !map.has(job._id)) {
+        map.set(job._id, job);
+      }
+    });
+
+    return Array.from(map.values());
+  }, [candidates]);
+
+
+  /* -------------------------------------------------------
+   * DEFAULT SELECTED CANDIDATE
    * ------------------------------------------------------- */
 
   useEffect(() => {
@@ -437,9 +288,15 @@ const filteredCandidates = useMemo(() => {
       filteredCandidates.length > 0 &&
       !selectedCandidate
     ) {
-      setSelectedCandidate(filteredCandidates[0]);
+      setSelectedCandidate(
+        filteredCandidates[0]
+      );
     }
-  }, [filteredCandidates, selectedCandidate]);
+  }, [
+    filteredCandidates,
+    selectedCandidate,
+  ]);
+
 
   /* -------------------------------------------------------
    * AI ANALYSIS
@@ -458,7 +315,9 @@ const filteredCandidates = useMemo(() => {
           : candidate.applicationId;
 
       if (!applicationId) {
-        console.error("Application ID not found");
+        console.error(
+          "Application ID not found"
+        );
         return;
       }
 
@@ -476,6 +335,7 @@ const filteredCandidates = useMemo(() => {
       setAnalyzingId(null);
     }
   };
+
 
   /* -------------------------------------------------------
    * STATUS CHANGE
@@ -520,67 +380,87 @@ const filteredCandidates = useMemo(() => {
     }
   };
 
-  const handleRemoveCandidate = async () => {
-  handleActionMenuClose();
-
-  if (!selectedCandidate?._id) return;
-
-  const candidateName =
-    selectedCandidate?.applicantId?.name ||
-    selectedCandidate?.applicantId?.fullName ||
-    "this candidate";
-
-  const confirmed = window.confirm(
-    `Are you sure you want to remove ${candidateName} from the candidate list?`
-  );
-
-  if (!confirmed) return;
-
-  try {
-    await removeCandidate(selectedCandidate._id);
-
-    // Remove selected candidate from UI
-    setSelectedCandidate(null);
-
-    // Refresh candidate list
-    await fetchCandidates();
-
-  } catch (err) {
-    console.error(
-      "REMOVE CANDIDATE ERROR:",
-      err.response?.data || err.message
-    );
-
-    alert(
-      err.response?.data?.message ||
-        err.message ||
-        "Unable to remove candidate"
-    );
-  }
-};
 
   /* -------------------------------------------------------
-   * MORE MENU
+   * REMOVE CANDIDATE
+   * ------------------------------------------------------- */
+
+  const handleRemoveCandidate = async () => {
+    handleActionMenuClose();
+
+    if (!selectedCandidate?._id) {
+      return;
+    }
+
+    const candidateName =
+      selectedCandidate?.applicantId?.name ||
+      selectedCandidate?.applicantId?.fullName ||
+      "this candidate";
+
+    const confirmed = window.confirm(
+      `Are you sure you want to remove ${candidateName} from the candidate list?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await removeCandidate(
+        selectedCandidate._id
+      );
+
+      setSelectedCandidate(null);
+
+      await fetchCandidates();
+    } catch (err) {
+      console.error(
+        "REMOVE CANDIDATE ERROR:",
+        err.response?.data || err.message
+      );
+
+      alert(
+        err.response?.data?.message ||
+          err.message ||
+          "Unable to remove candidate"
+      );
+    }
+  };
+
+
+  /* -------------------------------------------------------
+   * MENU
    * ------------------------------------------------------- */
 
   const handleActionMenuOpen = (event) => {
-    setActionMenuAnchor(event.currentTarget);
+    setActionMenuAnchor(
+      event.currentTarget
+    );
   };
 
   const handleActionMenuClose = () => {
     setActionMenuAnchor(null);
   };
 
+
+  /* -------------------------------------------------------
+   * REJECT
+   * ------------------------------------------------------- */
+
   const handleReject = async () => {
     handleActionMenuClose();
 
-    if (!selectedCandidate) return;
+    if (!selectedCandidate) {
+      return;
+    }
 
     const confirmed = window.confirm(
       "Are you sure you want to reject this candidate?"
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     await handleStatusChange(
       selectedCandidate,
@@ -588,26 +468,36 @@ const filteredCandidates = useMemo(() => {
     );
   };
 
+
   /* -------------------------------------------------------
    * SCHEDULE INTERVIEW
    * ------------------------------------------------------- */
 
-  const handleScheduleInterview = (candidate) => {
-    navigate("/recruiter/interviews", {
-      state: {
-        candidate,
-      },
-    });
+  const handleScheduleInterview = (
+    candidate
+  ) => {
+    navigate(
+      "/recruiter/interviews",
+      {
+        state: {
+          candidate,
+        },
+      }
+    );
   };
+
 
   /* -------------------------------------------------------
    * VIEW RESUME
    * ------------------------------------------------------- */
 
-  const handleViewResume = async (candidate) => {
+  const handleViewResume = async (
+    candidate
+  ) => {
     try {
       const applicationId =
-        typeof candidate?.applicationId === "object"
+        typeof candidate?.applicationId ===
+        "object"
           ? candidate.applicationId._id
           : candidate?.applicationId;
 
@@ -644,39 +534,43 @@ const filteredCandidates = useMemo(() => {
     }
   };
 
+
   /* -------------------------------------------------------
    * SCORE HELPERS
    * ------------------------------------------------------- */
 
   const getScoreColor = (score) => {
     if (score >= 80) return "#70d84a";
+
     if (score >= 60) return "#f4c542";
 
     return "#ff5d7d";
   };
 
+
   const getScoreLabel = (score) => {
-    if (score >= 90) return "Excellent Match";
-    if (score >= 80) return "Strong Match";
-    if (score >= 70) return "Good Match";
-    if (score >= 60) return "Moderate Match";
+    if (score >= 90) {
+      return "Excellent Match";
+    }
+
+    if (score >= 80) {
+      return "Strong Match";
+    }
+
+    if (score >= 70) {
+      return "Good Match";
+    }
+
+    if (score >= 60) {
+      return "Moderate Match";
+    }
 
     return "Low Match";
   };
 
-  const getExperience = (candidate) => {
-    const applicant = candidate?.applicantId;
-
-    return (
-      applicant?.experience ||
-      candidate?.aiAnalysis?.experienceYears ||
-      candidate?.aiAnalysis?.experience ||
-      "N/A"
-    );
-  };
 
   /* -------------------------------------------------------
-   * SELECTED DATA
+   * SELECTED CANDIDATE DATA
    * ------------------------------------------------------- */
 
   const selectedApplicant =
@@ -688,28 +582,29 @@ const filteredCandidates = useMemo(() => {
   const selectedAnalysis =
     selectedCandidate?.aiAnalysis || {};
 
-  const selectedScore =
-    Number(selectedCandidate?.aiScore || 0);
+  const selectedScore = Number(
+    selectedCandidate?.aiScore || 0
+  );
+
 
   /* -------------------------------------------------------
-   * LOADING
+   * EXPERIENCE
    * ------------------------------------------------------- */
 
-  if (loading) {
+  const getExperience = (candidate) => {
+    const applicant =
+      candidate?.applicantId;
+
     return (
-      <Box
-        sx={{
-          minHeight: "100vh",
-          bgcolor: "#020817",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      applicant?.experience ||
+      candidate?.aiAnalysis
+        ?.experienceYears ||
+      candidate?.aiAnalysis
+        ?.experience ||
+      "N/A"
     );
-  }
+  };
+
 
   /* -------------------------------------------------------
    * UI
@@ -719,692 +614,711 @@ const filteredCandidates = useMemo(() => {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#020817",
-        color: "#f8fafc",
+        background: "#020817",
+        color: "#fff",
       }}
     >
-      {/* NAVBAR */}
-      <Box
-        component="header"
-        sx={{
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-        }}
-      >
-        <RNavbar />
-      </Box>
+      <RNavbar />
 
       <Box
         sx={{
           display: "flex",
-          minWidth: 0,
         }}
       >
-        {/* SIDEBAR */}
         <RSidebar />
 
-        {/* MAIN */}
         <Box
-          component="main"
           sx={{
             flex: 1,
+            p: 3,
             minWidth: 0,
-            height: "calc(100vh - 68px)",
-            overflow: "hidden",
-            bgcolor: "#020817",
           }}
         >
+
+          {/* HEADER */}
+
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={2}
+            mb={3}
+          >
+            <IconButton
+              onClick={() =>
+                navigate(-1)
+              }
+              sx={{
+                color: "#fff",
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+
+            <Box>
+              <Typography
+                variant="h4"
+                fontWeight={700}
+              >
+                Candidates
+              </Typography>
+
+              <Typography
+                sx={{
+                  color: "#94a3b8",
+                }}
+              >
+                Manage and evaluate
+                candidates
+              </Typography>
+            </Box>
+          </Stack>
+
+
+          {/* FILTERS */}
+
           <Box
             sx={{
-              height: "100%",
               display: "flex",
-              flexDirection: "column",
+              gap: 2,
+              flexWrap: "wrap",
+              mb: 3,
             }}
           >
-            {/* TOP HEADER */}
-            <Box
+
+            {/* SEARCH */}
+
+            <TextField
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              placeholder="Search candidates..."
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <SearchIcon
+                    sx={{
+                      mr: 1,
+                      color: "#94a3b8",
+                    }}
+                  />
+                ),
+              }}
               sx={{
-                px: {
-                  xs: 2,
-                  md: 3,
+                minWidth: 260,
+                "& .MuiOutlinedInput-root": {
+                  color: "#fff",
+                  background:
+                    "#0f172a",
                 },
-                pt: 3,
-                pb: 2,
+              }}
+            />
+
+
+            {/* STATUS */}
+
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 150,
               }}
             >
-              <Box
+              <Select
+                value={statusFilter}
+                onChange={(e) =>
+                  setStatusFilter(
+                    e.target.value
+                  )
+                }
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  color: "#fff",
+                  background:
+                    "#0f172a",
                 }}
               >
-                <Box>
-                  <Typography
-                    sx={{ fontSize: 28, fontWeight: 700, letterSpacing: "-0.5px" }}
-                  >
-                    Candidates
-                  </Typography>
+                <MenuItem value="all">
+                  Status
+                </MenuItem>
 
-                  <Typography
-                    sx={{
-                      mt: 0.5,
-                      color: "#8c97ab",
-                      fontSize: 14,
-                    }}
-                  >
-                    Review and rank candidates using
-                    AI-powered resume analysis
-                  </Typography>
-                </Box>
+                <MenuItem value="applied">
+                  Applied
+                </MenuItem>
 
-                <Button
-                  startIcon={
-                    <DownloadRoundedIcon />
-                  }
-                  sx={{
-                    display: {
-                      xs: "none",
-                      md: "flex",
-                    },
-                    textTransform: "none",
-                    color: "white",
-                    px: 2.5,
-                    py: 1.1,
-                    borderRadius: 1.5,
-                    background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-                    "&:hover": {
-                      background: "linear-gradient(135deg,#4f46e5,#7c3aed)",
-                    },
-                  }}
-                >
-                  Download Report
-                </Button>
-              </Box>
+                <MenuItem value="shortlisted">
+                  Shortlisted
+                </MenuItem>
 
-              {/* TITLE */}
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 3, mb: 2 }}
+                <MenuItem value="rejected">
+                  Rejected
+                </MenuItem>
+
+                <MenuItem value="hired">
+                  Hired
+                </MenuItem>
+              </Select>
+            </FormControl>
+
+
+            {/* JOB */}
+
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 180,
+              }}
+            >
+              <Select
+                value={jobFilter}
+                onChange={(e) =>
+                  setJobFilter(
+                    e.target.value
+                  )
+                }
+                sx={{
+                  color: "#fff",
+                  background:
+                    "#0f172a",
+                }}
               >
+                <MenuItem value="all">
+                  All Jobs
+                </MenuItem>
+
+                {jobs.map((job) => (
+                  <MenuItem
+                    key={job._id}
+                    value={job._id}
+                  >
+                    {job.title}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+
+            {/* SCORE */}
+
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 150,
+              }}
+            >
+              <Select
+                value={scoreFilter}
+                onChange={(e) =>
+                  setScoreFilter(
+                    e.target.value
+                  )
+                }
+                sx={{
+                  color: "#fff",
+                  background:
+                    "#0f172a",
+                }}
+              >
+                <MenuItem value="all">
+                  Match Score
+                </MenuItem>
+
+                <MenuItem value="90">
+                  90 - 100
+                </MenuItem>
+
+                <MenuItem value="80">
+                  80 - 100
+                </MenuItem>
+
+                <MenuItem value="70">
+                  70 - 100
+                </MenuItem>
+              </Select>
+            </FormControl>
+
+
+            {/* SKILLS */}
+
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 150,
+              }}
+            >
+              <Select
+                value={skillFilter}
+                onChange={(e) =>
+                  setSkillFilter(
+                    e.target.value
+                  )
+                }
+                sx={{
+                  color: "#fff",
+                  background:
+                    "#0f172a",
+                }}
+              >
+                <MenuItem value="all">
+                  Skills
+                </MenuItem>
+
+                <MenuItem value="react">
+                  React
+                </MenuItem>
+
+                <MenuItem value="node">
+                  Node.js
+                </MenuItem>
+
+                <MenuItem value="mongodb">
+                  MongoDB
+                </MenuItem>
+              </Select>
+            </FormControl>
+
+
+            {/* EXPERIENCE */}
+
+            <FormControl
+              size="small"
+              sx={{
+                minWidth: 160,
+              }}
+            >
+              <Select
+                value={
+                  experienceFilter
+                }
+                onChange={(e) =>
+                  setExperienceFilter(
+                    e.target.value
+                  )
+                }
+                sx={{
+                  color: "#fff",
+                  background:
+                    "#0f172a",
+                }}
+              >
+                <MenuItem value="all">
+                  Experience
+                </MenuItem>
+
+                <MenuItem value="0-2">
+                  0 - 2 years
+                </MenuItem>
+
+                <MenuItem value="2-5">
+                  2 - 5 years
+                </MenuItem>
+
+                <MenuItem value="5+">
+                  5+ years
+                </MenuItem>
+              </Select>
+            </FormControl>
+
+          </Box>
+
+
+          {/* MAIN CONTENT */}
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns:
+                "minmax(350px, 0.9fr) minmax(400px, 1.1fr)",
+              gap: 2,
+            }}
+          >
+
+            {/* CANDIDATE LIST */}
+
+            <Box
+              sx={{
+                background:
+                  "#0f172a",
+                border:
+                  "1px solid #1e293b",
+                borderRadius: 2,
+                overflow: "hidden",
+              }}
+            >
+
+              <Box sx={{ p: 2 }}>
                 <Typography
-                  sx={{
-                    fontSize: 19,
-                    fontWeight: 600,
-                  }}
+                  fontWeight={700}
                 >
-                  Candidate Ranking
+                  Candidates (
+                  {
+                    filteredCandidates.length
+                  }
+                  )
                 </Typography>
-
-                <AutoAwesomeRoundedIcon
-                  sx={{
-                    fontSize: 19,
-                    color: "#8b5cf6",
-                  }}
-                />
               </Box>
 
-              {/* FILTERS */}
-              <Box
+              <Divider
                 sx={{
-                  display: "flex",
-                  gap: 1.5,
-                  flexWrap: "wrap",
+                  borderColor:
+                    "#1e293b",
                 }}
-              >
-                {/* SEARCH */}
-                <TextField
-                  size="small"
-                  placeholder="Search candidates..."
-                  value={search}
-                  onChange={(e) =>
-                    setSearch(e.target.value)
-                  }
-                  InputProps={{
-                    startAdornment: (
-                      <SearchRoundedIcon
-                        sx={{
-                          mr: 1,
-                          color: "#738096",
-                          fontSize: 20,
-                        }}
-                      />
-                    ),
-                  }}
-                  sx={{
-                    width: {
-                      xs: "100%",
-                      md: 260,
-                    },
+              />
 
-                    "& .MuiOutlinedInput-root": {
-                      bgcolor: "#0b1425",
-                      borderRadius: 1.5,
-                      color: "white",
 
-                      "& fieldset": {
-                        borderColor: "#263249",
-                      },
-                    },
-                  }}
-                />
-
-                {/* JOB */}
-                <FormControl size="small">
-                  <Select
-                    value={jobFilter}
-                    onChange={(e) =>
-                      setJobFilter(e.target.value)
-                    }
-                    displayEmpty
-                    sx={selectStyle}
-                  >
-                    <MenuItem value="all">
-                      All Jobs
-                    </MenuItem>
-
-                    {jobs.map((job) => (
-                      <MenuItem
-                        key={job._id}
-                        value={job._id}
-                      >
-                        {job.title}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                {/* SCORE */}
-                <FormControl size="small">
-                  <Select
-                    value={scoreFilter}
-                    onChange={(e) =>
-                      setScoreFilter(e.target.value)
-                    }
-                    displayEmpty
-                    sx={selectStyle}
-                  >
-                    <MenuItem value="all">
-                      Match Score
-                    </MenuItem>
-
-                    <MenuItem value="90">
-                      90 - 100
-                    </MenuItem>
-
-                    <MenuItem value="80">
-                      80 - 100
-                    </MenuItem>
-
-                    <MenuItem value="70">
-                      70 - 100
-                    </MenuItem>
-                  </Select>
-                </FormControl>
-
-                {/* SKILLS */}
-                <FormControl size="small">
-                  <Select
-                    value={skillFilter}
-                    onChange={(e) =>
-                      setSkillFilter(e.target.value)
-                    }
-                    displayEmpty
-                    sx={selectStyle}
-                  >
-                    <MenuItem value="all">
-                      Skills
-                    </MenuItem>
-
-                    <MenuItem value="react">
-                      React
-                    </MenuItem>
-
-                    <MenuItem value="node">
-                      Node.js
-                    </MenuItem>
-
-                    <MenuItem value="mongodb">
-                      MongoDB
-                    </MenuItem>
-                  </Select>
-                </FormControl>
-
-                {/* EXPERIENCE */}
-                <FormControl size="small">
-                  <Select
-                    value={experienceFilter}
-                    onChange={(e) =>
-                      setExperienceFilter(
-                        e.target.value
-                      )
-                    }
-                    displayEmpty
-                    sx={selectStyle}
-                  >
-                    <MenuItem value="all">
-                      Experience
-                    </MenuItem>
-
-                    <MenuItem value="0-2">
-                      0 - 2 years
-                    </MenuItem>
-
-                    <MenuItem value="2-5">
-                      2 - 5 years
-                    </MenuItem>
-
-                    <MenuItem value="5+">
-                      5+ years
-                    </MenuItem>
-                  </Select>
-                </FormControl>
-
-                {/* FILTER BUTTON */}
-                <Button
-                  startIcon={
-                    <FilterAltOutlinedIcon />
-                  }
-                  variant="outlined"
-                  sx={{
-                    textTransform: "none",
-                    color: "#d4dbea",
-                    borderColor: "#263249",
-                    borderRadius: 1.5,
-                    px: 2,
-                  }}
-                >
-                  Filters
-                </Button>
-              </Box>
-            </Box>
-
-            {/* SPLIT VIEW */}
-            <Box
-              sx={{
-                flex: 1,
-                minHeight: 0,
-                display: "grid",
-                gridTemplateColumns: {
-                  xs: "1fr",
-                  lg: "minmax(500px, 1.1fr) minmax(420px, .9fr)",
-                },
-                gap: 0,
-                borderTop:
-                  "1px solid #172236",
-              }}
-            >
-              {/* LEFT COLUMN */}
-              <Box
-                sx={{
-                  minWidth: 0,
-                  overflowY: "auto",
-                  px: {
-                    xs: 2,
-                    md: 3,
-                  },
-                  py: 2,
-
-                  borderRight: {
-                    lg: "1px solid #172236",
-                  },
-
-                  display: {
-                    xs: selectedCandidate
-                      ? "none"
-                      : "block",
-                    lg: "block",
-                  },
-                }}
-              >
+              {filteredCandidates.length ===
+              0 ? (
                 <Box
-                  sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}
+                  sx={{
+                    p: 4,
+                    textAlign:
+                      "center",
+                  }}
                 >
                   <Typography
-                    sx={{
-                      fontSize: 13,
-                      color: "#8c97ab",
-                    }}
+                    color="#94a3b8"
                   >
-                    Total{" "}
-                    {filteredCandidates.length}{" "}
-                    candidates found
-                  </Typography>
-
-                  <Typography
-                    sx={{
-                      fontSize: 13,
-                      color: "#8c97ab",
-                    }}
-                  >
-                    Sort by:{" "}
-                    <b
-                      style={{
-                        color: "#e2e8f0",
-                      }}
-                    >
-                      Highest Match
-                    </b>
+                    No candidates found
                   </Typography>
                 </Box>
+              ) : (
+                filteredCandidates.map(
+                  (candidate) => {
+                    const applicant =
+                      candidate?.applicantId;
 
-                {error && (
-                  <Alert
-                    severity="error"
-                    sx={{ mb: 2 }}
-                  >
-                    {error}
-                  </Alert>
-                )}
+                    const score =
+                      Number(
+                        candidate?.aiScore ||
+                          0
+                      );
 
-                {filteredCandidates.length ===
-                0 ? (
-                  <Box
-                    sx={{
-                      py: 10,
-                      textAlign: "center",
-                    }}
-                  >
-                    <Typography>
-                      No candidates found
-                    </Typography>
-                  </Box>
-                ) : (
-                  [...filteredCandidates]
-                    .sort(
-                      (a, b) =>
-                        Number(
-                          b.aiScore || 0
-                        ) -
-                        Number(
-                          a.aiScore || 0
-                        )
-                    )
-                    .map(
-                      (
-                        candidate,
-                        index
-                      ) => (
-                        <CandidateRow
-                          key={
-                            candidate._id
-                          }
-                          candidate={
+                    const isSelected =
+                      selectedCandidate?._id ===
+                      candidate?._id;
+
+                    return (
+                      <Box
+                        key={
+                          candidate._id
+                        }
+                        onClick={() =>
+                          setSelectedCandidate(
                             candidate
-                          }
-                          rank={
-                            index + 1
-                          }
-                          selected={
-                            selectedCandidate?._id ===
-                            candidate._id
-                          }
-                          onClick={() =>
-                            setSelectedCandidate(
-                              candidate
-                            )
-                          }
-                        />
-                      )
-                    )
-                )}
-
-                {/* PAGINATION */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent:
-                      "center",
-                    alignItems:
-                      "center",
-                    gap: 1,
-                    py: 3,
-                  }}
-                >
-                  <IconButton
-                    sx={
-                      paginationButton
-                    }
-                  >
-                    <ArrowBackIosNewRoundedIcon
-                      sx={{
-                        fontSize: 14,
-                      }}
-                    />
-                  </IconButton>
-
-                  <Box sx={pageNumber}>
-                    1
-                  </Box>
-
-                  <Typography
-                    sx={pageText}
-                  >
-                    2
-                  </Typography>
-
-                  <Typography
-                    sx={pageText}
-                  >
-                    3
-                  </Typography>
-
-                  <IconButton
-                    sx={
-                      paginationButton
-                    }
-                  >
-                    <ArrowForwardIosRoundedIcon
-                      sx={{
-                        fontSize: 14,
-                      }}
-                    />
-                  </IconButton>
-                </Box>
-              </Box>
-
-              {/* RIGHT COLUMN */}
-              {selectedCandidate && (
-                <Box
-                  sx={{
-                    minWidth: 0,
-                    overflowY: "auto",
-                    p: { xs: 2, md: 3 },
-                    display: { xs: "block", lg: "block" },
-                  }}
-                >
-                  {/* MOBILE BACK */}
-                  <Button
-                    startIcon={
-                      <ArrowBackIosNewRoundedIcon />
-                    }
-                    onClick={() =>
-                      setSelectedCandidate(
-                        null
-                      )
-                    }
-                    sx={{
-                      display: {
-                        xs: "flex",
-                        lg: "none",
-                      },
-                      color: "#b7c0d1",
-                      textTransform:
-                        "none",
-                      mb: 2,
-                    }}
-                  >
-                    Back to list
-                  </Button>
-
-                  {/* PROFILE HEADER */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent:
-                        "space-between",
-                      gap: 2,
-                      mb: 3,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display:
-                          "flex",
-                        gap: 2,
-                      }}
-                    >
-                      <Avatar
-                        src={selectedApplicant?.profileImage || selectedApplicant?.avatar}
-                        sx={{ width: 64, height: 64, bgcolor: "#1e293b" }}
+                          )
+                        }
+                        sx={{
+                          p: 2,
+                          cursor: "pointer",
+                          borderTop:
+                            "1px solid #1e293b",
+                          background:
+                            isSelected
+                              ? "#172033"
+                              : "transparent",
+                          "&:hover": {
+                            background:
+                              "#172033",
+                          },
+                        }}
                       >
-                        {(selectedApplicant?.name || selectedApplicant?.fullName || "C")
-                          .charAt(0)
-                          .toUpperCase()}
-                      </Avatar>
 
-                      <Box>
-                        <Box
-                          sx={{
-                            display:
-                              "flex",
-                            alignItems:
-                              "center",
-                            gap: 1,
-                          }}
+                        <Stack
+                          direction="row"
+                          justifyContent="space-between"
+                          alignItems="flex-start"
                         >
-                          <Typography
+
+                          <Box>
+                            <Typography
+                              fontWeight={700}
+                            >
+                              {applicant?.name ||
+                                applicant?.fullName ||
+                                "Unknown Candidate"}
+                            </Typography>
+
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color:
+                                  "#94a3b8",
+                                mt: 0.5,
+                              }}
+                            >
+                              {applicant?.email ||
+                                "No email"}
+                            </Typography>
+
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color:
+                                  "#64748b",
+                                mt: 0.5,
+                              }}
+                            >
+                              {candidate?.jobId
+                                ?.title ||
+                                "No job"}
+                            </Typography>
+                          </Box>
+
+
+                          <Chip
+                            label={`${score}%`}
+                            size="small"
                             sx={{
-                              fontSize: 20,
-                              fontWeight: 700,
+                              color:
+                                getScoreColor(
+                                  score
+                                ),
+                              border: `1px solid ${getScoreColor(
+                                score
+                              )}`,
+                              background:
+                                "transparent",
+                            }}
+                          />
+
+                        </Stack>
+
+
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          mt={1}
+                        >
+                          <Chip
+                            label={
+                              candidate?.status ||
+                              "Applied"
+                            }
+                            size="small"
+                            sx={{
+                              background:
+                                "#1e293b",
+                              color:
+                                "#cbd5e1",
+                            }}
+                          />
+
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color:
+                                "#64748b",
+                              alignSelf:
+                                "center",
                             }}
                           >
-                            {selectedApplicant?.name ||
-                              selectedApplicant?.fullName ||
-                              "Unknown Candidate"}
+                            {getExperience(
+                              candidate
+                            )}{" "}
+                            years
                           </Typography>
+                        </Stack>
 
-                          <Box
-                            sx={{
-                              width: 8,
-                              height: 8,
-                              borderRadius:
-                                "50%",
-                              bgcolor:
-                                "#70d84a",
-                            }}
-                          />
-                        </Box>
-
-                        <Typography
-                          sx={{
-                            color:
-                              "#a1aabd",
-                            fontSize: 13,
-                            mt: 0.3,
-                          }}
-                        >
-                          {selectedJob?.title ||
-                            "Full Stack Developer"}
-                        </Typography>
-
-                        <Typography
-                          sx={{
-                            color:
-                              "#8c97ab",
-                            fontSize: 12,
-                            mt: 1,
-                          }}
-                        >
-                          {selectedApplicant?.email ||
-                            "No email available"}
-                        </Typography>
-
-                        <Typography
-                          sx={{
-                            color:
-                              "#8c97ab",
-                            fontSize: 12,
-                            mt: 0.4,
-                          }}
-                        >
-                          <LocationOnOutlinedIcon
-                            sx={{ fontSize: 14, verticalAlign: "middle", mr: 0.3 }}
-                          />
-                          India
-                        </Typography>
                       </Box>
+                    );
+                  }
+                )
+              )}
+
+            </Box>
+
+
+            {/* DETAILS */}
+
+            <Box
+              sx={{
+                background:
+                  "#0f172a",
+                border:
+                  "1px solid #1e293b",
+                borderRadius: 2,
+                p: 3,
+                minHeight: 500,
+              }}
+            >
+
+              {!selectedCandidate ? (
+                <Box
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    alignItems:
+                      "center",
+                    justifyContent:
+                      "center",
+                  }}
+                >
+                  <Typography
+                    color="#64748b"
+                  >
+                    Select a candidate
+                    to view details
+                  </Typography>
+                </Box>
+              ) : (
+                <>
+
+                  {/* CANDIDATE HEADER */}
+
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                  >
+
+                    <Box>
+                      <Typography
+                        variant="h5"
+                        fontWeight={700}
+                      >
+                        {selectedApplicant?.name ||
+                          selectedApplicant?.fullName ||
+                          "Candidate"}
+                      </Typography>
+
+                      <Typography
+                        color="#94a3b8"
+                      >
+                        {selectedApplicant?.email ||
+                          "No email"}
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          mt: 1,
+                          color:
+                            "#64748b",
+                        }}
+                      >
+                        {selectedJob?.title ||
+                          "Job"}
+                      </Typography>
                     </Box>
 
-                    {/* VIEW RESUME */}
-                    <Button
-                      variant="outlined"
-                      startIcon={
-                        <DescriptionOutlinedIcon />
+
+                    <IconButton
+                      onClick={
+                        handleActionMenuOpen
                       }
+                      sx={{
+                        color: "#fff",
+                      }}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+
+                  </Stack>
+
+
+                  {/* ACTION MENU */}
+
+                  <Menu
+                    anchorEl={
+                      actionMenuAnchor
+                    }
+                    open={Boolean(
+                      actionMenuAnchor
+                    )}
+                    onClose={
+                      handleActionMenuClose
+                    }
+                  >
+                    <MenuItem
                       onClick={() =>
                         handleViewResume(
                           selectedCandidate
                         )
                       }
-                      sx={{
-                        textTransform:
-                          "none",
-                        borderColor:
-                          "#263249",
-                        color:
-                          "#dbe3f0",
-                        height: 38,
-                      }}
                     >
                       View Resume
-                    </Button>
-                  </Box>
+                    </MenuItem>
 
-                  {/* AI SCORE */}
-                  <DetailCard>
-                    <Box
-                      sx={{
-                        display:
-                          "flex",
-                        justifyContent:
-                          "space-between",
-                        alignItems:
-                          "center",
-                      }}
+                    <MenuItem
+                      onClick={() =>
+                        console.log(
+                          "Add note"
+                        )
+                      }
                     >
+                      Add Note
+                    </MenuItem>
+
+                    <MenuItem
+                      onClick={handleReject}
+                    >
+                      Reject Candidate
+                    </MenuItem>
+
+                    <MenuItem
+                      onClick={
+                        handleRemoveCandidate
+                      }
+                    >
+                      Remove Candidate
+                    </MenuItem>
+                  </Menu>
+
+
+                  <Divider
+                    sx={{
+                      my: 3,
+                      borderColor:
+                        "#1e293b",
+                    }}
+                  />
+
+
+                  {/* SCORE */}
+
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      background:
+                        "#07111f",
+                      border:
+                        "1px solid #1e293b",
+                      mb: 3,
+                    }}
+                  >
+
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+
                       <Box>
                         <Typography
-                          sx={{
-                            color:
-                              "#dce3ef",
-                            fontSize: 13,
-                            mb: 1,
-                          }}
+                          color="#94a3b8"
                         >
                           AI Match Score
                         </Typography>
 
                         <Typography
+                          variant="h3"
+                          fontWeight={800}
                           sx={{
-                            fontSize: 43,
-                            lineHeight: 1,
-                            fontWeight: 800,
                             color:
                               getScoreColor(
                                 selectedScore
                               ),
                           }}
                         >
-                          {selectedScore}%
+                          {
+                            selectedScore
+                          }%
                         </Typography>
 
                         <Typography
                           sx={{
-                            mt: 1,
-                            fontSize: 13,
                             color:
-                              "#dce3ef",
+                              getScoreColor(
+                                selectedScore
+                              ),
                           }}
                         >
                           {getScoreLabel(
@@ -1413,642 +1327,324 @@ const filteredCandidates = useMemo(() => {
                         </Typography>
                       </Box>
 
+
                       <Button
                         variant="contained"
-                        startIcon={
-                          analyzingId ===
-                          selectedCandidate._id ? (
-                            <CircularProgress
-                              size={16}
-                              color="inherit"
-                            />
-                          ) : (
-                            <AutoAwesomeRoundedIcon />
-                          )
-                        }
-                        disabled={
-                          analyzingId ===
-                          selectedCandidate._id
-                        }
                         onClick={() =>
                           handleAIAnalysis(
                             selectedCandidate
                           )
                         }
-                        sx={{
-                          textTransform:
-                            "none",
-                          background:
-                            "linear-gradient(135deg, #8b5cf6, #6366f1)",
-                          px: 2,
-                          py: 1,
-                          borderRadius: 1.5,
-                          fontWeight: 600,
-                        }}
+                        disabled={
+                          analyzingId ===
+                          selectedCandidate?._id
+                        }
                       >
                         {analyzingId ===
-                        selectedCandidate._id
+                        selectedCandidate?._id
                           ? "Analyzing..."
-                          : "Run AI Analysis"}
+                          : "Analyze Resume"}
                       </Button>
-                    </Box>
 
-                    <Box sx={{ mt: 2 }}>
-                      <LinearProgress
-                        variant="determinate"
-                        value={
-                          selectedScore
-                        }
-                        sx={{
-                          height: 6,
-                          borderRadius: 3,
-                          bgcolor:
-                            "#172236",
+                    </Stack>
 
-                          "& .MuiLinearProgress-bar":
-                            {
-                              bgcolor:
-                                getScoreColor(
-                                  selectedScore
-                                ),
-                            },
-                        }}
-                      />
-                    </Box>
-                  </DetailCard>
-
-                  {/* AI SUMMARY */}
-                  <DetailCard>
-                    <Typography
-                      sx={{
-                        fontSize: 15,
-                        fontWeight: 600,
-                        mb: 1.5,
-                        display: "flex",
-                        alignItems:
-                          "center",
-                        gap: 1,
-                      }}
-                    >
-                      <AutoAwesomeRoundedIcon
-                        sx={{
-                          fontSize: 16,
-                          color:
-                            "#8b5cf6",
-                        }}
-                      />
-
-                      AI Analysis Summary
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        fontSize: 13,
-                        color:
-                          "#94a3b8",
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {selectedAnalysis?.summary ||
-                        selectedCandidate?.aiSummary ||
-                        "No analysis generated yet. Click 'Run AI Analysis' to extract candidate insights, key strengths, and matching parameters."}
-                    </Typography>
-                  </DetailCard>
-
-                  {/* AI CANDIDATE COPILOT */}
-                  {selectedCandidate?.applicationId && (
-                    <CandidateCopilot
-                      applicationId={
-                        typeof selectedCandidate.applicationId === "object"
-                          ? selectedCandidate.applicationId._id
-                          : selectedCandidate.applicationId
-                      }
-                    />
-                  )}
-
-                  {/* STRENGTHS + GAPS */}
-                  <Box
-                    sx={{
-                      display:
-                        "grid",
-                      gridTemplateColumns:
-                        {
-                          xs: "1fr",
-                          sm: "1fr 1fr",
-                        },
-                      gap: 2,
-                      mb: 2,
-                    }}
-                  >
-                    {/* STRENGTHS */}
-                    <DetailCard
-                      sx={{
-                        mb: 0,
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontSize: 14,
-                          fontWeight: 600,
-                          color:
-                            "#70d84a",
-                          mb: 1.5,
-                          display:
-                            "flex",
-                          alignItems:
-                            "center",
-                          gap: 0.8,
-                        }}
-                      >
-                        <CheckCircleRoundedIcon
-                          sx={{
-                            fontSize: 16,
-                          }}
-                        />
-
-                        Key Strengths
-                      </Typography>
-
-                      {(
-                        selectedAnalysis?.strengths || [
-                          "Strong experience with React & Node.js",
-                          "Good project track record",
-                          "Relevant domain knowledge",
-                        ]
-                      ).map(
-                        (
-                          strength,
-                          i
-                        ) => (
-                          <Typography
-                            key={i}
-                            sx={{
-                              fontSize: 12,
-                              color:
-                                "#cbd5e1",
-                              mb: 0.8,
-                              display:
-                                "flex",
-                              alignItems:
-                                "center",
-                              gap: 1,
-                            }}
-                          >
-                            •{" "}
-                            {strength}
-                          </Typography>
-                        )
-                      )}
-                    </DetailCard>
-
-                    {/* GAPS */}
-                    <DetailCard
-                      sx={{
-                        mb: 0,
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontSize: 14,
-                          fontWeight: 600,
-                          color:
-                            "#ff5d7d",
-                          mb: 1.5,
-                          display:
-                            "flex",
-                          alignItems:
-                            "center",
-                          gap: 0.8,
-                        }}
-                      >
-                        <CancelRoundedIcon
-                          sx={{
-                            fontSize: 16,
-                          }}
-                        />
-
-                        Skill Gaps
-                      </Typography>
-
-                      {(
-                        selectedAnalysis?.weaknesses ||
-                        selectedAnalysis?.gaps || [
-                          "Limited experience in Cloud DevOps",
-                          "Short tenure at recent position",
-                        ]
-                      ).map(
-                        (
-                          gap,
-                          i
-                        ) => (
-                          <Typography
-                            key={i}
-                            sx={{
-                              fontSize: 12,
-                              color:
-                                "#cbd5e1",
-                              mb: 0.8,
-                              display:
-                                "flex",
-                              alignItems:
-                                "center",
-                              gap: 1,
-                            }}
-                          >
-                            •{" "}
-                            {gap}
-                          </Typography>
-                        )
-                      )}
-                    </DetailCard>
                   </Box>
 
-                  {/* SKILLS */}
-                  <DetailCard>
-                    <Typography
-                      sx={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        mb: 1.5,
-                      }}
-                    >
-                      Identified Skills
+
+                  {/* STATUS */}
+
+                  <Typography
+                    fontWeight={700}
+                    mb={1}
+                  >
+                    Candidate Status
+                  </Typography>
+
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    mb={3}
+                  >
+
+                    {[
+                      "applied",
+                      "shortlisted",
+                      "hired",
+                      "rejected",
+                    ].map((status) => (
+                      <Button
+                        key={status}
+                        size="small"
+                        variant={
+                          selectedCandidate?.status ===
+                          status
+                            ? "contained"
+                            : "outlined"
+                        }
+                        onClick={() =>
+                          handleStatusChange(
+                            selectedCandidate,
+                            status
+                          )
+                        }
+                      >
+                        {status
+                          .charAt(0)
+                          .toUpperCase() +
+                          status.slice(1)}
+                      </Button>
+                    ))}
+
+                  </Stack>
+
+
+                  {/* DETAILS */}
+
+                  <Typography
+                    variant="h6"
+                    fontWeight={700}
+                    mb={2}
+                  >
+                    Candidate Details
+                  </Typography>
+
+                  <Stack spacing={1.5}>
+
+                    <Typography>
+                      <strong>
+                        Experience:
+                      </strong>{" "}
+                      {getExperience(
+                        selectedCandidate
+                      )}{" "}
+                      years
                     </Typography>
 
-                    <Box
-                      sx={{
-                        display:
-                          "flex",
-                        flexWrap:
-                          "wrap",
-                        gap: 1,
-                      }}
+                    <Typography>
+                      <strong>
+                        Job:
+                      </strong>{" "}
+                      {selectedJob?.title ||
+                        "N/A"}
+                    </Typography>
+
+                    <Typography>
+                      <strong>
+                        Status:
+                      </strong>{" "}
+                      {selectedCandidate?.status ||
+                        "Applied"}
+                    </Typography>
+
+                  </Stack>
+
+
+                  {/* AI ANALYSIS */}
+
+                  <Box mt={4}>
+
+                    <Typography
+                      variant="h6"
+                      fontWeight={700}
+                      mb={2}
                     >
-                      {(
-                        selectedApplicant?.skills ||
-                        selectedAnalysis?.skills || [
-                          "React.js",
-                          "Node.js",
-                          "JavaScript",
-                          "Express",
-                          "MongoDB",
-                          "Tailwind CSS",
-                        ]
-                      ).map(
-                        (
-                          skill,
-                          index
-                        ) => (
-                          <Chip
-                            key={
-                              index
-                            }
-                            label={
-                              skill
-                            }
-                            size="small"
-                            sx={{
-                              bgcolor:
-                                "#172236",
-                              color:
-                                "#e2e8f0",
-                              fontSize: 12,
-                              border:
-                                "1px solid #263249",
-                            }}
-                          />
-                        )
+                      AI Analysis
+                    </Typography>
+
+                    <Typography
+                      color="#94a3b8"
+                      mb={2}
+                    >
+                      {selectedAnalysis
+                        ?.summary ||
+                        "No AI analysis available yet."}
+                    </Typography>
+
+
+                    {Array.isArray(
+                      selectedAnalysis?.skills
+                    ) &&
+                      selectedAnalysis
+                        .skills.length >
+                        0 && (
+                        <Box mb={2}>
+                          <Typography
+                            fontWeight={600}
+                            mb={1}
+                          >
+                            Skills
+                          </Typography>
+
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            flexWrap="wrap"
+                            useFlexGap
+                          >
+                            {selectedAnalysis.skills.map(
+                              (
+                                skill,
+                                index
+                              ) => (
+                                <Chip
+                                  key={
+                                    index
+                                  }
+                                  label={
+                                    skill
+                                  }
+                                  size="small"
+                                />
+                              )
+                            )}
+                          </Stack>
+                        </Box>
                       )}
-                    </Box>
-                  </DetailCard>
 
-                  {/* =================================================
-                      ACTION BUTTONS
-                     ================================================= */}
 
-                  <Box
-                    sx={{
-                      display:
-                        "flex",
-                      gap: 1.5,
-                      mt: 3,
-                      pt: 2.5,
-                      borderTop:
-                        "1px solid #172236",
-                      flexWrap:
-                        "wrap",
-                    }}
+                    {Array.isArray(
+                      selectedAnalysis?.strengths
+                    ) &&
+                      selectedAnalysis
+                        .strengths.length >
+                        0 && (
+                        <Box mb={2}>
+                          <Typography
+                            fontWeight={600}
+                            mb={1}
+                          >
+                            Strengths
+                          </Typography>
+
+                          {selectedAnalysis.strengths.map(
+                            (
+                              strength,
+                              index
+                            ) => (
+                              <Typography
+                                key={
+                                  index
+                                }
+                                color="#94a3b8"
+                              >
+                                •{" "}
+                                {strength}
+                              </Typography>
+                            )
+                          )}
+                        </Box>
+                      )}
+
+
+                    {Array.isArray(
+                      selectedAnalysis?.weaknesses
+                    ) &&
+                      selectedAnalysis
+                        .weaknesses.length >
+                        0 && (
+                        <Box mb={2}>
+                          <Typography
+                            fontWeight={600}
+                            mb={1}
+                          >
+                            Weaknesses
+                          </Typography>
+
+                          {selectedAnalysis.weaknesses.map(
+                            (
+                              weakness,
+                              index
+                            ) => (
+                              <Typography
+                                key={
+                                  index
+                                }
+                                color="#94a3b8"
+                              >
+                                •{" "}
+                                {weakness}
+                              </Typography>
+                            )
+                          )}
+                        </Box>
+                      )}
+
+                  </Box>
+
+
+                  {/* ACTIONS */}
+
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    mt={4}
                   >
-                    {/* ASK COPILOT */}
+
                     <Button
                       variant="outlined"
-                      startIcon={
-                        <AutoAwesomeRoundedIcon />
-                      }
-                      onClick={() => {
-                        document
-                          .getElementById(
-                            "candidate-copilot"
-                          )
-                          ?.scrollIntoView(
-                            {
-                              behavior:
-                                "smooth",
-                              block:
-                                "center",
-                            }
-                          );
-                      }}
-                      sx={{
-                        flex: 1.2,
-                        minWidth: 140,
-                        py: 1.15,
-                        textTransform:
-                          "none",
-                        fontWeight: 600,
-                        borderRadius: 1.5,
-                        color:
-                          "#a78bfa",
-                        borderColor:
-                          "rgba(139,92,246,0.45)",
-                        bgcolor:
-                          "rgba(139,92,246,0.04)",
-
-                        "&:hover":
-                          {
-                            bgcolor:
-                              "rgba(139,92,246,0.12)",
-                            borderColor:
-                              "#8b5cf6",
-                          },
-                      }}
-                    >
-                      Ask Copilot
-                    </Button>
-
-                    {/* SHORTLIST */}
-                    <Button
-                      variant="contained"
-                      startIcon={
-                        <CheckCircleRoundedIcon />
-                      }
-                      disabled={
-                        selectedCandidate?.status ===
-                        "shortlisted"
-                      }
                       onClick={() =>
-                        handleStatusChange(
-                          selectedCandidate,
-                          "shortlisted"
+                        handleViewResume(
+                          selectedCandidate
                         )
                       }
-                      sx={{
-                        flex: 1,
-                        minWidth: 125,
-                        py: 1.15,
-                        textTransform:
-                          "none",
-                        fontWeight: 600,
-                        borderRadius: 1.5,
-                        bgcolor:
-                          "#16a34a",
-                        boxShadow:
-                          "none",
-
-                        "&:hover":
-                          {
-                            bgcolor:
-                              "#15803d",
-                            boxShadow:
-                              "none",
-                          },
-
-                        "&.Mui-disabled":
-                          {
-                            bgcolor:
-                              "rgba(22,163,74,0.18)",
-                            color:
-                              "#86efac",
-                          },
-                      }}
                     >
-                      {selectedCandidate?.status ===
-                      "shortlisted"
-                        ? "Shortlisted"
-                        : "Shortlist"}
+                      View Resume
                     </Button>
 
-                    {/* SCHEDULE INTERVIEW */}
                     <Button
                       variant="contained"
-                      startIcon={
-                        <EventRoundedIcon />
-                      }
                       onClick={() =>
                         handleScheduleInterview(
                           selectedCandidate
                         )
                       }
-                      disabled={
-                        selectedCandidate?.status ===
-                        "rejected"
-                      }
-                      sx={{
-                        flex: 1.3,
-                        minWidth: 175,
-                        py: 1.15,
-                        textTransform:
-                          "none",
-                        fontWeight: 600,
-                        borderRadius: 1.5,
-                        bgcolor:
-                          "#4f46e5",
-                        boxShadow:
-                          "none",
-
-                        "&:hover":
-                          {
-                            bgcolor:
-                              "#4338ca",
-                            boxShadow:
-                              "none",
-                          },
-                      }}
                     >
                       Schedule Interview
                     </Button>
 
-                    {/* MORE ACTIONS */}
-                    <IconButton
-                      onClick={
-                        handleActionMenuOpen
-                      }
-                      sx={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 1.5,
-                        border:
-                          "1px solid #263249",
-                        color:
-                          "#94a3b8",
-                        bgcolor:
-                          "#0b1425",
-
-                        "&:hover":
-                          {
-                            bgcolor:
-                              "#111c30",
-                            color:
-                              "#fff",
-                            borderColor:
-                              "#3b82f6",
-                          },
+                    <Button
+                      variant="outlined"
+                      onClick={() => {
+                        document
+                          .getElementById(
+                            "candidate-copilot"
+                          )
+                          ?.scrollIntoView({
+                            behavior:
+                              "smooth",
+                          });
                       }}
                     >
-                      <MoreVertRoundedIcon />
-                    </IconButton>
+                      Ask Copilot
+                    </Button>
 
-                    {/* MORE MENU */}
-                    <Menu
-                      anchorEl={
-                        actionMenuAnchor
-                      }
-                      open={Boolean(
-                        actionMenuAnchor
-                      )}
-                      onClose={
-                        handleActionMenuClose
-                      }
-                      PaperProps={{
-                        sx: {
-                          mt: 1,
-                          minWidth: 190,
-                          bgcolor:
-                            "#0b1425",
-                          color:
-                            "#e2e8f0",
-                          border:
-                            "1px solid #263249",
-                          borderRadius: 2,
-                          boxShadow:
-                            "0 12px 40px rgba(0,0,0,0.45)",
+                  </Stack>
 
-                          "& .MuiMenuItem-root":
-                            {
-                              fontSize: 13,
-                              py: 1.2,
-                              px: 1.8,
-
-                              "&:hover":
-                                {
-                                  bgcolor:
-                                    "#111c30",
-                                },
-                            },
-                        },
-                      }}
-                    >
-                      {/* VIEW RESUME */}
-                      <MenuItem
-                        onClick={() => {
-                          handleActionMenuClose();
-
-                          handleViewResume(
-                            selectedCandidate
-                          );
-                        }}
-                      >
-                        <DescriptionOutlinedIcon
-                          sx={{
-                            fontSize: 18,
-                            mr: 1.2,
-                            color:
-                              "#94a3b8",
-                          }}
-                        />
-
-                        View Resume
-                      </MenuItem>
-
-                      {/* ADD NOTE */}
-                      <MenuItem
-                        onClick={() => {
-                          handleActionMenuClose();
-
-                          console.log(
-                            "Add note:",
-                            selectedCandidate
-                          );
-                        }}
-                      >
-                        <DescriptionOutlinedIcon
-                          sx={{
-                            fontSize: 18,
-                            mr: 1.2,
-                            color:
-                              "#94a3b8",
-                          }}
-                        />
-
-                        Add Note
-                      </MenuItem>
-
-                      {/* REJECT */}
-                      <MenuItem
-                        onClick={
-                          handleReject
-                        }
-                        disabled={
-                          selectedCandidate?.status ===
-                          "rejected"
-                        }
-                        sx={{
-                          color:
-                            "#f87171 !important",
-
-                          "&:hover":
-                            {
-                              bgcolor:
-                                "rgba(239,68,68,0.08) !important",
-                            },
-                        }}
-                      >
-                        <CancelRoundedIcon
-                          sx={{
-                            fontSize: 18,
-                            mr: 1.2,
-                          }}
-                        />
-
-                        Reject Candidate
-                      </MenuItem>
-                      <MenuItem
-                        onClick={handleRemoveCandidate}
-                        sx={{
-                        color: "#f87171",
-                         "&:hover": {
-                        bgcolor: "rgba(239,68,68,0.08)",
-                        },
-                        }}
-                      >
-                      <CancelRoundedIcon
-                        sx={{
-                         fontSize: 18,
-                         mr: 1.2,
-                        }}
-                      />
-                      Remove Candidate
-                     </MenuItem>
-                    </Menu>
-                  </Box>
-                </Box>
+                </>
               )}
+
             </Box>
+
           </Box>
+
+
+          {/* CANDIDATE COPILOT */}
+
+          {selectedCandidate && (
+            <Box
+              id="candidate-copilot"
+              mt={3}
+            >
+              <CandidateCopilot
+                candidate={
+                  selectedCandidate
+                }
+              />
+            </Box>
+          )}
+
         </Box>
       </Box>
     </Box>
   );
 }
-
-export default Candidate;
