@@ -373,79 +373,60 @@ function Candidate() {
         Number(
           applicant?.experience ||
           candidate?.aiAnalysis?.experienceYears ||
-          candidate?.aiAnalysis?.experience ||
-          0
-        ) || 0;
 
-      if (experienceFilter === "0-2") {
-        matchesExperience = experience <= 2;
+const filteredCandidates = useMemo(() => {
+  if (!candidates) return [];
+
+  return candidates.filter((candidate) => {
+    const applicant = candidate?.applicantId;
+    const job = candidate?.jobId;
+
+    /* Job from URL */
+    if (jobId && job?._id !== jobId) {
+      return false;
+    }
+
+    const name =
+      applicant?.name ||
+      applicant?.fullName ||
+      "";
+
+    const email = applicant?.email || "";
+    const jobTitle = job?.title || "";
+
+    const searchText = search.toLowerCase();
+
+    /* Search */
+    const matchesSearch =
+      name.toLowerCase().includes(searchText) ||
+      email.toLowerCase().includes(searchText) ||
+      jobTitle.toLowerCase().includes(searchText);
+
+    /* Status */
+    const matchesStatus =
+      statusFilter === "all" ||
+      candidate?.status?.toLowerCase() ===
+        statusFilter.toLowerCase();
+
+    /* Job */
+    const matchesJob =
+      jobFilter === "all" ||
+      job?._id === jobFilter;
+
+    /* Score */
+    const score = Number(candidate?.aiScore || 0);
+
+    let matchesScore = true;
+
+    if (scoreFilter !== "all") {
+      if (scoreFilter === "80+") {
+        matchesScore = score >= 80;
       }
 
-      if (experienceFilter === "2-5") {
-        matchesExperience =
-          experience > 2 && experience <= 5;
-      }
+      if (scoreFilter === "60-79") {
+        matchesScore = s
 
-      if (experienceFilter === "5+") {
-        matchesExperience = experience > 5;
-      }
 
-      /* Skills */
-      let matchesSkill = true;
-
-      if (skillFilter !== "all") {
-        const skills = [
-          ...(applicant?.skills || []),
-          ...(candidate?.skills || []),
-          ...(candidate?.aiAnalysis?.skills || []),
-        ].map((skill) =>
-          String(skill).toLowerCase()
-        );
-
-        matchesSkill = skills.some((skill) =>
-          skill.includes(skillFilter.toLowerCase())
-        );
-      }
-
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesJob &&
-        matchesScore &&
-        matchesSkill &&
-        matchesExperience
-      );
-    });
-  }, [
-    candidates,
-    search,
-    statusFilter,
-    jobFilter,
-    scoreFilter,
-    skillFilter,
-    experienceFilter,
-    jobId,
-  ]);
-
-  /* -------------------------------------------------------
-   * UNIQUE JOBS
-   * ------------------------------------------------------- */
-
-  const jobs = useMemo(() => {
-    if (!candidates) return [];
-
-    const map = new Map();
-
-    candidates.forEach((candidate) => {
-      const job = candidate?.jobId;
-
-      if (job?._id && !map.has(job._id)) {
-        map.set(job._id, job);
-      }
-    });
-
-    return Array.from(map.values());
-  }, [candidates]);
 
   /* -------------------------------------------------------
    * DEFAULT SELECT
