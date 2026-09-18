@@ -1,27 +1,58 @@
+
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
-import pdfPoppler from "pdf-poppler";
+import { createCanvas } from "@napi-rs/canvas";
 import Tesseract from "tesseract.js";
 import fs from "fs";
 import path from "path";
 import os from "os";
+
+// ==========================================
+// PDF.JS CANVAS FACTORY
+// ==========================================
+
+class NodeCanvasFactory {
+  create(width, height) {
+    const canvas = createCanvas(width, height);
+    const context = canvas.getContext("2d");
+
+    return {
+      canvas,
+      context,
+    };
+  }
+
+  reset(canvasAndContext, width, height) {
+    canvasAndContext.canvas.width = width;
+    canvasAndContext.canvas.height = height;
+  }
+
+  destroy(canvasAndContext) {
+    canvasAndContext.canvas.width = 1;
+    canvasAndContext.canvas.height = 1;
+    canvasAndContext.canvas = null;
+    canvasAndContext.context = null;
+  }
+}
+
+// ==========================================
+// EXTRACT RESUME TEXT
+// ==========================================
 
 export async function extractResumeText(pdfBuffer) {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), "resume-")
   );
 
-  const pdfPath = path.join(tempDir, "resume.pdf");
-
   try {
-    // Save PDF temporarily
-    fs.writeFileSync(pdfPath, pdfBuffer);
-
     // ==========================================
     // 1. TRY NORMAL PDF TEXT EXTRACTION
     // ==========================================
 
+    console.log("📄 Trying normal PDF text extraction...");
+
     const pdf = await pdfjsLib.getDocument({
-      data:  new Uint8Array(pdfBuffer),
+      data: new Uint8Array(pdfBuffer),
+      useSystemFonts: true,
     }).promise;
 
     let extractedText = "";
@@ -32,69 +63,89 @@ export async function extractResumeText(pdfBuffer) {
       const content = await page.getTextContent();
 
       const pageText = content.items
-        .map((item) => item.str)
+        .map((item) => item.str || "")
         .join(" ");
 
       extractedText += pageText + "\n";
     }
 
-    // If enough text was extracted, return it
+    // ==========================================
+    // NORMAL PDF SUCCESS
+    // ==========================================
+
     if (extractedText.trim().length > 50) {
       console.log("✅ Resume text extracted using PDF.js");
 
       return extractedText.trim();
     }
 
+    // ==========================================
+    // 2. OCR FALLBACK
+    // ==========================================
+
     console.log(
       "⚠️ PDF has little/no text. Switching to OCR..."
     );
 
-    // ==========================================
-    // 2. OCR FALLBACK FOR SCANNED PDF
-    // ==========================================
-
-    const outputPrefix = path.join(tempDir, "page");
-
-    await pdfPoppler.convert(pdfPath, {
-      format: "png",
-      out_dir: tempDir,
-      out_prefix: "page",
-      page: null,
-      scale: 1500,
-    });
-
-    const files = fs
-      .readdirSync(tempDir)
-      .filter(
-        (file) =>
-          file.startsWith("page-") &&
-          file.endsWith(".png")
-      )
-      .sort();
-
-    if (files.length === 0) {
-      throw new Error(
-        "Could not convert PDF pages to images."
-      );
-    }
+    const canvasFactory = new NodeCanvasFactory();
 
     let ocrText = "";
 
-    for (const file of files) {
-      const imagePath = path.join(tempDir, file);
+    // ==========================================
+    // RENDER EACH PDF PAGE
+    // ==========================================
 
-      console.log(`🔍 Running OCR on ${file}...`);
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+      console.log(
+        `🖼️ Rendering PDF page ${pageNumber}/${pdf.numPages}...`
+      );
+
+      const page = await pdf.getPage(pageNumber);
+
+      // Higher scale = better OCR quality
+      const scale = 2;
+
+      const viewport = page.getViewport({
+        scale,
+      });
+
+      const canvasAndContext = canvasFactory.create(
+        Math.ceil(viewport.width),
+        Math.ceil(viewport.height)
+      );
+
+      // ==========================================
+      // RENDER PDF PAGE TO CANVAS
+      // ==========================================
+
+      await page.render({
+        canvasContext: canvasAndContext.context,
+        viewport,
+        canvasFactory,
+      }).promise;
+
+      // Convert canvas to PNG buffer
+      const imageBuffer =
+        canvasAndContext.canvas.toBuffer("image/png");
+
+      console.log(
+        `🔍 Running OCR on page ${pageNumber}...`
+      );
+
+      // ==========================================
+      // TESSERACT OCR
+      // ==========================================
 
       const {
         data: { text },
       } = await Tesseract.recognize(
-        imagePath,
+        imageBuffer,
         "eng",
         {
           logger: (info) => {
             if (info.status === "recognizing text") {
               console.log(
-                `${file}: ${Math.round(
+                `Page ${pageNumber}: ${Math.round(
                   info.progress * 100
                 )}%`
               );
@@ -104,7 +155,14 @@ export async function extractResumeText(pdfBuffer) {
       );
 
       ocrText += text + "\n";
+
+      // Cleanup canvas
+      canvasFactory.destroy(canvasAndContext);
     }
+
+    // ==========================================
+    // OCR RESULT
+    // ==========================================
 
     if (!ocrText.trim()) {
       throw new Error(
@@ -128,7 +186,7 @@ export async function extractResumeText(pdfBuffer) {
 
   } finally {
     // ==========================================
-    // CLEAN TEMP FILES
+    // CLEAN TEMP DIRECTORY
     // ==========================================
 
     try {
@@ -144,3 +202,4 @@ export async function extractResumeText(pdfBuffer) {
     }
   }
 }
+
