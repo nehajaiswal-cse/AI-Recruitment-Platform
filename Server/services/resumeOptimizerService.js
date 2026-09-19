@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const groq = new OpenAI({
   baseURL: "https://api.groq.com/openai/v1",
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: process.env.OPENROUTER_API_KEY,
 });
 
 const MODEL = process.env.AI_INTERVIEW_MODEL || "openai/gpt-oss-120b";

@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 
@@ -62,6 +63,7 @@ app.use("/api/ats", atsRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/recruiter/settings", recruiterSettingsRoutes);
 app.use("/api/resume-builder", resumeBuilderRoutes);
+app.use("/api/ai-interviews", aiInterviewRoutes);
 app.use("/api/copilot",copilotRoutes);
 
 // ==========================================
