@@ -16,6 +16,7 @@ import Apply from "./pages/applicant/jobs/Apply.jsx";
 import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx";
 import Applications from "./pages/applicant/Applications.jsx";
 import AInterview from "./pages/applicant/Interview/Interviews";
+import InterviewDetails from "./pages/applicant/Interview/InterviewDetails";
 import InterviewCalendar from "./pages/applicant/Interview/InterviewCalendar.jsx";
 import Settings from "./pages/applicant/Settings";
 import Resume from "./pages/applicant/Resume";
@@ -97,6 +98,11 @@ export default function App() {
           <Route
             path="/applicant/interviews/calendar"
             element={<InterviewCalendar />}
+          />
+
+          <Route
+            path="/applicant/interviews/details/:id"
+            element={<InterviewDetails />}
           />
 
           <Route
