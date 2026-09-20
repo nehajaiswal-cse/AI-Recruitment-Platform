@@ -53,6 +53,7 @@ const Navbar = ({
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
+      handleMenuClose();
 
     if (role === "applicant") {
       navigate("/applicant/login");
@@ -536,48 +537,170 @@ const Navbar = ({
         </IconButton>
 
         {/* MOBILE MENU */}
-        <Menu
-          anchorEl={anchorEl}
-          open={menuOpen}
-          onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
+        {/* MOBILE MENU */}
+<Menu
+  anchorEl={anchorEl}
+  open={menuOpen}
+  onClose={handleMenuClose}
+  anchorOrigin={{
+    vertical: "bottom",
+    horizontal: "right",
+  }}
+  transformOrigin={{
+    vertical: "top",
+    horizontal: "right",
+  }}
+  slotProps={{
+    paper: {
+      sx: {
+        mt: 1.2,
+        minWidth: 240,
+        borderRadius: "16px",
+        bgcolor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+        border: `1px solid ${theme.palette.divider}`,
+        boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
+        overflow: "hidden",
+      },
+    },
+  }}
+>
+  {/* APPLICANT / RECRUITER */}
+  {!showLogout && (
+    <>
+      <MenuItem
+        onClick={() => handleRoleSelect("applicant")}
+        sx={{
+          py: 1.5,
+          gap: 1.5,
+          color: theme.palette.text.primary,
+
+          "&:hover": {
+            bgcolor: hoverBg,
+          },
+        }}
+      >
+        <PersonRoundedIcon
+          sx={{
+            color: "#6366f1",
           }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
+        />
+
+        <Box>
+          <Typography
+            sx={{
+              fontSize: 11,
+              color: theme.palette.text.secondary,
+              lineHeight: 1,
+            }}
+          >
+            I'm a
+          </Typography>
+
+          <Typography
+            sx={{
+              fontSize: 15,
+              fontWeight: 700,
+              mt: 0.4,
+            }}
+          >
+            Applicant
+          </Typography>
+        </Box>
+      </MenuItem>
+
+      <MenuItem
+        onClick={() => handleRoleSelect("recruiter")}
+        sx={{
+          py: 1.5,
+          gap: 1.5,
+          color: theme.palette.text.primary,
+
+          "&:hover": {
+            bgcolor: hoverBg,
+          },
+        }}
+      >
+        <BusinessCenterRoundedIcon
+          sx={{
+            color: "#a855f7",
           }}
-          slotProps={{
-            paper: {
-              sx: {
-                mt: 1.2,
+        />
 
-                minWidth: 250,
+        <Box>
+          <Typography
+            sx={{
+              fontSize: 11,
+              color: theme.palette.text.secondary,
+              lineHeight: 1,
+            }}
+          >
+            I'm a
+          </Typography>
 
-                borderRadius: "16px",
+          <Typography
+            sx={{
+              fontSize: 15,
+              fontWeight: 700,
+              mt: 0.4,
+            }}
+          >
+            Recruiter
+          </Typography>
+        </Box>
+      </MenuItem>
+    </>
+  )}
 
-                bgcolor: theme.palette.background.paper,
+  {/* LOGGED-IN MOBILE LINKS */}
+  {showLogout && (
+    <>
+      {links.map((link) => (
+        <MenuItem
+          key={link.path}
+          component={NavLink}
+          to={link.path}
+          onClick={handleMenuClose}
+          sx={{
+            py: 1.4,
+            color: theme.palette.text.primary,
 
-                color: theme.palette.text.primary,
+            "&.active": {
+              fontWeight: 700,
+              bgcolor: hoverBg,
+            },
 
-                border:
-                  `1px solid ${theme.palette.divider}`,
-
-                boxShadow:
-                  "0 20px 50px rgba(0,0,0,0.25)",
-
-                overflow: "hidden",
-              },
+            "&:hover": {
+              bgcolor: hoverBg,
             },
           }}
         >
+          {link.label}
+        </MenuItem>
+      ))}
 
-          {/* Your existing mobile menu content can remain,
-              replacing hardcoded white/blue text colors
-              with theme.palette.text.primary/secondary. */}
+      <Divider />
 
-        </Menu>
+      <MenuItem
+        onClick={handleLogout}
+        sx={{
+          py: 1.4,
+          color: theme.palette.error.main,
+
+          "&:hover": {
+            bgcolor:
+              theme.palette.mode === "dark"
+                ? "rgba(255,80,80,0.10)"
+                : "rgba(239,68,68,0.08)",
+          },
+        }}
+      >
+        <LogoutRoundedIcon sx={{ mr: 1.5 }} />
+        Logout
+      </MenuItem>
+    </>
+  )}
+</Menu>
       </Toolbar>
     </AppBar>
   );
