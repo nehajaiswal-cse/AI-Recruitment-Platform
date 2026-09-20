@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "lucide-react": "^1.31.0"
+    "lucide-react": "^1.31.0",
+    "pdf-poppler": "^0.2.3",
+    "pdfjs-dist": "^6.3.289",
+    "tesseract.js": "^7.0.0"
   }
 }

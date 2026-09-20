@@ -259,9 +259,7 @@ const Resume = () => {
       if (!token) {
         throw new Error("You are not logged in. Please log in again.");
       }
-
-      const response = await fetch(
-        "http://localhost:5000/api/resume-optimizer/analyze",
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/resume-optimizer/analyze`,
         {
           method: "POST",
           headers: {

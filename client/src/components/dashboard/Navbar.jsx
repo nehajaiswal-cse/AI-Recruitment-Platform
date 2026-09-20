@@ -1,387 +1,709 @@
-import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import Divider from '@mui/material/Divider'
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
 
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded";
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 
-import Logo from '../common/Logo.jsx'
-import ThemeToggle from '../common/ThemeToggle.jsx'
+import Logo from "../common/Logo.jsx";
+import ThemeToggle from "../common/ThemeToggle.jsx";
+import NotificationBell from "../notifications/NotificationsBell.jsx";
+
+import { brandGradient } from "../../theme";
 
 const Navbar = ({
   links = [],
   showLogout = false,
 }) => {
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedRole, setSelectedRole] = useState(null);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const theme = useTheme();
 
-  const menuOpen = Boolean(anchorEl)
+  const menuOpen = Boolean(anchorEl);
 
   const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-    handleMenuClose()
-    navigate('/')
-  }
+    handleMenuClose();
+    navigate("/");
+  };
+
+  const handleRoleSelect = (role) => {
+    setSelectedRole(role);
+      handleMenuClose();
+
+    if (role === "applicant") {
+      navigate("/applicant/login");
+    }
+
+    if (role === "recruiter") {
+      navigate("/recruiter/login");
+    }
+  };
+
+  const hoverBg =
+    theme.palette.mode === "dark"
+      ? "rgba(255,255,255,0.06)"
+      : "rgba(15,23,42,0.06)";
+
+  const subtleBg =
+    theme.palette.mode === "dark"
+      ? "rgba(255,255,255,0.05)"
+      : "rgba(15,23,42,0.04)";
 
   return (
     <AppBar
       position="sticky"
       elevation={0}
       sx={{
-        bgcolor: 'background.default',
-        color: 'text.primary',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        width: '100%',
+        bgcolor: theme.palette.background.default,
+        color: theme.palette.text.primary,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        width: "100%",
       }}
     >
       <Toolbar
         sx={{
           height: {
-            xs: 60,
-            sm: 64,
-            md: 68,
-            lg: 72,
+            xs: 64,
+            sm: 72,
+            md: 84,
           },
 
-          minHeight: 'unset',
+          minHeight: "unset",
 
           px: {
-            xs: 1,
-            sm: 2,
-            md: 3,
-            lg: 4,
+            xs: 2,
+            sm: 3,
+            md: 4,
+            lg: 6,
           },
 
-          gap: {
-            xs: 0.5,
-            sm: 1,
-            md: 1.5,
-          },
-
-          width: '100%',
-          boxSizing: 'border-box',
+          gap: 2,
+          width: "100%",
+          boxSizing: "border-box",
         }}
       >
 
-        {/* ========================= */}
         {/* LOGO */}
-        {/* ========================= */}
-
         <Box
           sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: {
+              xs: 1,
+              sm: 1.5,
+            },
             flexShrink: 0,
-            minWidth: 0,
-            display: 'flex',
-            alignItems: 'center',
 
-            '& img': {
-              maxWidth: {
+            "& img": {
+              width: {
                 xs: 42,
-                sm: 46,
-                md: 50,
+                sm: 48,
+                md: 52,
               },
-
-              width: 'auto',
+              height: "auto",
             },
           }}
         >
           <Logo />
         </Box>
 
-
-        {/* ========================= */}
-        {/* SPACE */}
-        {/* ========================= */}
-
         <Box sx={{ flex: 1 }} />
 
+        {/* ROLE SWITCHER */}
+        {/* ROLE SWITCHER */}
+{!showLogout && (
+  <Box
+    sx={{
+      display: {
+        xs: "none",
+        sm: "flex",
+      },
 
-        {/* ========================= */}
-        {/* DESKTOP NAVIGATION */}
-        {/* ========================= */}
+      alignItems: "center",
+      p: "3px",
+      borderRadius: "20px",
 
-        <Box
+      bgcolor:
+        theme.palette.mode === "dark"
+          ? "rgba(255,255,255,0.06)"
+          : "rgba(15,23,42,0.04)",
+
+      border: `1px solid ${theme.palette.divider}`,
+
+      boxShadow:
+        theme.palette.mode === "dark"
+          ? "0 8px 30px rgba(0,0,0,0.20)"
+          : "0 8px 30px rgba(15,23,42,0.08)",
+
+      backdropFilter: "blur(12px)",
+    }}
+  >
+    {/* APPLICANT */}
+    <Button
+      onClick={() => handleRoleSelect("applicant")}
+      startIcon={
+        <PersonRoundedIcon
           sx={{
-            display: {
-              xs: 'none',
-              md: 'flex',
-            },
-
-            alignItems: 'center',
-
-            gap: {
-              md: 0,
-              lg: 0.5,
-              xl: 1,
-            },
-
-            mr: {
-              md: 1,
-              lg: 2,
+            fontSize: {
+              sm: 21,
+              md: 23,
             },
           }}
+        />
+      }
+      sx={{
+        minWidth: {
+          sm: 135,
+          md: 160,
+        },
+
+        height: {
+          sm: 48,
+          md: 52,
+        },
+
+        px: {
+          sm: 2,
+          md: 2.5,
+        },
+
+        borderRadius: "26px",
+        textTransform: "none",
+
+        // Theme-aware text
+        color:
+          selectedRole === "applicant"
+            ? "#fff"
+            : theme.palette.text.primary,
+
+        // Theme-aware background
+        background:
+          selectedRole === "applicant"
+            ? brandGradient
+            : "transparent",
+
+        boxShadow:
+          selectedRole === "applicant"
+            ? "0 5px 18px rgba(66,103,181,0.28)"
+            : "none",
+
+        transition: "all 0.25s ease",
+
+        "&:hover": {
+          background:
+            selectedRole === "applicant"
+              ? brandGradient
+              : hoverBg,
+
+          color:
+            selectedRole === "applicant"
+              ? "#fff"
+              : theme.palette.text.primary,
+        },
+
+        "& .MuiButton-startIcon": {
+          marginRight: 1,
+
+          color:
+            selectedRole === "applicant"
+              ? "#fff"
+              : theme.palette.text.secondary,
+        },
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: 11,
+
+            color:
+              selectedRole === "applicant"
+                ? "rgba(255,255,255,0.75)"
+                : theme.palette.text.secondary,
+
+            lineHeight: 1,
+            mb: 0.3,
+          }}
         >
-          {links.map((link) => (
+          I'm a
+        </Typography>
+
+        <Typography
+          sx={{
+            fontSize: {
+              sm: 14,
+              md: 15,
+            },
+
+            fontWeight: 700,
+            lineHeight: 1,
+
+            color:
+              selectedRole === "applicant"
+                ? "#fff"
+                : theme.palette.text.primary,
+          }}
+        >
+          Applicant
+        </Typography>
+      </Box>
+    </Button>
+
+    {/* RECRUITER */}
+    <Button
+      onClick={() => handleRoleSelect("recruiter")}
+      startIcon={
+        <BusinessCenterRoundedIcon
+          sx={{
+            fontSize: {
+              sm: 21,
+              md: 23,
+            },
+          }}
+        />
+      }
+      sx={{
+        minWidth: {
+          sm: 135,
+          md: 160,
+        },
+
+        height: {
+          sm: 48,
+          md: 52,
+        },
+
+        px: {
+          sm: 2,
+          md: 2.5,
+        },
+
+        borderRadius: "26px",
+        textTransform: "none",
+
+        // Theme-aware text
+        color:
+          selectedRole === "recruiter"
+            ? "#fff"
+            : theme.palette.text.primary,
+
+        background:
+          selectedRole === "recruiter"
+            ? brandGradient
+            : "transparent",
+
+        boxShadow:
+          selectedRole === "recruiter"
+            ? "0 5px 18px rgba(66,103,181,0.28)"
+            : "none",
+
+        transition: "all 0.25s ease",
+
+        "&:hover": {
+          background:
+            selectedRole === "recruiter"
+              ? brandGradient
+              : hoverBg,
+
+          color:
+            selectedRole === "recruiter"
+              ? "#fff"
+              : theme.palette.text.primary,
+        },
+
+        "& .MuiButton-startIcon": {
+          marginRight: 1,
+
+          color:
+            selectedRole === "recruiter"
+              ? "#fff"
+              : theme.palette.text.secondary,
+        },
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: 11,
+
+            color:
+              selectedRole === "recruiter"
+                ? "rgba(255,255,255,0.75)"
+                : theme.palette.text.secondary,
+
+            lineHeight: 1,
+            mb: 0.3,
+          }}
+        >
+          I'm a
+        </Typography>
+
+        <Typography
+          sx={{
+            fontSize: {
+              sm: 14,
+              md: 15,
+            },
+
+            fontWeight: 700,
+            lineHeight: 1,
+
+            color:
+              selectedRole === "recruiter"
+                ? "#fff"
+                : theme.palette.text.primary,
+          }}
+        >
+          Recruiter
+        </Typography>
+      </Box>
+    </Button>
+  </Box>
+)}
+
+        {/* LOGGED-IN LINKS */}
+        {showLogout && (
+          <Box
+            sx={{
+              display: {
+                xs: "none",
+                md: "flex",
+              },
+
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
+            {links.map((link) => (
+              <Button
+                key={link.path}
+                component={NavLink}
+                to={link.path}
+                end
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontSize: 14,
+                  px: 1.5,
+                  textTransform: "none",
+
+                  "&.active": {
+                    color: theme.palette.text.primary,
+                    fontWeight: 700,
+                  },
+
+                  "&:hover": {
+                    color: theme.palette.text.primary,
+                    bgcolor: hoverBg,
+                  },
+                }}
+              >
+                {link.label}
+              </Button>
+            ))}
+
             <Button
-              key={link.path}
-              component={NavLink}
-              to={link.path}
-              end
+              onClick={handleLogout}
+              startIcon={<LogoutRoundedIcon />}
               sx={{
-                color: 'text.secondary',
+                color: theme.palette.error.main,
+                ml: 1,
+                textTransform: "none",
 
-                fontSize: {
-                  md: '0.8rem',
-                  lg: '0.875rem',
-                  xl: '0.95rem',
-                },
-
-                px: {
-                  md: 1,
-                  lg: 1.25,
-                  xl: 1.5,
-                },
-
-                minWidth: 'auto',
-
-                '&.active': {
-                  color: 'text.primary',
-                  fontWeight: 700,
-                },
-
-                '&:hover': {
-                  color: 'text.primary',
-                  bgcolor: 'action.hover',
+                "&:hover": {
+                  bgcolor:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,80,80,0.10)"
+                      : "rgba(239,68,68,0.08)",
                 },
               }}
             >
-              {link.label}
+              Logout
             </Button>
-          ))}
-        </Box>
-
-
-        {/* ========================= */}
-        {/* DESKTOP LOGOUT */}
-        {/* ========================= */}
-
-        {showLogout && (
-          <Button
-            onClick={handleLogout}
-            startIcon={<LogoutRoundedIcon />}
-            sx={{
-              display: {
-                xs: 'none',
-                md: 'flex',
-              },
-
-              color: 'error.main',
-
-              fontSize: {
-                md: '0.8rem',
-                lg: '0.875rem',
-                xl: '0.95rem',
-              },
-
-              px: {
-                md: 1,
-                lg: 1.25,
-                xl: 1.5,
-              },
-
-              minWidth: 'auto',
-
-              borderRadius: 1.5,
-
-              '&:hover': {
-                bgcolor: 'error.main',
-                color: '#fff',
-              },
-            }}
-          >
-            Logout
-          </Button>
+          </Box>
         )}
 
+        {/* NOTIFICATIONS */}
+        {showLogout && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              ml: 0.5,
+            }}
+          >
+            <NotificationBell />
+          </Box>
+        )}
 
-        {/* ========================= */}
-        {/* THEME TOGGLE */}
-        {/* ========================= */}
-
+        {/* DIVIDER */}
         <Box
           sx={{
+            display: {
+              xs: "none",
+              sm: "block",
+            },
+
+            width: "1px",
+            height: 32,
+
+            bgcolor: theme.palette.divider,
+
+            mx: {
+              sm: 1,
+              md: 1.5,
+            },
+          }}
+        />
+
+        {/* THEME */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
             flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
+
+            "& button": {
+              color: theme.palette.text.primary,
+            },
           }}
         >
           <ThemeToggle />
         </Box>
 
-
-        {/* ========================= */}
-        {/* RIGHT HAMBURGER */}
-        {/* ========================= */}
-
+        {/* MOBILE */}
         <IconButton
           onClick={handleMenuOpen}
           aria-label="Open navigation menu"
           sx={{
             display: {
-              xs: 'inline-flex',
-              md: 'none',
+              xs: "inline-flex",
+              sm: "none",
             },
 
-            color: 'text.primary',
-            flexShrink: 0,
+            color: theme.palette.text.primary,
+
+            width: 42,
+            height: 42,
+
+            borderRadius: "12px",
+
+            border: `1px solid ${theme.palette.divider}`,
+
+            bgcolor: subtleBg,
+
+            "&:hover": {
+              bgcolor: hoverBg,
+            },
           }}
         >
           <MenuRoundedIcon />
         </IconButton>
 
+        {/* MOBILE MENU */}
+        {/* MOBILE MENU */}
+<Menu
+  anchorEl={anchorEl}
+  open={menuOpen}
+  onClose={handleMenuClose}
+  anchorOrigin={{
+    vertical: "bottom",
+    horizontal: "right",
+  }}
+  transformOrigin={{
+    vertical: "top",
+    horizontal: "right",
+  }}
+  slotProps={{
+    paper: {
+      sx: {
+        mt: 1.2,
+        minWidth: 240,
+        borderRadius: "16px",
+        bgcolor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+        border: `1px solid ${theme.palette.divider}`,
+        boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
+        overflow: "hidden",
+      },
+    },
+  }}
+>
+  {/* APPLICANT / RECRUITER */}
+  {!showLogout && (
+    <>
+      <MenuItem
+        onClick={() => handleRoleSelect("applicant")}
+        sx={{
+          py: 1.5,
+          gap: 1.5,
+          color: theme.palette.text.primary,
 
-        {/* ========================= */}
-        {/* MOBILE NAVIGATION MENU */}
-        {/* ========================= */}
-
-        <Menu
-          anchorEl={anchorEl}
-          open={menuOpen}
-          onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
+          "&:hover": {
+            bgcolor: hoverBg,
+          },
+        }}
+      >
+        <PersonRoundedIcon
+          sx={{
+            color: "#6366f1",
           }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+        />
+
+        <Box>
+          <Typography
+            sx={{
+              fontSize: 11,
+              color: theme.palette.text.secondary,
+              lineHeight: 1,
+            }}
+          >
+            I'm a
+          </Typography>
+
+          <Typography
+            sx={{
+              fontSize: 15,
+              fontWeight: 700,
+              mt: 0.4,
+            }}
+          >
+            Applicant
+          </Typography>
+        </Box>
+      </MenuItem>
+
+      <MenuItem
+        onClick={() => handleRoleSelect("recruiter")}
+        sx={{
+          py: 1.5,
+          gap: 1.5,
+          color: theme.palette.text.primary,
+
+          "&:hover": {
+            bgcolor: hoverBg,
+          },
+        }}
+      >
+        <BusinessCenterRoundedIcon
+          sx={{
+            color: "#a855f7",
           }}
-          slotProps={{
-            paper: {
-              sx: {
-                mt: 1,
+        />
 
-                minWidth: {
-                  xs: 210,
-                  sm: 240,
-                },
+        <Box>
+          <Typography
+            sx={{
+              fontSize: 11,
+              color: theme.palette.text.secondary,
+              lineHeight: 1,
+            }}
+          >
+            I'm a
+          </Typography>
 
-                maxWidth: 'calc(100vw - 24px)',
+          <Typography
+            sx={{
+              fontSize: 15,
+              fontWeight: 700,
+              mt: 0.4,
+            }}
+          >
+            Recruiter
+          </Typography>
+        </Box>
+      </MenuItem>
+    </>
+  )}
 
-                bgcolor: 'background.paper',
-                color: 'text.primary',
+  {/* LOGGED-IN MOBILE LINKS */}
+  {showLogout && (
+    <>
+      {links.map((link) => (
+        <MenuItem
+          key={link.path}
+          component={NavLink}
+          to={link.path}
+          onClick={handleMenuClose}
+          sx={{
+            py: 1.4,
+            color: theme.palette.text.primary,
 
-                border: '1px solid',
-                borderColor: 'divider',
-              },
+            "&.active": {
+              fontWeight: 700,
+              bgcolor: hoverBg,
+            },
+
+            "&:hover": {
+              bgcolor: hoverBg,
             },
           }}
         >
+          {link.label}
+        </MenuItem>
+      ))}
 
-          {/* Mobile Links */}
-          {links.map((link) => (
-            <MenuItem
-              key={link.path}
-              component={NavLink}
-              to={link.path}
-              end
-              onClick={handleMenuClose}
-              sx={{
-                py: 1.25,
+      <Divider />
 
-                '&.active': {
-                  color: 'primary.main',
-                  fontWeight: 700,
-                  bgcolor: 'action.selected',
-                },
-              }}
-            >
-              {link.label}
-            </MenuItem>
-          ))}
+      <MenuItem
+        onClick={handleLogout}
+        sx={{
+          py: 1.4,
+          color: theme.palette.error.main,
 
-
-          {/* Mobile Logout */}
-          {showLogout && (
-            <>
-              <Divider />
-
-              <MenuItem
-                onClick={handleLogout}
-                sx={{
-                  py: 1.25,
-
-                  color: 'error.main',
-
-                  '&:hover': {
-                    bgcolor: 'error.main',
-                    color: '#fff',
-                  },
-                }}
-              >
-                <LogoutRoundedIcon
-                  fontSize="small"
-                  sx={{ mr: 1.5 }}
-                />
-
-                Logout
-              </MenuItem>
-            </>
-          )}
-
-
-          <Divider />
-
-
-          {/* Mobile Theme */}
-          <Box
-            sx={{
-              px: 2,
-              py: 1.5,
-
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <Box
-              component="span"
-              sx={{
-                fontSize: '0.9rem',
-                color: 'text.secondary',
-              }}
-            >
-              Theme
-            </Box>
-
-            <ThemeToggle />
-          </Box>
-
-        </Menu>
-
+          "&:hover": {
+            bgcolor:
+              theme.palette.mode === "dark"
+                ? "rgba(255,80,80,0.10)"
+                : "rgba(239,68,68,0.08)",
+          },
+        }}
+      >
+        <LogoutRoundedIcon sx={{ mr: 1.5 }} />
+        Logout
+      </MenuItem>
+    </>
+  )}
+</Menu>
       </Toolbar>
     </AppBar>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

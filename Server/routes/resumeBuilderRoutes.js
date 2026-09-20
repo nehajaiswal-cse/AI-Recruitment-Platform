@@ -21,6 +21,13 @@ router.get(
 );
 
 router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware("applicant"),
+  createBuilderResume
+);
+
+router.post(
   "/export",
   authMiddleware,
   roleMiddleware("applicant"),

@@ -1,8 +1,9 @@
 import Interview from "../models/interview.js";
 import Job from "../models/job.js";
+import Application from "../models/applications.js";
 import Candidate from "../models/candidate.js";
 import transporter from "../config/mailer.js";
-
+import { createNotification } from "../utils/createNotification.js";
 // =====================================================
 // CREATE INTERVIEW
 // =====================================================
@@ -72,7 +73,14 @@ const createInterview = async (req, res) => {
       duration,
     });
 
-    console.log("📧 Sending email to:", candidateUser.email);
+    await createNotification({
+  recipientId: candidateData.applicantId._id,
+  type: "interview",
+  title: "Interview Scheduled 📅",
+  message: `Your interview has been scheduled for ${date} at ${time}.`,
+  link: "/applicant/interviews",
+});
+   
 
     const info = await transporter.sendMail({
       from: process.env.EMAIL_USER,

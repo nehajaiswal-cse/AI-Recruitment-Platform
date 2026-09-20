@@ -2,7 +2,7 @@ import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3 from "../config/s3.js";
 import Resume from "../models/Resume.js";
-import Application from "../models/applications.js";
+
 
 const getFileTypeFromMime = (mimetype) => {
   if (mimetype === "application/pdf") return "PDF";
@@ -74,24 +74,23 @@ export const getResumeSignedUrl = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const application = await Application.findById(id);
+    const resume = await Resume.findById(id);
 
-    if (!application) {
-      return res.status(404).json({
-        message: "Application not found",
-      });
-    }
-
-    if (!application.resume?.fileUrl) {
+    if (!resume) {
       return res.status(404).json({
         message: "Resume not found",
       });
     }
 
-    // Convert full S3 URL into S3 object key
-    const fileUrl = new URL(application.resume.fileUrl);
-    const key = decodeURIComponent(fileUrl.pathname.substring(1));
+    if (!resume.fileUrl) {
+      return res.status(404).json({
+        message: "Resume file not found",
+      });
+    }
 
+    // Convert full S3 URL into S3 object key
+    const fileUrl = new URL(resume.fileUrl);
+    const key = decodeURIComponent(fileUrl.pathname.substring(1));
 
     const command = new GetObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -105,7 +104,6 @@ export const getResumeSignedUrl = async (req, res) => {
     console.log("Signed URL generated successfully");
 
     return res.status(200).json({ url });
-
   } catch (error) {
     console.error("Get signed url error:", error);
 
@@ -162,7 +160,7 @@ export const deleteResume = async (req, res) => {
     try {
       await s3.send(
         new DeleteObjectCommand({
-          Bucket: process.env.AWS_BUCKET_NAME,
+          Bucket: process.env.AWS_S3_BUCKET_NAME,
           Key: resume.fileKey,
         })
       );

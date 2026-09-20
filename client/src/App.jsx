@@ -16,6 +16,8 @@ import Apply from "./pages/applicant/jobs/Apply.jsx";
 import ApplicantviewJob from "./pages/applicant/jobs/ApplicantviewJob.jsx";
 import Applications from "./pages/applicant/Applications.jsx";
 import AInterview from "./pages/applicant/Interview/Interviews";
+import InterviewDetails from "./pages/applicant/Interview/InterviewDetails";
+import InterviewCalendar from "./pages/applicant/Interview/InterviewCalendar.jsx";
 import Settings from "./pages/applicant/Settings";
 import Resume from "./pages/applicant/Resume";
 import ResumeBuilder from "./pages/applicant/ResumeBuilder";
@@ -60,8 +62,14 @@ export default function App() {
 
         <Route path="/recruiter/login" element={<RecruiterLogin />} />
 
-        <Route path="/applicant/forgot-password" element={<ApplicantForgotPassword />} />
-        <Route path="/recruiter/forgot-password" element={<RecruiterForgotPassword />} />
+        <Route
+          path="/applicant/forgot-password"
+          element={<ApplicantForgotPassword />}
+        />
+        <Route
+          path="/recruiter/forgot-password"
+          element={<RecruiterForgotPassword />}
+        />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
         {/* ================= APPLICANT ROUTES ================= */}
@@ -77,18 +85,36 @@ export default function App() {
 
           <Route path="/applicant/interviews" element={<AInterview />} />
 
-          <Route path="/applicant/interviews/coach" element={<AIInterviewCoach />} />
+          <Route
+            path="/applicant/interviews/coach"
+            element={<AIInterviewCoach />}
+          />
 
-          <Route path="/applicant/interviews/feedback" element={<InterviewFeedback />} />
+          <Route
+            path="/applicant/interviews/feedback"
+            element={<InterviewFeedback />}
+          />
 
-          <Route path="/applicant/interviews/feedback/:id" element={<InterviewFeedback />} />
+          <Route
+            path="/applicant/interviews/calendar"
+            element={<InterviewCalendar />}
+          />
+
+          <Route
+            path="/applicant/interviews/details/:id"
+            element={<InterviewDetails />}
+          />
+
+          <Route
+            path="/applicant/interviews/feedback/:id"
+            element={<InterviewFeedback />}
+          />
 
           <Route path="/applicant/settings" element={<Settings />} />
 
           <Route path="/applicant/resume" element={<Resume />} />
 
           <Route path="/applicant/resume-builder" element={<ResumeBuilder />} />
-
 
           <Route
             path="/applicant/resume-builder/preview"

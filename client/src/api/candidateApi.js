@@ -57,7 +57,7 @@ export const deleteCandidate = async (candidateId) => {
 export const analyzeCandidateResume = async (applicationId) => {
   try {
     console.log(
-      "🤖 API received applicationId:",
+      "API received applicationId:",
       applicationId
     );
 

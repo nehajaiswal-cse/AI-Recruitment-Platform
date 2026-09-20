@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { FiLock, FiEye, FiEyeOff, FiAlertCircle, FiCheckCircle } from "react-icons/fi";
+import {
+  FiLock,
+  FiEye,
+  FiEyeOff,
+  FiAlertCircle,
+  FiCheckCircle,
+  FiArrowLeft,
+} from "react-icons/fi";
 import { Box, Typography, useTheme } from "@mui/material";
 
 import useAuth from "../../hooks/useAuth";
@@ -10,6 +17,8 @@ const ResetPasswordForm = () => {
   const navigate = useNavigate();
   const { token } = useParams();
   const { resetPassword } = useAuth();
+
+  const isDark = theme.palette.mode === "dark";
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,17 +52,30 @@ const ResetPasswordForm = () => {
     try {
       await resetPassword({ token, password });
 
-      setSuccess("Your password has been reset. Redirecting to sign in...");
+      setSuccess(
+        "Your password has been reset. Redirecting to sign in..."
+      );
+
       setTimeout(() => navigate("/applicant/login"), 1500);
     } catch (err) {
-      setError(err?.message || "This reset link is invalid or has expired.");
+      setError(
+        err?.message || "This reset link is invalid or has expired."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box sx={{ width: "100%", maxWidth: 480, mx: "auto", px: { xs: 2, sm: 3 } }}>
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 480,
+        mx: "auto",
+        px: { xs: 2, sm: 3 },
+      }}
+    >
+      {/* CARD */}
       <Box
         sx={{
           bgcolor: "background.paper",
@@ -61,20 +83,39 @@ const ResetPasswordForm = () => {
           borderColor: "divider",
           borderRadius: 3,
           p: { xs: 3, sm: 4 },
-          boxShadow:
-            theme.palette.mode === "dark"
-              ? "0 20px 50px rgba(0,0,0,0.30)"
-              : "0 20px 50px rgba(15,23,42,0.10)",
+
+          boxShadow: isDark
+            ? "0 20px 50px rgba(0, 0, 0, 0.30)"
+            : "0 20px 50px rgba(15, 23, 42, 0.10)",
+
+          transition:
+            "background-color 0.2s ease, border-color 0.2s ease",
         }}
       >
-        <Typography component="h2" sx={{ fontSize: { xs: 28, sm: 32 }, fontWeight: 700, color: "text.primary" }}>
+        {/* HEADER */}
+        <Typography
+          component="h2"
+          sx={{
+            fontSize: { xs: 28, sm: 32 },
+            fontWeight: 700,
+            color: "text.primary",
+          }}
+        >
           Set a new password
         </Typography>
 
-        <Typography sx={{ mt: 0.5, fontSize: 14, color: "text.secondary" }}>
+        <Typography
+          sx={{
+            mt: 0.5,
+            fontSize: 14,
+            color: "text.secondary",
+            lineHeight: 1.6,
+          }}
+        >
           Choose a new password for your account.
         </Typography>
 
+        {/* ERROR MESSAGE */}
         {error && (
           <Box
             sx={{
@@ -84,16 +125,39 @@ const ResetPasswordForm = () => {
               display: "flex",
               alignItems: "flex-start",
               gap: 1.5,
-              bgcolor: theme.palette.mode === "dark" ? "rgba(239,68,68,0.12)" : "rgba(239,68,68,0.08)",
+
+              bgcolor: isDark
+                ? "rgba(239, 68, 68, 0.12)"
+                : "rgba(239, 68, 68, 0.08)",
+
               border: "1px solid",
-              borderColor: theme.palette.mode === "dark" ? "rgba(239,68,68,0.35)" : "rgba(239,68,68,0.25)",
+
+              borderColor: isDark
+                ? "rgba(239, 68, 68, 0.35)"
+                : "rgba(239, 68, 68, 0.25)",
             }}
           >
-            <FiAlertCircle size={20} style={{ color: theme.palette.error.main, flexShrink: 0, marginTop: 2 }} />
-            <Typography sx={{ fontSize: 14, color: theme.palette.error.main }}>{error}</Typography>
+            <FiAlertCircle
+              size={20}
+              style={{
+                color: theme.palette.error.main,
+                flexShrink: 0,
+                marginTop: 2,
+              }}
+            />
+
+            <Typography
+              sx={{
+                fontSize: 14,
+                color: "error.main",
+              }}
+            >
+              {error}
+            </Typography>
           </Box>
         )}
 
+        {/* SUCCESS MESSAGE */}
         {success && (
           <Box
             sx={{
@@ -103,31 +167,79 @@ const ResetPasswordForm = () => {
               display: "flex",
               alignItems: "flex-start",
               gap: 1.5,
-              bgcolor: theme.palette.mode === "dark" ? "rgba(16,185,129,0.12)" : "rgba(16,185,129,0.08)",
+
+              bgcolor: isDark
+                ? "rgba(16, 185, 129, 0.12)"
+                : "rgba(16, 185, 129, 0.08)",
+
               border: "1px solid",
-              borderColor: theme.palette.mode === "dark" ? "rgba(16,185,129,0.35)" : "rgba(16,185,129,0.25)",
+
+              borderColor: isDark
+                ? "rgba(16, 185, 129, 0.35)"
+                : "rgba(16, 185, 129, 0.25)",
             }}
           >
-            <FiCheckCircle size={20} style={{ color: theme.palette.success.main, flexShrink: 0, marginTop: 2 }} />
-            <Typography sx={{ fontSize: 14, color: theme.palette.success.main }}>{success}</Typography>
+            <FiCheckCircle
+              size={20}
+              style={{
+                color: theme.palette.success.main,
+                flexShrink: 0,
+                marginTop: 2,
+              }}
+            />
+
+            <Typography
+              sx={{
+                fontSize: 14,
+                color: "success.main",
+              }}
+            >
+              {success}
+            </Typography>
           </Box>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+        {/* FORM */}
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          noValidate
+          sx={{ mt: 3 }}
+        >
+          {/* NEW PASSWORD */}
           <Box sx={{ mb: 2.5 }}>
             <Typography
               component="label"
               htmlFor="password"
-              sx={{ display: "block", mb: 1, fontSize: 12, fontWeight: 600, letterSpacing: "1px", color: "text.secondary" }}
+              sx={{
+                display: "block",
+                mb: 1,
+                fontSize: 12,
+                fontWeight: 600,
+                letterSpacing: "1px",
+                color: "text.secondary",
+              }}
             >
               NEW PASSWORD
             </Typography>
 
             <Box sx={{ position: "relative" }}>
-              <Box sx={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "text.secondary", zIndex: 1, display: "flex" }}>
+              {/* LOCK ICON */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: 14,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "text.secondary",
+                  zIndex: 1,
+                  display: "flex",
+                }}
+              >
                 <FiLock size={19} />
               </Box>
 
+              {/* PASSWORD INPUT */}
               <Box
                 component="input"
                 id="password"
@@ -137,65 +249,127 @@ const ResetPasswordForm = () => {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  if (error) setError("");
+
+                  if (error) {
+                    setError("");
+                  }
                 }}
                 placeholder="••••••••"
                 sx={{
                   width: "100%",
                   boxSizing: "border-box",
                   height: 64,
+
                   pl: 6,
                   pr: 6,
+
                   borderRadius: 2,
                   outline: "none",
+
                   fontSize: 16,
                   fontFamily: "inherit",
+
                   color: "text.primary",
-                  bgcolor: theme.palette.mode === "dark" ? "#182235" : "#f1f5f9",
+
+                  // Theme-aware input background
+                  bgcolor: "background.default",
+
                   border: "1px solid",
                   borderColor: "divider",
-                  "&::placeholder": { color: "text.secondary", opacity: 1 },
-                  "&:focus": { borderColor: "primary.main", boxShadow: `0 0 0 3px ${theme.palette.primary.main}20` },
+
+                  transition: "all 0.2s ease",
+
+                  "&::placeholder": {
+                    color: "text.secondary",
+                    opacity: 1,
+                  },
+
+                  "&:hover": {
+                    borderColor: isDark
+                      ? "rgba(148, 163, 184, 0.30)"
+                      : "rgba(15, 23, 42, 0.20)",
+                  },
+
+                  "&:focus": {
+                    borderColor: "primary.main",
+                    boxShadow: `0 0 0 3px ${theme.palette.primary.main}20`,
+                  },
                 }}
               />
 
+              {/* SHOW / HIDE PASSWORD */}
               <Box
                 component="button"
                 type="button"
+                aria-label={
+                  showPassword ? "Hide password" : "Show password"
+                }
                 onClick={() => setShowPassword((prev) => !prev)}
                 sx={{
                   position: "absolute",
                   right: 12,
                   top: "50%",
                   transform: "translateY(-50%)",
+
                   border: 0,
                   bgcolor: "transparent",
+
                   color: "text.secondary",
                   cursor: "pointer",
+
                   display: "flex",
+                  alignItems: "center",
+
                   p: 0.5,
-                  "&:hover": { color: "primary.main" },
+
+                  "&:hover": {
+                    color: "primary.main",
+                  },
                 }}
               >
-                {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                {showPassword ? (
+                  <FiEyeOff size={20} />
+                ) : (
+                  <FiEye size={20} />
+                )}
               </Box>
             </Box>
           </Box>
 
+          {/* CONFIRM PASSWORD */}
           <Box sx={{ mb: 3 }}>
             <Typography
               component="label"
               htmlFor="confirmPassword"
-              sx={{ display: "block", mb: 1, fontSize: 12, fontWeight: 600, letterSpacing: "1px", color: "text.secondary" }}
+              sx={{
+                display: "block",
+                mb: 1,
+                fontSize: 12,
+                fontWeight: 600,
+                letterSpacing: "1px",
+                color: "text.secondary",
+              }}
             >
               CONFIRM PASSWORD
             </Typography>
 
             <Box sx={{ position: "relative" }}>
-              <Box sx={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "text.secondary", zIndex: 1, display: "flex" }}>
+              {/* LOCK ICON */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  left: 14,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "text.secondary",
+                  zIndex: 1,
+                  display: "flex",
+                }}
+              >
                 <FiLock size={19} />
               </Box>
 
+              {/* CONFIRM PASSWORD INPUT */}
               <Box
                 component="input"
                 id="confirmPassword"
@@ -205,30 +379,57 @@ const ResetPasswordForm = () => {
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
-                  if (error) setError("");
+
+                  if (error) {
+                    setError("");
+                  }
                 }}
                 placeholder="••••••••"
                 sx={{
                   width: "100%",
                   boxSizing: "border-box",
                   height: 64,
+
                   pl: 6,
                   pr: 2,
+
                   borderRadius: 2,
                   outline: "none",
+
                   fontSize: 16,
                   fontFamily: "inherit",
+
                   color: "text.primary",
-                  bgcolor: theme.palette.mode === "dark" ? "#182235" : "#f1f5f9",
+
+                  // Theme-aware input background
+                  bgcolor: "background.default",
+
                   border: "1px solid",
                   borderColor: "divider",
-                  "&::placeholder": { color: "text.secondary", opacity: 1 },
-                  "&:focus": { borderColor: "primary.main", boxShadow: `0 0 0 3px ${theme.palette.primary.main}20` },
+
+                  transition: "all 0.2s ease",
+
+                  "&::placeholder": {
+                    color: "text.secondary",
+                    opacity: 1,
+                  },
+
+                  "&:hover": {
+                    borderColor: isDark
+                      ? "rgba(148, 163, 184, 0.30)"
+                      : "rgba(15, 23, 42, 0.20)",
+                  },
+
+                  "&:focus": {
+                    borderColor: "primary.main",
+                    boxShadow: `0 0 0 3px ${theme.palette.primary.main}20`,
+                  },
                 }}
               />
             </Box>
           </Box>
 
+          {/* RESET BUTTON */}
           <Box
             component="button"
             type="submit"
@@ -236,20 +437,41 @@ const ResetPasswordForm = () => {
             sx={{
               width: "100%",
               height: 64,
+
               border: 0,
               borderRadius: 2,
-              background: "linear-gradient(90deg, #3b82f6, #9333ea)",
+
+              // Same brand gradient as your theme
+              background:
+                "linear-gradient(135deg, #3b82f6, #9333ea)",
+
               color: "#fff",
               fontSize: 17,
               fontWeight: 600,
               fontFamily: "inherit",
+
               cursor: loading ? "not-allowed" : "pointer",
+
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+
               opacity: loading ? 0.55 : 1,
-              boxShadow: "0 8px 20px rgba(59,130,246,0.20)",
-              "&:hover": { opacity: loading ? 0.55 : 0.92, transform: loading ? "none" : "translateY(-1px)" },
+
+              transition: "all 0.2s ease",
+
+              boxShadow: isDark
+                ? "0 8px 20px rgba(59, 130, 246, 0.25)"
+                : "0 8px 20px rgba(59, 130, 246, 0.20)",
+
+              "&:hover": {
+                opacity: loading ? 0.55 : 0.92,
+                transform: loading ? "none" : "translateY(-1px)",
+              },
+
+              "&:active": {
+                transform: loading ? "none" : "translateY(0)",
+              },
             }}
           >
             {loading ? (
@@ -257,23 +479,62 @@ const ResetPasswordForm = () => {
                 sx={{
                   width: 20,
                   height: 20,
-                  border: "2px solid rgba(255,255,255,0.3)",
+
+                  border: "2px solid rgba(255, 255, 255, 0.3)",
                   borderTopColor: "#fff",
+
                   borderRadius: "50%",
+
                   animation: "rpSpin 0.8s linear infinite",
-                  "@keyframes rpSpin": { from: { transform: "rotate(0deg)" }, to: { transform: "rotate(360deg)" } },
+
+                  "@keyframes rpSpin": {
+                    from: {
+                      transform: "rotate(0deg)",
+                    },
+                    to: {
+                      transform: "rotate(360deg)",
+                    },
+                  },
                 }}
               />
             ) : (
-              <Typography component="span" sx={{ color: "#fff", fontSize: 17, fontWeight: 600 }}>
+              <Typography
+                component="span"
+                sx={{
+                  color: "#fff",
+                  fontSize: 17,
+                  fontWeight: 600,
+                }}
+              >
                 Reset password
               </Typography>
             )}
           </Box>
         </Box>
 
-        <Box sx={{ mt: 3, textAlign: "center" }}>
-          <Link to="/applicant/login" style={{ color: theme.palette.text.secondary, fontSize: "14px", fontWeight: 500, textDecoration: "none" }}>
+        {/* BACK TO LOGIN */}
+        <Box
+          sx={{
+            mt: 3,
+            textAlign: "center",
+          }}
+        >
+          <Link
+            to="/applicant/login"
+            style={{
+              color: theme.palette.text.secondary,
+              fontSize: "14px",
+              fontWeight: 500,
+              textDecoration: "none",
+
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+
+              transition: "color 0.2s ease",
+            }}
+          >
+            <FiArrowLeft size={14} />
             Back to sign in
           </Link>
         </Box>
@@ -283,3 +544,4 @@ const ResetPasswordForm = () => {
 };
 
 export default ResetPasswordForm;
+

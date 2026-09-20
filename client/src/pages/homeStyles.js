@@ -1,4 +1,3 @@
-
 export const COLORS = {
   // Brand colors — remain the same in both themes
   blue: "#3287F5",
@@ -7,26 +6,23 @@ export const COLORS = {
   tealDark: "#4FB5AA",
   white: "#FFFFFF",
 
-  // These are kept for places where you still need static colors
+  // Static colors kept for backward compatibility
   navy: "#0F1F35",
   navyDark: "#091729",
   navyCard: "#142A45",
   navyCardLight: "#1B344F",
-
   light: "#F5F8FB",
   lightBlue: "#EEF4F8",
   lightSection: "#EAF2F7",
   section: "#C9D9E6",
-
   textDark: "#10233D",
   text: "#304A61",
   muted: "#687D91",
   mutedLight: "#9FB2C7",
-
   border: "rgba(130,166,195,0.18)",
   track: "#2A435F",
 
-  // Kept for backward compatibility
+  // Backward compatibility
   cardGradient:
     "linear-gradient(145deg, #142A45 0%, #10233D 100%)",
 
@@ -97,8 +93,7 @@ export const darkCardBase = {
   position: "relative",
   overflow: "hidden",
 
-  // IMPORTANT:
-  // These now follow MUI theme
+  // Theme-aware
   bgcolor: "background.paper",
   color: "text.primary",
 
@@ -112,6 +107,7 @@ export const darkCardBase = {
 export const darkCardHover = {
   "&:hover": {
     transform: "translateY(-6px)",
+    boxShadow: "0 14px 30px rgba(0, 0, 0, 0.12)",
   },
 };
 
