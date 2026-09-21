@@ -495,36 +495,7 @@ const Navbar = ({ links = [], showLogout = false }) => {
           <ThemeToggle />
         </Box>
 
-        {/* MOBILE */}
-        <IconButton
-          onClick={handleMenuOpen}
-          aria-label="Open navigation menu"
-          sx={{
-            display: {
-              xs: "inline-flex",
-              sm: "none",
-            },
-
-            color: theme.palette.text.primary,
-
-            width: 42,
-            height: 42,
-
-            borderRadius: "12px",
-
-            border: `1px solid ${theme.palette.divider}`,
-
-            bgcolor: subtleBg,
-
-            "&:hover": {
-              bgcolor: hoverBg,
-            },
-          }}
-        >
-          <MenuRoundedIcon />
-        </IconButton>
-
-                {/* MOBILE */}
+      {/* MOBILE */}
         <IconButton
           onClick={handleMenuOpen}
           aria-label="Open navigation menu"
