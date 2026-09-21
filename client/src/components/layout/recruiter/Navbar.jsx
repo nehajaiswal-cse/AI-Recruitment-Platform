@@ -24,11 +24,18 @@ const recruiterLinks = [
     path: "/recruiter/analytics",
   },
   {
+    label: "Company",
+    path: "/recruiter/company",
+  },
+  {
+    label: "Settings",
+    path: "/recruiter/settings",
+  },
+  {
     label: "Profile",
     path: "/recruiter/profile",
-  }
- 
-]
+  },
+];
 
 const RNavbar = ({ onSidebarToggle }) => {
   return (
