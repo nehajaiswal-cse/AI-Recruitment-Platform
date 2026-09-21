@@ -23,10 +23,7 @@ import NotificationBell from "../notifications/NotificationsBell.jsx";
 
 import { brandGradient } from "../../theme";
 
-const Navbar = ({
-  links = [],
-  showLogout = false,
-}) => {
+const Navbar = ({ links = [], showLogout = false }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null);
 
@@ -107,7 +104,6 @@ const Navbar = ({
           boxSizing: "border-box",
         }}
       >
-
         {/* LOGO */}
         <Box
           sx={{
@@ -136,267 +132,259 @@ const Navbar = ({
 
         {/* ROLE SWITCHER */}
         {/* ROLE SWITCHER */}
-{!showLogout && (
-  <Box
-    sx={{
-      display: {
-        xs: "none",
-        sm: "flex",
-      },
+        {!showLogout && (
+          <Box
+            sx={{
+              display: {
+                xs: "none",
+                sm: "flex",
+              },
 
-      alignItems: "center",
-      p: "3px",
-      borderRadius: "20px",
+              alignItems: "center",
+              p: "3px",
+              borderRadius: "20px",
 
-      bgcolor:
-        theme.palette.mode === "dark"
-          ? "rgba(255,255,255,0.06)"
-          : "rgba(15,23,42,0.04)",
+              bgcolor:
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.06)"
+                  : "rgba(15,23,42,0.04)",
 
-      border: `1px solid ${theme.palette.divider}`,
+              border: `1px solid ${theme.palette.divider}`,
 
-      boxShadow:
-        theme.palette.mode === "dark"
-          ? "0 8px 30px rgba(0,0,0,0.20)"
-          : "0 8px 30px rgba(15,23,42,0.08)",
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 8px 30px rgba(0,0,0,0.20)"
+                  : "0 8px 30px rgba(15,23,42,0.08)",
 
-      backdropFilter: "blur(12px)",
-    }}
-  >
-    {/* APPLICANT */}
-    <Button
-      onClick={() => handleRoleSelect("applicant")}
-      startIcon={
-        <PersonRoundedIcon
-          sx={{
-            fontSize: {
-              sm: 21,
-              md: 23,
-            },
-          }}
-        />
-      }
-      sx={{
-        minWidth: {
-          sm: 135,
-          md: 160,
-        },
+              backdropFilter: "blur(12px)",
+            }}
+          >
+            {/* APPLICANT */}
+            <Button
+              onClick={() => handleRoleSelect("applicant")}
+              startIcon={
+                <PersonRoundedIcon
+                  sx={{
+                    fontSize: {
+                      sm: 21,
+                      md: 23,
+                    },
+                  }}
+                />
+              }
+              sx={{
+                minWidth: {
+                  sm: 135,
+                  md: 160,
+                },
 
-        height: {
-          sm: 48,
-          md: 52,
-        },
+                height: {
+                  sm: 48,
+                  md: 52,
+                },
 
-        px: {
-          sm: 2,
-          md: 2.5,
-        },
+                px: {
+                  sm: 2,
+                  md: 2.5,
+                },
 
-        borderRadius: "26px",
-        textTransform: "none",
+                borderRadius: "26px",
+                textTransform: "none",
 
-        // Theme-aware text
-        color:
-          selectedRole === "applicant"
-            ? "#fff"
-            : theme.palette.text.primary,
+                // Theme-aware text
+                color:
+                  selectedRole === "applicant"
+                    ? "#fff"
+                    : theme.palette.text.primary,
 
-        // Theme-aware background
-        background:
-          selectedRole === "applicant"
-            ? brandGradient
-            : "transparent",
+                // Theme-aware background
+                background:
+                  selectedRole === "applicant" ? brandGradient : "transparent",
 
-        boxShadow:
-          selectedRole === "applicant"
-            ? "0 5px 18px rgba(66,103,181,0.28)"
-            : "none",
+                boxShadow:
+                  selectedRole === "applicant"
+                    ? "0 5px 18px rgba(66,103,181,0.28)"
+                    : "none",
 
-        transition: "all 0.25s ease",
+                transition: "all 0.25s ease",
 
-        "&:hover": {
-          background:
-            selectedRole === "applicant"
-              ? brandGradient
-              : hoverBg,
+                "&:hover": {
+                  background:
+                    selectedRole === "applicant" ? brandGradient : hoverBg,
 
-          color:
-            selectedRole === "applicant"
-              ? "#fff"
-              : theme.palette.text.primary,
-        },
+                  color:
+                    selectedRole === "applicant"
+                      ? "#fff"
+                      : theme.palette.text.primary,
+                },
 
-        "& .MuiButton-startIcon": {
-          marginRight: 1,
+                "& .MuiButton-startIcon": {
+                  marginRight: 1,
 
-          color:
-            selectedRole === "applicant"
-              ? "#fff"
-              : theme.palette.text.secondary,
-        },
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: 11,
+                  color:
+                    selectedRole === "applicant"
+                      ? "#fff"
+                      : theme.palette.text.secondary,
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: 11,
 
-            color:
-              selectedRole === "applicant"
-                ? "rgba(255,255,255,0.75)"
-                : theme.palette.text.secondary,
+                    color:
+                      selectedRole === "applicant"
+                        ? "rgba(255,255,255,0.75)"
+                        : theme.palette.text.secondary,
 
-            lineHeight: 1,
-            mb: 0.3,
-          }}
-        >
-          I'm a
-        </Typography>
+                    lineHeight: 1,
+                    mb: 0.3,
+                  }}
+                >
+                  I'm a
+                </Typography>
 
-        <Typography
-          sx={{
-            fontSize: {
-              sm: 14,
-              md: 15,
-            },
+                <Typography
+                  sx={{
+                    fontSize: {
+                      sm: 14,
+                      md: 15,
+                    },
 
-            fontWeight: 700,
-            lineHeight: 1,
+                    fontWeight: 700,
+                    lineHeight: 1,
 
-            color:
-              selectedRole === "applicant"
-                ? "#fff"
-                : theme.palette.text.primary,
-          }}
-        >
-          Applicant
-        </Typography>
-      </Box>
-    </Button>
+                    color:
+                      selectedRole === "applicant"
+                        ? "#fff"
+                        : theme.palette.text.primary,
+                  }}
+                >
+                  Applicant
+                </Typography>
+              </Box>
+            </Button>
 
-    {/* RECRUITER */}
-    <Button
-      onClick={() => handleRoleSelect("recruiter")}
-      startIcon={
-        <BusinessCenterRoundedIcon
-          sx={{
-            fontSize: {
-              sm: 21,
-              md: 23,
-            },
-          }}
-        />
-      }
-      sx={{
-        minWidth: {
-          sm: 135,
-          md: 160,
-        },
+            {/* RECRUITER */}
+            <Button
+              onClick={() => handleRoleSelect("recruiter")}
+              startIcon={
+                <BusinessCenterRoundedIcon
+                  sx={{
+                    fontSize: {
+                      sm: 21,
+                      md: 23,
+                    },
+                  }}
+                />
+              }
+              sx={{
+                minWidth: {
+                  sm: 135,
+                  md: 160,
+                },
 
-        height: {
-          sm: 48,
-          md: 52,
-        },
+                height: {
+                  sm: 48,
+                  md: 52,
+                },
 
-        px: {
-          sm: 2,
-          md: 2.5,
-        },
+                px: {
+                  sm: 2,
+                  md: 2.5,
+                },
 
-        borderRadius: "26px",
-        textTransform: "none",
+                borderRadius: "26px",
+                textTransform: "none",
 
-        // Theme-aware text
-        color:
-          selectedRole === "recruiter"
-            ? "#fff"
-            : theme.palette.text.primary,
+                // Theme-aware text
+                color:
+                  selectedRole === "recruiter"
+                    ? "#fff"
+                    : theme.palette.text.primary,
 
-        background:
-          selectedRole === "recruiter"
-            ? brandGradient
-            : "transparent",
+                background:
+                  selectedRole === "recruiter" ? brandGradient : "transparent",
 
-        boxShadow:
-          selectedRole === "recruiter"
-            ? "0 5px 18px rgba(66,103,181,0.28)"
-            : "none",
+                boxShadow:
+                  selectedRole === "recruiter"
+                    ? "0 5px 18px rgba(66,103,181,0.28)"
+                    : "none",
 
-        transition: "all 0.25s ease",
+                transition: "all 0.25s ease",
 
-        "&:hover": {
-          background:
-            selectedRole === "recruiter"
-              ? brandGradient
-              : hoverBg,
+                "&:hover": {
+                  background:
+                    selectedRole === "recruiter" ? brandGradient : hoverBg,
 
-          color:
-            selectedRole === "recruiter"
-              ? "#fff"
-              : theme.palette.text.primary,
-        },
+                  color:
+                    selectedRole === "recruiter"
+                      ? "#fff"
+                      : theme.palette.text.primary,
+                },
 
-        "& .MuiButton-startIcon": {
-          marginRight: 1,
+                "& .MuiButton-startIcon": {
+                  marginRight: 1,
 
-          color:
-            selectedRole === "recruiter"
-              ? "#fff"
-              : theme.palette.text.secondary,
-        },
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: 11,
+                  color:
+                    selectedRole === "recruiter"
+                      ? "#fff"
+                      : theme.palette.text.secondary,
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: 11,
 
-            color:
-              selectedRole === "recruiter"
-                ? "rgba(255,255,255,0.75)"
-                : theme.palette.text.secondary,
+                    color:
+                      selectedRole === "recruiter"
+                        ? "rgba(255,255,255,0.75)"
+                        : theme.palette.text.secondary,
 
-            lineHeight: 1,
-            mb: 0.3,
-          }}
-        >
-          I'm a
-        </Typography>
+                    lineHeight: 1,
+                    mb: 0.3,
+                  }}
+                >
+                  I'm a
+                </Typography>
 
-        <Typography
-          sx={{
-            fontSize: {
-              sm: 14,
-              md: 15,
-            },
+                <Typography
+                  sx={{
+                    fontSize: {
+                      sm: 14,
+                      md: 15,
+                    },
 
-            fontWeight: 700,
-            lineHeight: 1,
+                    fontWeight: 700,
+                    lineHeight: 1,
 
-            color:
-              selectedRole === "recruiter"
-                ? "#fff"
-                : theme.palette.text.primary,
-          }}
-        >
-          Recruiter
-        </Typography>
-      </Box>
-    </Button>
-  </Box>
-)}
+                    color:
+                      selectedRole === "recruiter"
+                        ? "#fff"
+                        : theme.palette.text.primary,
+                  }}
+                >
+                  Recruiter
+                </Typography>
+              </Box>
+            </Button>
+          </Box>
+        )}
 
         {/* LOGGED-IN LINKS */}
         {showLogout && (
@@ -536,171 +524,191 @@ const Navbar = ({
           <MenuRoundedIcon />
         </IconButton>
 
-        {/* MOBILE MENU */}
-        {/* MOBILE MENU */}
-<Menu
-  anchorEl={anchorEl}
-  open={menuOpen}
-  onClose={handleMenuClose}
-  anchorOrigin={{
-    vertical: "bottom",
-    horizontal: "right",
-  }}
-  transformOrigin={{
-    vertical: "top",
-    horizontal: "right",
-  }}
-  slotProps={{
-    paper: {
-      sx: {
-        mt: 1.2,
-        minWidth: 240,
-        borderRadius: "16px",
-        bgcolor: theme.palette.background.paper,
-        color: theme.palette.text.primary,
-        border: `1px solid ${theme.palette.divider}`,
-        boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
-        overflow: "hidden",
-      },
-    },
-  }}
->
-  {/* APPLICANT / RECRUITER */}
-  {!showLogout && (
-    <>
-      <MenuItem
-        onClick={() => handleRoleSelect("applicant")}
-        sx={{
-          py: 1.5,
-          gap: 1.5,
-          color: theme.palette.text.primary,
-
-          "&:hover": {
-            bgcolor: hoverBg,
-          },
-        }}
-      >
-        <PersonRoundedIcon
+                {/* MOBILE */}
+        <IconButton
+          onClick={handleMenuOpen}
+          aria-label="Open navigation menu"
           sx={{
-            color: "#6366f1",
-          }}
-        />
-
-        <Box>
-          <Typography
-            sx={{
-              fontSize: 11,
-              color: theme.palette.text.secondary,
-              lineHeight: 1,
-            }}
-          >
-            I'm a
-          </Typography>
-
-          <Typography
-            sx={{
-              fontSize: 15,
-              fontWeight: 700,
-              mt: 0.4,
-            }}
-          >
-            Applicant
-          </Typography>
-        </Box>
-      </MenuItem>
-
-      <MenuItem
-        onClick={() => handleRoleSelect("recruiter")}
-        sx={{
-          py: 1.5,
-          gap: 1.5,
-          color: theme.palette.text.primary,
-
-          "&:hover": {
-            bgcolor: hoverBg,
-          },
-        }}
-      >
-        <BusinessCenterRoundedIcon
-          sx={{
-            color: "#a855f7",
-          }}
-        />
-
-        <Box>
-          <Typography
-            sx={{
-              fontSize: 11,
-              color: theme.palette.text.secondary,
-              lineHeight: 1,
-            }}
-          >
-            I'm a
-          </Typography>
-
-          <Typography
-            sx={{
-              fontSize: 15,
-              fontWeight: 700,
-              mt: 0.4,
-            }}
-          >
-            Recruiter
-          </Typography>
-        </Box>
-      </MenuItem>
-    </>
-  )}
-
-  {/* LOGGED-IN MOBILE LINKS */}
-  {showLogout && (
-    <>
-      {links.map((link) => (
-        <MenuItem
-          key={link.path}
-          component={NavLink}
-          to={link.path}
-          onClick={handleMenuClose}
-          sx={{
-            py: 1.4,
-            color: theme.palette.text.primary,
-
-            "&.active": {
-              fontWeight: 700,
-              bgcolor: hoverBg,
+            display: {
+              xs: "inline-flex",
+              sm: "none",
             },
-
+            color: theme.palette.text.primary,
+            width: 42,
+            height: 42,
+            borderRadius: "12px",
+            border: `1px solid ${theme.palette.divider}`,
+            bgcolor: subtleBg,
             "&:hover": {
               bgcolor: hoverBg,
             },
           }}
         >
-          {link.label}
-        </MenuItem>
-      ))}
+          <MenuRoundedIcon />
+        </IconButton>
 
-      <Divider />
+        {/* MOBILE MENU */}
+        <Menu
+          anchorEl={anchorEl}
+          open={menuOpen}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          slotProps={{
+            paper: {
+              sx: {
+                mt: 1.2,
+                minWidth: 250,
+                borderRadius: "16px",
+                bgcolor: theme.palette.background.paper,
+                color: theme.palette.text.primary,
+                border: `1px solid ${theme.palette.divider}`,
+                boxShadow: "0 20px 50px rgba(0,0,0,0.25)",
+                overflow: "hidden",
+              },
+            },
+          }}
+        >
+          {/* ROLE SWITCHER - MOBILE */}
+          {!showLogout && (
+            <>
+              <MenuItem
+                onClick={() => handleRoleSelect("applicant")}
+                sx={{
+                  py: 1.5,
+                  gap: 1.5,
+                  color: theme.palette.text.primary,
+                  "&:hover": {
+                    bgcolor: hoverBg,
+                  },
+                }}
+              >
+                <PersonRoundedIcon
+                  sx={{
+                    color: "#6366f1",
+                  }}
+                />
 
-      <MenuItem
-        onClick={handleLogout}
-        sx={{
-          py: 1.4,
-          color: theme.palette.error.main,
+                <Box>
+                  <Typography
+                    sx={{
+                      fontSize: 11,
+                      color: theme.palette.text.secondary,
+                      lineHeight: 1,
+                    }}
+                  >
+                    I'm a
+                  </Typography>
 
-          "&:hover": {
-            bgcolor:
-              theme.palette.mode === "dark"
-                ? "rgba(255,80,80,0.10)"
-                : "rgba(239,68,68,0.08)",
-          },
-        }}
-      >
-        <LogoutRoundedIcon sx={{ mr: 1.5 }} />
-        Logout
-      </MenuItem>
-    </>
-  )}
-</Menu>
+                  <Typography
+                    sx={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      mt: 0.4,
+                    }}
+                  >
+                    Applicant
+                  </Typography>
+                </Box>
+              </MenuItem>
+
+              <MenuItem
+                onClick={() => handleRoleSelect("recruiter")}
+                sx={{
+                  py: 1.5,
+                  gap: 1.5,
+                  color: theme.palette.text.primary,
+                  "&:hover": {
+                    bgcolor: hoverBg,
+                  },
+                }}
+              >
+                <BusinessCenterRoundedIcon
+                  sx={{
+                    color: "#a855f7",
+                  }}
+                />
+
+                <Box>
+                  <Typography
+                    sx={{
+                      fontSize: 11,
+                      color: theme.palette.text.secondary,
+                      lineHeight: 1,
+                    }}
+                  >
+                    I'm a
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      mt: 0.4,
+                    }}
+                  >
+                    Recruiter
+                  </Typography>
+                </Box>
+              </MenuItem>
+            </>
+          )}
+
+          {/* LOGGED-IN MOBILE LINKS */}
+          {showLogout && (
+            <>
+              {links.map((link) => (
+                <MenuItem
+                  key={link.path}
+                  component={NavLink}
+                  to={link.path}
+                  onClick={handleMenuClose}
+                  sx={{
+                    py: 1.4,
+                    color: theme.palette.text.primary,
+
+                    "&.active": {
+                      fontWeight: 700,
+                      bgcolor: hoverBg,
+                    },
+
+                    "&:hover": {
+                      bgcolor: hoverBg,
+                    },
+                  }}
+                >
+                  {link.label}
+                </MenuItem>
+              ))}
+
+              <Divider />
+
+              <MenuItem
+                onClick={handleLogout}
+                sx={{
+                  py: 1.4,
+                  color: theme.palette.error.main,
+
+                  "&:hover": {
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(255,80,80,0.10)"
+                        : "rgba(239,68,68,0.08)",
+                  },
+                }}
+              >
+                <LogoutRoundedIcon sx={{ mr: 1.5 }} />
+                Logout
+              </MenuItem>
+            </>
+          )}
+        </Menu>
       </Toolbar>
     </AppBar>
   );

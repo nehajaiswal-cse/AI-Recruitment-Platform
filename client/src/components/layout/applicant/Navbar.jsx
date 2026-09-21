@@ -1,7 +1,6 @@
 import Navbar from "../../dashboard/Navbar.jsx";
 import '../../../index.css';
 
-
 const applicantLinks = [
   {
     label: "Dashboard",
@@ -24,10 +23,17 @@ const applicantLinks = [
     path: "/applicant/interviews",
   },
   {
+    label: "Resume",
+    path: "/applicant/resume",
+  },
+  {
     label: "Profile",
     path: "/applicant/profile",
   },
- 
+  {
+    label: "Settings",
+    path: "/applicant/settings",
+  },
 ];
 
 const ANavbar = () => {
