@@ -603,6 +603,24 @@ if (!subscriptionConfirmed) {
   return res.status(202).json({
     success: false,
     pending: true,
+
+    // TEMPORARY DEBUG DATA
+    debug: {
+      subscriptionStatus: subscription?.status,
+      paidCount: subscription?.paid_count,
+      checkoutPaymentStatus: payment?.status,
+      checkoutPaymentAmount: payment?.amount,
+
+      actualPaymentId,
+      actualPaymentStatus: actualPayment?.status,
+      actualPaymentAmount: actualPayment?.amount,
+
+      actualPaymentCaptured,
+      subscriptionAlreadyPaid,
+      subscriptionIsActive,
+      subscriptionConfirmed,
+    },
+
     message:
       "Subscription payment is being processed. Please wait for Razorpay confirmation.",
   });
