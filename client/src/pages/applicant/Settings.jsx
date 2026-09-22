@@ -426,9 +426,16 @@ const Settings = () => {
             );
 
             // Refresh authenticated user state
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            setPlan(verification.plan);
+
+            setSubscription(verification?.subscription || null);
+
+            showSnackbar(
+              "Payment successful! Talvyn Pro activated.",
+              "success",
+            );
+
+            setPaymentLoading(false);
           } catch (error) {
             console.error("Payment verification error:", error);
 
