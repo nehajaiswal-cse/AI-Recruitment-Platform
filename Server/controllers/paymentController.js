@@ -570,9 +570,13 @@ const actualPaymentCaptured =
 const subscriptionAlreadyPaid =
   Number(subscription.paid_count || 0) > 0;
 
+const subscriptionIsActive =
+  subscription.status === "active";
+
 const subscriptionConfirmed =
   actualPaymentCaptured ||
-  subscriptionAlreadyPaid;
+  subscriptionAlreadyPaid ||
+  subscriptionIsActive;
 
 console.log(
   "Final subscription payment check:",

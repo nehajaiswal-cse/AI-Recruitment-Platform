@@ -366,25 +366,58 @@ const Settings = () => {
           try {
             setPaymentLoading(true);
 
-            const verification = await verifySubscription({
+            const paymentData = {
               razorpay_payment_id: response.razorpay_payment_id,
 
               razorpay_subscription_id: response.razorpay_subscription_id,
 
               razorpay_signature: response.razorpay_signature,
-            });
+            };
 
-            // Update UI immediately. The backend has already
-            // verified the Razorpay signature and captured payment.
+            let verification = null;
+
+            // Retry verification because Razorpay subscription
+            // activation/payment confirmation can take a little time.
+            for (let attempt = 1; attempt <= 5; attempt++) {
+              console.log(`Verifying subscription - attempt ${attempt}/5`);
+
+              verification = await verifySubscription(paymentData);
+
+              console.log("Verification response:", verification);
+
+              // Payment successfully verified
+              if (verification?.success && verification?.plan === "pro") {
+                break;
+              }
+
+              // Razorpay is still processing the subscription
+              if (verification?.pending) {
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                continue;
+              }
+
+              // Some other verification error occurred
+              break;
+            }
+
+            // ------------------------------------------
+            // FINAL RESULT
+            // ------------------------------------------
+
             if (!verification?.success || verification?.plan !== "pro") {
               throw new Error(
                 verification?.message ||
-                  "Subscription payment is still being processed.",
+                  "Subscription activation is taking longer than expected. Please check again shortly.",
               );
             }
 
+            // ------------------------------------------
+            // UPDATE UI
+            // ------------------------------------------
+
             setPlan(verification.plan);
-            setSubscription(verification.subscription);
+
             setSubscription(verification?.subscription || null);
 
             showSnackbar(
@@ -392,8 +425,7 @@ const Settings = () => {
               "success",
             );
 
-            // Reload once so the authenticated user state is
-            // refreshed everywhere in the application.
+            // Refresh authenticated user state
             setTimeout(() => {
               window.location.reload();
             }, 1000);
